@@ -1,6 +1,7 @@
 # sbomfuzz README
 
-This is the README for your extension "sbomfuzz". After writing up a brief description, we recommend including the following sections.
+This is the README for VScode extension "sbomfuzz". 
+This is a VScode extension for SBOMFuzz, it helps rust developer select targets and auto-generate harness for targeted direct fuction fuzzing.
 
 ## Prereq
 Make sure you install 
