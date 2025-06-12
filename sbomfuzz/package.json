@@ -30,8 +30,9 @@
     "views": {
       "sbomfuzzContainer": [
         {
-          "id": "sbomfuzzView",
-          "name": "Dashboard"
+          "id": "sbomfuzzWebview",
+          "type": "webview",
+          "name": "Fuzz Targets"
         }
       ]
     },
@@ -42,7 +43,6 @@
         "when": "view == sbomfuzzView"
       }
     ]
-
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

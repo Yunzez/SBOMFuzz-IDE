@@ -38,15 +38,47 @@ var vscode2 = __toESM(require("vscode"));
 
 // src/view.ts
 var vscode = __toESM(require("vscode"));
-var SbomFuzzTreeDataProvider = class {
-  getTreeItem(element) {
-    return element;
+var fs = __toESM(require("fs"));
+var path = __toESM(require("path"));
+var SbomFuzzWebviewViewProvider = class {
+  constructor(context) {
+    this.context = context;
   }
-  getChildren() {
-    return [
-      new vscode.TreeItem("Hello"),
-      new vscode.TreeItem("World")
-    ];
+  static viewType = "sbomfuzzWebview";
+  resolveWebviewView(webviewView, context, _token) {
+    webviewView.webview.options = {
+      enableScripts: true
+    };
+    webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+    webviewView.webview.onDidReceiveMessage((message) => {
+      if (message.command === "runFuzz") {
+        vscode.window.showInformationMessage(
+          `Running fuzz target: ${message.target}`
+        );
+      } else if (message.command === "showSbom") {
+        vscode.window.showInformationMessage(
+          `Showing SBOM for target: ${message.target}`
+        );
+      } else if (message.command === "requestEntries") {
+        vscode.window.showInformationMessage(
+          `Running sbomfuzz for entry list ${message.target}, this may take a while`
+        );
+      }
+    });
+  }
+  getHtmlForWebview(webview) {
+    const mediaPath = vscode.Uri.file(
+      path.join(this.context.extensionPath, "media")
+    );
+    const webviewUri = webview.asWebviewUri(mediaPath);
+    const templatePath = path.join(
+      this.context.extensionPath,
+      "media",
+      "template.html"
+    );
+    let html = fs.readFileSync(templatePath, "utf-8");
+    html = html.replace(/\$\{webviewUri\}/g, webviewUri.toString());
+    return html;
   }
 };
 
@@ -59,10 +91,13 @@ function activate(context) {
       vscode2.window.showInformationMessage("Hello World from sbomfuzz!");
     }
   );
-  const treeDataProvider = new SbomFuzzTreeDataProvider();
-  vscode2.window.createTreeView("sbomfuzzView", {
-    treeDataProvider
-  });
+  const provider = new SbomFuzzWebviewViewProvider(context);
+  context.subscriptions.push(
+    vscode2.window.registerWebviewViewProvider(
+      SbomFuzzWebviewViewProvider.viewType,
+      provider
+    )
+  );
   context.subscriptions.push(disposable);
 }
 function deactivate() {

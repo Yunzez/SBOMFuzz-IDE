@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import {SbomFuzzTreeDataProvider} from "./view";
+import { SbomFuzzWebviewViewProvider } from "./view";
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -21,10 +21,13 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const treeDataProvider = new SbomFuzzTreeDataProvider();
-  vscode.window.createTreeView("sbomfuzzView", {
-    treeDataProvider,
-  });
+  const provider = new SbomFuzzWebviewViewProvider(context);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      SbomFuzzWebviewViewProvider.viewType,
+      provider
+    )
+  );
 
   context.subscriptions.push(disposable);
 }

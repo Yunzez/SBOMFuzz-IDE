@@ -1,0 +1,31 @@
+body {
+  font-family: sans-serif;
+  padding: 1em;
+}
+button {
+  margin-left: 0.5em;
+}
+
+.md-button{
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    padding: 0.5em 1em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 0.25em;
+    cursor: pointer;
+}
+
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+
+.item{
+    margin: 0.5em;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 0.25em;
+}

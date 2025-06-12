@@ -1,14 +1,3 @@
-# sbomfuzz README
-
-This is the README for your extension "sbomfuzz". After writing up a brief description, we recommend including the following sections.
-
-## Prereq
-Make sure you install 
-```
-esbuild Problem Matchers
-```
-from VSCode exntendsions
-
 ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
