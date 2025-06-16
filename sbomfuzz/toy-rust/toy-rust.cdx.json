@@ -1,0 +1,46 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.3",
+  "version": 1,
+  "serialNumber": "urn:uuid:6d5d7a7e-ac90-4aff-9cf1-1b5dfdd683e6",
+  "metadata": {
+    "timestamp": "2025-06-16T19:26:12.042355000Z",
+    "tools": [
+      {
+        "vendor": "CycloneDX",
+        "name": "cargo-cyclonedx",
+        "version": "0.5.7"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust#0.1.0",
+      "name": "toy-rust",
+      "version": "0.1.0",
+      "scope": "required",
+      "purl": "pkg:cargo/toy-rust@0.1.0?download_url=file://.",
+      "components": [
+        {
+          "type": "application",
+          "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust#0.1.0 bin-target-0",
+          "name": "toy-rust",
+          "version": "0.1.0",
+          "purl": "pkg:cargo/toy-rust@0.1.0?download_url=file://.#src/main.rs"
+        }
+      ]
+    },
+    "properties": [
+      {
+        "name": "cdx:rustc:sbom:target:triple",
+        "value": "aarch64-apple-darwin"
+      }
+    ]
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust#0.1.0",
+      "dependsOn": []
+    }
+  ]
+}

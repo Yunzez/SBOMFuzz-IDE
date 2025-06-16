@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
+import { runRustAnalyzer } from "./rustAnalyzerStart";
+import { findCargoProjectRoot } from "./util";
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
 
@@ -22,7 +24,6 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         vscode.window.showInformationMessage(
           `Running fuzz target: ${message.target}`
         );
-        // TODO: hook into your actual harness generator/runner
       } else if (message.command === "showSbom") {
         vscode.window.showInformationMessage(
           `Showing SBOM for target: ${message.target}`
@@ -31,6 +32,19 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         vscode.window.showInformationMessage(
           `Running sbomfuzz for entry list ${message.target}, this may take a while`
         );
+      } else if (message.command === "runAnalyzer") {
+        const projectRoot = message.projectPath; // send this from the webview
+        console.log("Resolved analyzer path:", projectRoot);
+        console.log("Exists:", fs.existsSync(projectRoot));
+        console.log("Is file:", fs.statSync(projectRoot).isFile());
+        runRustAnalyzer(this.context, projectRoot);
+      } else if (message.command === "getCargoProjectRoot") {
+        console.log("Requesting Cargo project root");
+        const root = findCargoProjectRoot(); // your helper function
+        webviewView.webview.postMessage({
+          command: "cargoProjectRoot",
+          path: root,
+        });
       }
     });
   }

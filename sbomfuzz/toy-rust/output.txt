@@ -1,0 +1,175 @@
+19:26:08 [INFO] Logger setup complete.
+19:26:11 [INFO] Database loaded: 3.53s, 0b
+19:26:11 [INFO] Analyzing local root: AbsPathBuf("/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust")
+19:26:11 [INFO] Number of project files in the workspace: 1
+19:26:11 [INFO] manifest_or_root: /Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust/Cargo.toml
+19:26:11 [INFO] workspace_root: /Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust
+19:26:11 [INFO] n_packages: 26
+19:26:11 [INFO] workspace: Cargo { root: Some("toy-rust"), n_packages: 1, n_sysroot_crates: 25, n_rustc_compiler_crates: 0, n_rustc_cfg: 83, n_cfg_overrides: 0, toolchain: Some(Version { major: 1, minor: 83, patch: 0, pre: Prerelease("nightly") }), data_layout: Ok("e-m:o-i64:64-i128:128-n32:64-S128-Fn32"), cargo_config_extra_env: {}, set_test: false, build_scripts: "ok" }
+19:26:11 [INFO] Dependency Crate: "panic_abort-0.0.0"
+19:26:11 [INFO] Dependency Crate: "unicode_width-0.1.14"
+19:26:11 [INFO] Dependency Crate: "rand_xorshift-0.3.0"
+19:26:11 [INFO] Dependency Crate: "allocator_api2-0.2.18"
+19:26:11 [INFO] Dependency Crate: "unwind-0.0.0"
+19:26:11 [INFO] Dependency Crate: "hashbrown-0.15.0"
+19:26:11 [INFO] Dependency Crate: "libc-0.2.159"
+19:26:11 [INFO] Dependency Crate: "panic_unwind-0.0.0"
+19:26:11 [INFO] Dependency Crate: "memchr-2.5.0"
+19:26:11 [INFO] Dependency Crate: "rand_core-0.6.4"
+19:26:11 [INFO] Dependency Crate: "compiler_builtins-0.1.133"
+19:26:11 [INFO] Dependency Crate: "rustc_demangle-0.1.24"
+19:26:11 [INFO] Dependency Crate: "rand-0.8.5"
+19:26:11 [INFO] Dependency Crate: "cfg_if-1.0.0"
+19:26:11 [INFO] Dependency Crate: "std_detect-0.1.5"
+19:26:11 [INFO] Dependency Crate: "getopts-0.2.21"
+19:26:11 [INFO] Package: toy-rust (is_member: true)
+19:26:12 [INFO] Running local analysis for 1 roots
+19:26:12 [INFO] Source Root SourceRootId(16) contains 0 files
+19:26:12 [INFO] Source Root SourceRootId(15) contains 2 files
+19:26:12 [INFO] Total number of files in the database: 2
+19:26:12 [INFO] Analyzing file: AbsPathBuf("/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs")
+19:26:12 [INFO] Module found: Some(Module { id: ModuleId { krate: Idx::<CrateData>(21), block: None, local_id: Idx::<ModuleData>(0) } })
+19:26:12 [INFO] Found def function: main
+19:26:12 [INFO] Found function: main, fn token: fn
+19:26:12 [INFO] 
+ ---------
+19:26:12 [INFO] FUNCTION: "fn main() {\n    println!(\"Hello, world!\");\n    let a = 10;\n    let b = 5;\n    let sum = add(a, b);\n    let difference = subtract(a, b);\n    let product = multiply(a, b);\n    let quotient = divide(a, b);\n    println!(\"Sum: {}\", sum);\n    println!(\"Difference: {}\", difference);\n    println!(\"Product: {}\", product);\n    println!(\"Quotient: {}\", quotient);\n}"
+19:26:12 [INFO] Function belongs to crate: toy_rust
+19:26:12 [INFO] Macro calls found: 5
+19:26:12 [INFO] macro call resolved: "println!(\"Hello, world!\")"
+19:26:12 [INFO] macro crate name: "std"
+19:26:12 [INFO] macro call resolved: "println!(\"Sum: {}\", sum)"
+19:26:12 [INFO] macro crate name: "std"
+19:26:12 [INFO] macro call resolved: "println!(\"Difference: {}\", difference)"
+19:26:12 [INFO] macro crate name: "std"
+19:26:12 [INFO] macro call resolved: "println!(\"Product: {}\", product)"
+19:26:12 [INFO] macro crate name: "std"
+19:26:12 [INFO] macro call resolved: "println!(\"Quotient: {}\", quotient)"
+19:26:12 [INFO] macro crate name: "std"
+19:26:12 [INFO] Extracted path: "add"
+19:26:12 [INFO] callable test call: "add(a, b)"
+19:26:12 [INFO] callable call.expr(): "add"
+19:26:12 [INFO] callable call.expr() type: "fn add(i32, i32) -> i32"
+19:26:12 [INFO] callable &ast::Expr::cast: "add(a, b)"
+19:26:12 [INFO] callable &ast::Expr::cast type: "i32"
+19:26:12 [INFO] 🧭 Resolving function call: "add(a, b)"
+19:26:12 [INFO] ❌ No callable function found for this expr: add(a, b)
+19:26:12 [INFO] This is a callee: "add"
+19:26:12 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+19:26:12 [INFO] This is a function call from sema: Name { symbol: "add", ctx: () }
+19:26:12 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Idx::<CrateData>(21), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(3)<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(6610))), is_bound_method: false }
+19:26:12 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "add", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
+19:26:12 [INFO] Found 0 expanded use statements
+19:26:12 [INFO] syntax node: "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}"
+19:26:12 [INFO] No macro found
+19:26:12 [INFO] Analyzing function named : Name { symbol: "add", ctx: () }
+19:26:12 [INFO] Storing function in cache: Name { symbol: "add", ctx: () }
+19:26:12 [INFO] function: Name { symbol: "add", ctx: () }
+19:26:12 [INFO] parent param type: "i32"
+19:26:12 [INFO] parent param type: "i32"
+19:26:12 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Idx::<CrateData>(21) }),  current_crate: Crate { id: Idx::<CrateData>(21) }
+19:26:12 [INFO] Extracted path: "subtract"
+19:26:12 [INFO] callable test call: "subtract(a, b)"
+19:26:12 [INFO] callable call.expr(): "subtract"
+19:26:12 [INFO] callable call.expr() type: "fn subtract(i32, i32) -> i32"
+19:26:12 [INFO] callable &ast::Expr::cast: "subtract(a, b)"
+19:26:12 [INFO] callable &ast::Expr::cast type: "i32"
+19:26:12 [INFO] 🧭 Resolving function call: "subtract(a, b)"
+19:26:12 [INFO] ❌ No callable function found for this expr: subtract(a, b)
+19:26:12 [INFO] This is a callee: "subtract"
+19:26:12 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+19:26:12 [INFO] This is a function call from sema: Name { symbol: "subtract", ctx: () }
+19:26:12 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Idx::<CrateData>(21), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(4)<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(6611))), is_bound_method: false }
+19:26:12 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "subtract", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
+19:26:12 [INFO] Found 0 expanded use statements
+19:26:12 [INFO] syntax node: "fn subtract(a: i32, b: i32) -> i32 {\n    a - b\n}"
+19:26:12 [INFO] No macro found
+19:26:12 [INFO] Analyzing function named : Name { symbol: "subtract", ctx: () }
+19:26:12 [INFO] Storing function in cache: Name { symbol: "subtract", ctx: () }
+19:26:12 [INFO] function: Name { symbol: "subtract", ctx: () }
+19:26:12 [INFO] parent param type: "i32"
+19:26:12 [INFO] parent param type: "i32"
+19:26:12 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Idx::<CrateData>(21) }),  current_crate: Crate { id: Idx::<CrateData>(21) }
+19:26:12 [INFO] Extracted path: "multiply"
+19:26:12 [INFO] callable test call: "multiply(a, b)"
+19:26:12 [INFO] callable call.expr(): "multiply"
+19:26:12 [INFO] callable call.expr() type: "fn multiply(i32, i32) -> i32"
+19:26:12 [INFO] callable &ast::Expr::cast: "multiply(a, b)"
+19:26:12 [INFO] callable &ast::Expr::cast type: "i32"
+19:26:12 [INFO] 🧭 Resolving function call: "multiply(a, b)"
+19:26:12 [INFO] ❌ No callable function found for this expr: multiply(a, b)
+19:26:12 [INFO] This is a callee: "multiply"
+19:26:12 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+19:26:12 [INFO] This is a function call from sema: Name { symbol: "multiply", ctx: () }
+19:26:12 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Idx::<CrateData>(21), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(5)<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(6612))), is_bound_method: false }
+19:26:12 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "multiply", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
+19:26:12 [INFO] Found 0 expanded use statements
+19:26:12 [INFO] syntax node: "fn multiply(a: i32, b: i32) -> i32 {\n    a * b\n}"
+19:26:12 [INFO] No macro found
+19:26:12 [INFO] Analyzing function named : Name { symbol: "multiply", ctx: () }
+19:26:12 [INFO] Storing function in cache: Name { symbol: "multiply", ctx: () }
+19:26:12 [INFO] function: Name { symbol: "multiply", ctx: () }
+19:26:12 [INFO] parent param type: "i32"
+19:26:12 [INFO] parent param type: "i32"
+19:26:12 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Idx::<CrateData>(21) }),  current_crate: Crate { id: Idx::<CrateData>(21) }
+19:26:12 [INFO] Extracted path: "divide"
+19:26:12 [INFO] callable test call: "divide(a, b)"
+19:26:12 [INFO] callable call.expr(): "divide"
+19:26:12 [INFO] callable call.expr() type: "fn divide(i32, i32) -> i32"
+19:26:12 [INFO] callable &ast::Expr::cast: "divide(a, b)"
+19:26:12 [INFO] callable &ast::Expr::cast type: "i32"
+19:26:12 [INFO] 🧭 Resolving function call: "divide(a, b)"
+19:26:12 [INFO] ❌ No callable function found for this expr: divide(a, b)
+19:26:12 [INFO] This is a callee: "divide"
+19:26:12 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+19:26:12 [INFO] This is a function call from sema: Name { symbol: "divide", ctx: () }
+19:26:12 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Idx::<CrateData>(21), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(6)<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(6613))), is_bound_method: false }
+19:26:12 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "divide", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
+19:26:12 [INFO] Found 0 expanded use statements
+19:26:12 [INFO] syntax node: "fn divide(a: i32, b: i32) -> i32 {\n    if b == 0 {\n        panic!(\"Cannot divide by zero\");\n    }\n    a / b\n}"
+19:26:12 [INFO] Macro calls found: 1
+19:26:12 [INFO] macro call resolved: "panic!(\"Cannot divide by zero\")"
+19:26:12 [INFO] macro crate name: "std"
+19:26:12 [INFO] Analyzing function named : Name { symbol: "divide", ctx: () }
+19:26:12 [INFO] Storing function in cache: Name { symbol: "divide", ctx: () }
+19:26:12 [INFO] function: Name { symbol: "divide", ctx: () }
+19:26:12 [INFO] parent param type: "i32"
+19:26:12 [INFO] parent param type: "i32"
+19:26:12 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Idx::<CrateData>(21) }),  current_crate: Crate { id: Idx::<CrateData>(21) }
+19:26:12 [INFO] Found def function: add
+19:26:12 [INFO] Found function: add, fn token: fn
+19:26:12 [INFO] 
+ ---------
+19:26:12 [INFO] FUNCTION: "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}"
+19:26:12 [INFO] Function belongs to crate: toy_rust
+19:26:12 [INFO] No macro found
+19:26:12 [INFO] Found def function: subtract
+19:26:12 [INFO] Found function: subtract, fn token: fn
+19:26:12 [INFO] 
+ ---------
+19:26:12 [INFO] FUNCTION: "fn subtract(a: i32, b: i32) -> i32 {\n    a - b\n}"
+19:26:12 [INFO] Function belongs to crate: toy_rust
+19:26:12 [INFO] No macro found
+19:26:12 [INFO] Found def function: multiply
+19:26:12 [INFO] Found function: multiply, fn token: fn
+19:26:12 [INFO] 
+ ---------
+19:26:12 [INFO] FUNCTION: "fn multiply(a: i32, b: i32) -> i32 {\n    a * b\n}"
+19:26:12 [INFO] Function belongs to crate: toy_rust
+19:26:12 [INFO] No macro found
+19:26:12 [INFO] Found def function: divide
+19:26:12 [INFO] Found function: divide, fn token: fn
+19:26:12 [INFO] 
+ ---------
+19:26:12 [INFO] FUNCTION: "fn divide(a: i32, b: i32) -> i32 {\n    if b == 0 {\n        panic!(\"Cannot divide by zero\");\n    }\n    a / b\n}"
+19:26:12 [INFO] Function belongs to crate: toy_rust
+19:26:12 [INFO] Macro calls found: 1
+19:26:12 [INFO] macro call resolved: "panic!(\"Cannot divide by zero\")"
+19:26:12 [INFO] macro crate name: "std"
+19:26:12 [INFO] 
+ ----------- done with file ----------- 
+
+19:26:13 [INFO] number of resolved external functions / Number of external functions: 16405 / 58462
+19:26:13 [INFO] number of resolved internal functions / Number of internal functions: 5 / 5
+19:26:13 [INFO] name: "0.1.0"
+19:26:13 [INFO] SBOM dep num 0
