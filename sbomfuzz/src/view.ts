@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
 import { findCargoProjectRoot } from "./util";
+import { loadFunctionResults } from "./functionOutputProcesser";
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
 
@@ -20,30 +21,65 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage((message) => {
+      if (message.command === "log") {
+        console.log("[webview log]", message.message);
+      }
+
+      console.log("[webview] Received message:", message);
       if (message.command === "runFuzz") {
         vscode.window.showInformationMessage(
           `Running fuzz target: ${message.target}`
         );
-      } else if (message.command === "showSbom") {
+      }
+
+      if (message.command === "showSbom") {
         vscode.window.showInformationMessage(
           `Showing SBOM for target: ${message.target}`
         );
-      } else if (message.command === "requestEntries") {
+      }
+
+      if (message.command === "requestEntries") {
         vscode.window.showInformationMessage(
           `Running sbomfuzz for entry list ${message.target}, this may take a while`
         );
-      } else if (message.command === "runAnalyzer") {
+      }
+
+      if (message.command === "runAnalyzer") {
         const projectRoot = message.projectPath; // send this from the webview
         console.log("Resolved analyzer path:", projectRoot);
         console.log("Exists:", fs.existsSync(projectRoot));
         console.log("Is file:", fs.statSync(projectRoot).isFile());
-        runRustAnalyzer(this.context, projectRoot);
-      } else if (message.command === "getCargoProjectRoot") {
+        runRustAnalyzer(this.context, projectRoot, webviewView.webview);
+      }
+
+      if (message.command === "getCargoProjectRoot") {
         console.log("Requesting Cargo project root");
         const root = findCargoProjectRoot(); // your helper function
         webviewView.webview.postMessage({
           command: "cargoProjectRoot",
           path: root,
+        });
+      }
+
+      if (message.command === "openLocation") {
+        const { filePath, offset } = message;
+        const uri = vscode.Uri.file(filePath);
+
+        vscode.workspace.openTextDocument(uri).then((doc) => {
+          // Use the offset to get the position in the document
+          const position = doc.positionAt(offset);
+          const line = position.line;
+          const column = position.character;
+
+          vscode.window.showTextDocument(doc).then((editor) => {
+            const pos = new vscode.Position(line, column);
+            const selection = new vscode.Selection(pos, pos);
+            editor.selection = selection;
+            editor.revealRange(
+              new vscode.Range(pos, pos),
+              vscode.TextEditorRevealType.InCenter
+            );
+          });
         });
       }
     });
