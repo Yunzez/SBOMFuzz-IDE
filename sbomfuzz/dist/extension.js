@@ -34,7 +34,7 @@ __export(extension_exports, {
   deactivate: () => deactivate
 });
 module.exports = __toCommonJS(extension_exports);
-var vscode4 = __toESM(require("vscode"));
+var vscode5 = __toESM(require("vscode"));
 
 // src/view.ts
 var vscode3 = __toESM(require("vscode"));
@@ -149,21 +149,49 @@ var SbomFuzzWebviewViewProvider = class {
   }
 };
 
+// src/rustFunctionCodeLensProvider.ts
+var vscode4 = __toESM(require("vscode"));
+var RustFunctionCodeLensProvider = class {
+  provideCodeLenses(document) {
+    const lenses = [];
+    const regex = /^\s*(pub\s+)?(async\s+)?fn\s+(\w+)\s*\(/;
+    for (let i = 0; i < document.lineCount; i++) {
+      const line = document.lineAt(i);
+      const match = regex.exec(line.text);
+      if (match) {
+        const functionName = match[3];
+        const range = new vscode4.Range(i, 0, i, line.text.length);
+        const cmd = {
+          title: "Show Function Info",
+          command: "workbench.view.extension.sbomfuzzContainer",
+          arguments: [functionName]
+        };
+        lenses.push(new vscode4.CodeLens(range, cmd));
+      }
+    }
+    return lenses;
+  }
+};
+
 // src/extension.ts
 function activate(context) {
   console.log('Congratulations, your extension "sbomfuzz" is now active!');
-  const disposable = vscode4.commands.registerCommand(
+  const disposable = vscode5.commands.registerCommand(
     "sbomfuzz.helloWorld",
     () => {
-      vscode4.window.showInformationMessage("Hello World from sbomfuzz!");
+      vscode5.window.showInformationMessage("Hello World from sbomfuzz!");
     }
   );
   const provider = new SbomFuzzWebviewViewProvider(context);
   context.subscriptions.push(
-    vscode4.window.registerWebviewViewProvider(
+    vscode5.window.registerWebviewViewProvider(
       SbomFuzzWebviewViewProvider.viewType,
       provider
     )
+  );
+  const codeLensProvider = new RustFunctionCodeLensProvider();
+  context.subscriptions.push(
+    vscode5.languages.registerCodeLensProvider({ language: "rust" }, codeLensProvider)
   );
   context.subscriptions.push(disposable);
 }

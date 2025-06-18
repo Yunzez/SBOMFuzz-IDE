@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { SbomFuzzWebviewViewProvider } from "./view";
+import { RustFunctionCodeLensProvider } from "./rustFunctionCodeLensProvider";
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -27,6 +29,11 @@ export function activate(context: vscode.ExtensionContext) {
       SbomFuzzWebviewViewProvider.viewType,
       provider
     )
+  );
+
+  const codeLensProvider = new RustFunctionCodeLensProvider();
+  context.subscriptions.push(
+    vscode.languages.registerCodeLensProvider({ language: 'rust' }, codeLensProvider)
   );
 
   context.subscriptions.push(disposable);
