@@ -1,0 +1,73 @@
+All Functions Summary:
+- Total Functions: 6
+
+Function Key: 5311654264970339343
+- Macro: false
+- Crate: rand
+- From Crate: toy_rust
+- Module Path: rand::rng
+- Use Statement: None
+- Function Name: gen_range
+- Parameters: self:   RngCore: {}
+, range:   Sized: {}
+  SampleRange: {}
+
+- Is Entry Node: true
+- Location: /Users/yunzezhao/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/rng.rs|offset=3545
+
+Function Key: 13584674274953654522
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: multiply
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: /Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=618
+
+Function Key: 9061111531804937341
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: add
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: /Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=378
+
+Function Key: 8952098418500919288
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: subtract
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: /Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=569
+
+Function Key: 7321434435314038949
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: divide
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: /Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=667
+
+Function Key: 17447653159546510187
+- Macro: false
+- Crate: rand
+- From Crate: toy_rust
+- Module Path: rand::rngs::thread
+- Use Statement: None
+- Function Name: thread_rng
+- Parameters: 
+- Is Entry Node: true
+- Location: /Users/yunzezhao/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/rngs/thread.rs|offset=3478
+
+Finished writing all functions.
