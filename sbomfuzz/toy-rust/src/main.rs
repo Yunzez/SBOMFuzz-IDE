@@ -19,15 +19,12 @@ fn add(a: i32, b: i32) -> i32 {
     a + b
 }
 
-<<<<<<< Updated upstream
-=======
 fn add_random(a: i32) -> i32 {
     let mut rng = rand::thread_rng();
     let random_number: i32 = rng.gen_range(1..=10);
     a + random_number
 }
 
->>>>>>> Stashed changes
 fn subtract(a: i32, b: i32) -> i32 {
     a - b
 }
