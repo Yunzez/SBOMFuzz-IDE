@@ -1,1 +1,4 @@
 **/node_modules/
+/sbomfuzz/toy-rust/target
+/sbomfuzz/toy-rust/target/debug
+*.lock
