@@ -1,6 +1,7 @@
 import { setupMessaging, sendMessage, log } from "./messaging.js";
 
 let pathSelected = null;
+let fuzzRootSelected = null;
 const targetContainer = document.getElementById("entry-list");
 const pathDiv = document.getElementById("path-display-container");
 
@@ -33,6 +34,25 @@ setupMessaging({
       pathDiv.innerHTML = `Cargo Project Root: ${projectRootPath}`;
     } else {
       pathDiv.innerHTML = "No Cargo project found.";
+    }
+  },
+
+  onFuzzRoot: (fuzzRootPath) => {
+     const fuzzPathDiv = document.getElementById("fuzz-path-display");
+      
+    if (fuzzRootPath) {
+      log("🧪 Got Fuzz root: " + fuzzRootPath);
+      fuzzRootSelected = fuzzRootPath;
+      fuzzPathDiv.innerHTML = `Fuzz Root: ${fuzzRootPath}`;
+    } else {
+
+      fuzzPathDiv.innerText = "No Fuzz root found.";
+      const createRootButton = document.createElement("button");
+      createRootButton.textContent = "Create a Root";
+      createRootButton.addEventListener("click", () => {
+        sendMessage({ command: "createFuzzRoot" });
+      });
+      fuzzPathDiv.appendChild(createRootButton);
     }
   },
 

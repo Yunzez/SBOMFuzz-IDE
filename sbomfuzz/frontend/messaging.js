@@ -9,7 +9,7 @@ export function setupMessaging(handlers = {}) {
   // Assign callback functions
   onRustAnalysisDone = handlers.onRustAnalysisDone || (() => {});
   onCargoProjectRoot = handlers.onCargoProjectRoot || (() => {});
-
+  onFuzzRoot = handlers.onFuzzRoot || (() => {});
   // Listen for messages from the extension
   window.addEventListener("message", (event) => {
     const msg = event.data;
@@ -27,6 +27,12 @@ export function setupMessaging(handlers = {}) {
           onRustAnalysisDone(msg.results || []);
         }
         break;
+        
+      case "fuzzRoot":
+        if (onFuzzRoot) {
+          onFuzzRoot(msg.path);
+        }
+        break;
 
       default:
         console.warn("Unhandled message from extension:", msg);
@@ -36,6 +42,8 @@ export function setupMessaging(handlers = {}) {
 
   // Request project root immediately
   sendMessage({ command: "getCargoProjectRoot" });
+  // Request fuzz root immediately
+  sendMessage({ command: "getFuzzRoot" });
 }
 
 // 🔼 Used to send messages to the extension

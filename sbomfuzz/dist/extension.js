@@ -200,12 +200,28 @@ var path3 = __toESM(require("path"));
 var vscode3 = __toESM(require("vscode"));
 function findCargoProjectRoot() {
   const folders = vscode3.workspace.workspaceFolders;
-  if (!folders) return;
+  if (!folders) {
+    return;
+  }
   for (const folder of folders) {
     const folderPath = folder.uri.fsPath;
     const cargoPath = path3.join(folderPath, "Cargo.toml");
     if (fs3.existsSync(cargoPath)) {
       return folderPath;
+    }
+  }
+  return;
+}
+function findFuzzRoot() {
+  const folders = vscode3.workspace.workspaceFolders;
+  if (!folders) {
+    return;
+  }
+  for (const folder of folders) {
+    const folderPath = folder.uri.fsPath;
+    const fuzzPath = path3.join(folderPath, "fuzz", "Cargo.toml");
+    if (fs3.existsSync(fuzzPath)) {
+      return path3.join(folderPath, "fuzz");
     }
   }
   return;
@@ -255,6 +271,14 @@ var SbomFuzzWebviewViewProvider = class {
         webviewView.webview.postMessage({
           command: "cargoProjectRoot",
           path: root
+        });
+      }
+      if (message.command === "getFuzzRoot") {
+        console.log("Requesting Fuzz root");
+        const fuzzRoot = findFuzzRoot();
+        webviewView.webview.postMessage({
+          command: "fuzzRoot",
+          path: fuzzRoot
         });
       }
       if (message.command === "openLocation") {

@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
-import { findCargoProjectRoot } from "./util";
+import { findCargoProjectRoot, findFuzzRoot } from "./util";
 import { FunctionLocation, loadFunctionResults } from "./functionOutputProcesser";
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
@@ -58,6 +58,15 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.postMessage({
           command: "cargoProjectRoot",
           path: root,
+        });
+      }
+
+      if (message.command === "getFuzzRoot") {
+        console.log("Requesting Fuzz root");
+        const fuzzRoot = findFuzzRoot();
+         webviewView.webview.postMessage({
+          command: "fuzzRoot",
+          path: fuzzRoot,
         });
       }
 
