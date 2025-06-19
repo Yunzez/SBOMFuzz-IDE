@@ -5,12 +5,31 @@ Entry Functions Summary:
 To show entry functions in transitive dependencies, please set verbose_dependency to true.
 - Verbose param: false
 To show more resolved params for each functions, please set verbose_param to true. (this might take longer)
-  - core
   - rand
   - std
   - toy_rust
+  - core
 
 Entry Function Details:
+
+*****
+                
+ Function Info: 
+ - Macro: false 
+ - Crate: rand 
+ - Crate Link: https://rust-random.github.io/book 
+ - Crate Version: 0.8.5 
+ - From Crate: toy_rust 
+ - From Crate Link: unknown_website 
+ - Module Path: rand::rngs::thread 
+ - Use Statement: None 
+ - Function Name: thread_rng 
+ -Function Usage: fn add_random(a: i32) -> i32 {
+    let mut rng = rand::thread_rng();
+    let random_number: i32 = rng.gen_range(1..=10);
+    a + random_number
+} 
+ - Parameters: 
 
 *****
                 
@@ -34,23 +53,4 @@ Entry Function Details:
 range:   Sized: {}
   SampleRange: {}
 
-
-*****
-                
- Function Info: 
- - Macro: false 
- - Crate: rand 
- - Crate Link: https://rust-random.github.io/book 
- - Crate Version: 0.8.5 
- - From Crate: toy_rust 
- - From Crate Link: unknown_website 
- - Module Path: rand::rngs::thread 
- - Use Statement: None 
- - Function Name: thread_rng 
- -Function Usage: fn add_random(a: i32) -> i32 {
-    let mut rng = rand::thread_rng();
-    let random_number: i32 = rng.gen_range(1..=10);
-    a + random_number
-} 
- - Parameters: 
 

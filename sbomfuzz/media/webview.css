@@ -17,10 +17,11 @@ button {
     cursor: pointer;
 }
 
-.container{
+.container {
     display: flex;
     align-items: center;
     justify-content: start;
+    flex-wrap: wrap;
 }
 
 .item{
@@ -28,4 +29,15 @@ button {
     padding: 0.5em;
     border: 1px solid #ccc;
     border-radius: 0.25em;
+}
+
+.function-button {
+    border: 2px solid #f9f9f9;
+    border-radius: 0.5em;
+    color: white;
+    border: none;
+    padding: 0.5em 1em;
+    border-radius: 0.25em;
+    cursor: pointer;
+    margin: 0.5em;
 }
