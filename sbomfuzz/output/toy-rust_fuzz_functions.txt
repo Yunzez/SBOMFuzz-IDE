@@ -1,31 +1,13 @@
 Fuzzable Functions Summary:
 - Total Fuzzable Functions: 4
 - Unique Crates Involved: 4
+  - rand
   - toy_rust
   - std
   - core
-  - rand
 
 Fuzzable Function Details:
 
-Function Information: 
-                - Macro: false
-                - Crate: toy_rust
-                - From Crate: toy_rust
-                - Module Path: toy_rust
-                - Use Statement: None
-                - Function Name: multiply
-                - Parameters: a: i32, b: i32 
-                - Fuzzable: true
-Function Information: 
-                - Macro: false
-                - Crate: toy_rust
-                - From Crate: toy_rust
-                - Module Path: toy_rust
-                - Use Statement: None
-                - Function Name: subtract
-                - Parameters: a: i32, b: i32 
-                - Fuzzable: true
 Function Information: 
                 - Macro: false
                 - Crate: toy_rust
@@ -41,6 +23,24 @@ Function Information:
                 - From Crate: toy_rust
                 - Module Path: toy_rust
                 - Use Statement: None
+                - Function Name: multiply
+                - Parameters: a: i32, b: i32 
+                - Fuzzable: true
+Function Information: 
+                - Macro: false
+                - Crate: toy_rust
+                - From Crate: toy_rust
+                - Module Path: toy_rust
+                - Use Statement: None
                 - Function Name: add
+                - Parameters: a: i32, b: i32 
+                - Fuzzable: true
+Function Information: 
+                - Macro: false
+                - Crate: toy_rust
+                - From Crate: toy_rust
+                - Module Path: toy_rust
+                - Use Statement: None
+                - Function Name: subtract
                 - Parameters: a: i32, b: i32 
                 - Fuzzable: true

@@ -14,7 +14,8 @@ fn main() {
     println!("Quotient: {}", quotient);
 }
 
-
+/// Some test doc comments.
+/// To test jumping to function definition.
 fn add(a: i32, b: i32) -> i32 {
     a + b
 }

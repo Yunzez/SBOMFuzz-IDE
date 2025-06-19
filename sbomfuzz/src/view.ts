@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
 import { findCargoProjectRoot } from "./util";
-import { loadFunctionResults } from "./functionOutputProcesser";
+import { FunctionLocation, loadFunctionResults } from "./functionOutputProcesser";
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
 
@@ -62,25 +62,7 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       }
 
       if (message.command === "openLocation") {
-        const { filePath, offset } = message;
-        const uri = vscode.Uri.file(filePath);
-
-        vscode.workspace.openTextDocument(uri).then((doc) => {
-          // Use the offset to get the position in the document
-          const position = doc.positionAt(offset);
-          const line = position.line;
-          const column = position.character;
-
-          vscode.window.showTextDocument(doc).then((editor) => {
-            const pos = new vscode.Position(line, column);
-            const selection = new vscode.Selection(pos, pos);
-            editor.selection = selection;
-            editor.revealRange(
-              new vscode.Range(pos, pos),
-              vscode.TextEditorRevealType.InCenter
-            );
-          });
-        });
+        jumpToFunctionLocation(message);
       }
 
       if (message.command === "testVisualization") {
@@ -114,4 +96,38 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
 
     return html;
   }
+}
+
+
+
+function jumpToFunctionLocation(loc: FunctionLocation) {
+  const uri = vscode.Uri.file(loc.filePath);
+
+  vscode.workspace.openTextDocument(uri).then((doc) => {
+    // Use the offset to get the position in the document
+    const position = doc.positionAt(loc.offset);
+    let line = position.line;
+
+    // Jump past doc comments
+    while (line < doc.lineCount) {
+      const text = doc.lineAt(line).text;
+      // Check if the line is a doc comment
+      if (/^\s*\/\/\//.test(text)) {
+        line++;
+      } else {
+        break;
+      }
+  }
+
+  vscode.window.showTextDocument(doc).then((editor) => {
+    // REPLACED COLUMN WITH 0 SINCE I'VE JUMPED PAST DOC COMMENTS AND THERES NO GUARANTEE COLUMN EXISTS
+    const pos = new vscode.Position(line, 0);
+    const selection = new vscode.Selection(pos, pos);
+    editor.selection = selection;
+    editor.revealRange(
+      new vscode.Range(pos, pos),
+      vscode.TextEditorRevealType.InCenter
+    );
+  });
+  });
 }

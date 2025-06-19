@@ -239,22 +239,7 @@ var SbomFuzzWebviewViewProvider = class {
         });
       }
       if (message.command === "openLocation") {
-        const { filePath, offset } = message;
-        const uri = vscode4.Uri.file(filePath);
-        vscode4.workspace.openTextDocument(uri).then((doc) => {
-          const position = doc.positionAt(offset);
-          const line = position.line;
-          const column = position.character;
-          vscode4.window.showTextDocument(doc).then((editor) => {
-            const pos = new vscode4.Position(line, column);
-            const selection = new vscode4.Selection(pos, pos);
-            editor.selection = selection;
-            editor.revealRange(
-              new vscode4.Range(pos, pos),
-              vscode4.TextEditorRevealType.InCenter
-            );
-          });
-        });
+        jumpToFunctionLocation(message);
       }
       if (message.command === "testVisualization") {
         const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
@@ -283,6 +268,30 @@ var SbomFuzzWebviewViewProvider = class {
     return html;
   }
 };
+function jumpToFunctionLocation(loc) {
+  const uri = vscode4.Uri.file(loc.filePath);
+  vscode4.workspace.openTextDocument(uri).then((doc) => {
+    const position = doc.positionAt(loc.offset);
+    let line = position.line;
+    while (line < doc.lineCount) {
+      const text = doc.lineAt(line).text;
+      if (/^\s*\/\/\//.test(text)) {
+        line++;
+      } else {
+        break;
+      }
+    }
+    vscode4.window.showTextDocument(doc).then((editor) => {
+      const pos = new vscode4.Position(line, 0);
+      const selection = new vscode4.Selection(pos, pos);
+      editor.selection = selection;
+      editor.revealRange(
+        new vscode4.Range(pos, pos),
+        vscode4.TextEditorRevealType.InCenter
+      );
+    });
+  });
+}
 
 // src/rustFunctionCodeLensProvider.ts
 var vscode5 = __toESM(require("vscode"));
