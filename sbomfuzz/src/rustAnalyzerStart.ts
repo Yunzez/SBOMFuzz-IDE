@@ -10,9 +10,11 @@ export function runRustAnalyzer(
   webview: vscode.Webview
 ) {
   vscode.window.showInformationMessage(
-    "Starting Rust analyzer, this may take a while."
+    "Starting Rust analyzer, this may take a while"
   );
-  const binaryPath = path.join(context.extensionPath, "core", "rust-analyzer");
+  const binary_name = get_platform_specific_binary();
+  if (binary_name === undefined) { return }
+  const binaryPath = path.join(context.extensionPath, "core", binary_name);
 
   const outputPath = path.join(context.extensionPath, "output");
 
@@ -62,4 +64,21 @@ export function runRustAnalyzer(
       vscode.window.showErrorMessage(`Rust analyzer failed: ${stderr}`);
     }
   });
+}
+
+
+function get_platform_specific_binary() {
+  console.log("PLATFORM: ", process.platform);
+  switch(process.platform) {
+    case "win32":
+      console.log("WINDOWS RUST ANALYZER IS UNIMPLEMENTED");
+      return "rust-analyzer-windows"
+    case "linux":
+      return "rust-analyzer-linux"
+    case "darwin":
+      return "rust-analyzer-darwin"
+    default:
+      console.log("UNKNOWN PLATFORM: ", process.platform)
+      return undefined
+  }
 }
