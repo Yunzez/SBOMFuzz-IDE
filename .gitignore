@@ -2,3 +2,8 @@
 /sbomfuzz/toy-rust/target
 /sbomfuzz/toy-rust/target/debug
 *.lock
+sbomfuzz/harnessGen/generated_fuzz_harnesses/.DS_Store
+sbomfuzz/harnessGen/.DS_Store
+sbomfuzz/.DS_Store
+.DS_Store
+sbomfuzz/harnessGen/.env

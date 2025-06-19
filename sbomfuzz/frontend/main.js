@@ -4,6 +4,27 @@ let pathSelected = null;
 const targetContainer = document.getElementById("entry-list");
 const pathDiv = document.getElementById("path-display-container");
 
+export function toggleCollapse(headerEl) {
+  const contentEl = headerEl.nextElementSibling;
+  const isOpen = headerEl.classList.toggle("expanded");
+
+  if (isOpen) {
+    contentEl.style.display = "block";
+  } else {
+    contentEl.style.display = "none";
+  }
+}
+
+const collapsibleHeaders = document.querySelectorAll(".collapsible-header");
+
+collapsibleHeaders.forEach((header) => {
+  log("Setting up collapsible header:", header.textContent);
+  header.addEventListener("click", () => {
+    log("Collapsible header clicked:", header.textContent);
+    toggleCollapse(header);
+  });
+});
+
 setupMessaging({
   onCargoProjectRoot: (projectRootPath) => {
     if (projectRootPath) {
@@ -17,13 +38,13 @@ setupMessaging({
 
   onRustAnalysisDone: (results) => {
     log("Rendering function results");
-
+    targetContainer.innerHTML = ""; // Clear previous results
     for (const result of results) {
       const resultDiv = document.createElement("div");
       resultDiv.className = "function-button";
       resultDiv.innerHTML = `
         <div style="font-weight:bold; margin-bottom:4px;">
-          ${result.functionName}::${result.functionName}
+          ${result.functionModulePath}::${result.functionName}
         </div>
         <div>
           ${result.functionLocation.filePath.replace(pathSelected, "")}
@@ -40,7 +61,7 @@ setupMessaging({
 
       targetContainer.appendChild(resultDiv);
     }
-  }
+  },
 });
 
 // 📤 Button actions
