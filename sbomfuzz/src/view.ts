@@ -2,8 +2,11 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
-import { findCargoProjectRoot, findFuzzRoot } from "./util";
-import { FunctionLocation, loadFunctionResults } from "./functionOutputProcesser";
+import { findCargoProjectRoot, findFuzzRoot, waitForDir } from "./util";
+import {
+  FunctionLocation,
+  loadFunctionResults,
+} from "./functionOutputProcesser";
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
 
@@ -64,7 +67,7 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       if (message.command === "getFuzzRoot") {
         console.log("Requesting Fuzz root");
         const fuzzRoot = findFuzzRoot();
-         webviewView.webview.postMessage({
+        webviewView.webview.postMessage({
           command: "fuzzRoot",
           path: fuzzRoot,
         });
@@ -72,6 +75,44 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
 
       if (message.command === "openLocation") {
         jumpToFunctionLocation(message);
+      }
+
+      if (message.command === "createFuzzRoot") {
+        const targetDir = message.target; // <-- assume pathSelected is the user's cargo project
+
+        if (!targetDir) {
+          vscode.window.showErrorMessage("No project path selected.");
+          return;
+        }
+
+        const fuzzDir = path.join(targetDir, "fuzz");
+
+        if (fs.existsSync(fuzzDir)) {
+          vscode.window.showWarningMessage("Fuzz directory already exists.");
+          return;
+        }
+
+        const terminal = vscode.window.createTerminal({
+          name: "cargo-fuzz-init",
+          cwd: targetDir,
+        });
+
+        terminal.show();
+        terminal.sendText("cargo fuzz init");
+
+        waitForDir(fuzzDir).then((ok) => {
+          if (ok) {
+            vscode.window.showInformationMessage("✅ Fuzz root created!");
+            webviewView.webview.postMessage({
+              command: "fuzzRoot",
+              path: fuzzDir,
+            });
+          } else {
+            vscode.window.showWarningMessage(
+              "⚠️ Fuzz root may failed, please check."
+            );
+          }
+        });
       }
 
       if (message.command === "testVisualization") {
@@ -107,8 +148,6 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   }
 }
 
-
-
 function jumpToFunctionLocation(loc: FunctionLocation) {
   const uri = vscode.Uri.file(loc.filePath);
 
@@ -126,17 +165,17 @@ function jumpToFunctionLocation(loc: FunctionLocation) {
       } else {
         break;
       }
-  }
+    }
 
-  vscode.window.showTextDocument(doc).then((editor) => {
-    // REPLACED COLUMN WITH 0 SINCE I'VE JUMPED PAST DOC COMMENTS AND THERES NO GUARANTEE COLUMN EXISTS
-    const pos = new vscode.Position(line, 0);
-    const selection = new vscode.Selection(pos, pos);
-    editor.selection = selection;
-    editor.revealRange(
-      new vscode.Range(pos, pos),
-      vscode.TextEditorRevealType.InCenter
-    );
-  });
+    vscode.window.showTextDocument(doc).then((editor) => {
+      // REPLACED COLUMN WITH 0 SINCE I'VE JUMPED PAST DOC COMMENTS AND THERES NO GUARANTEE COLUMN EXISTS
+      const pos = new vscode.Position(line, 0);
+      const selection = new vscode.Selection(pos, pos);
+      editor.selection = selection;
+      editor.revealRange(
+        new vscode.Range(pos, pos),
+        vscode.TextEditorRevealType.InCenter
+      );
+    });
   });
 }
