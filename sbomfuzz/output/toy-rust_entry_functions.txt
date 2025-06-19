@@ -6,9 +6,9 @@ To show entry functions in transitive dependencies, please set verbose_dependenc
 - Verbose param: false
 To show more resolved params for each functions, please set verbose_param to true. (this might take longer)
   - rand
+  - core
   - std
   - toy_rust
-  - core
 
 Entry Function Details:
 
@@ -50,7 +50,7 @@ Entry Function Details:
 } 
  - Parameters: self:   RngCore: {}
 
-range:   Sized: {}
-  SampleRange: {}
+range:   SampleRange: {}
+  Sized: {}
 
 
