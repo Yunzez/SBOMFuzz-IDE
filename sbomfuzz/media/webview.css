@@ -35,9 +35,8 @@ button {
     border: 2px solid #f9f9f9;
     border-radius: 0.5em;
     color: white;
-    border: none;
     padding: 0.5em 1em;
-    border-radius: 0.25em;
     cursor: pointer;
     margin: 0.5em;
+    display: inline-block; /* Ensure it behaves like a button or link */
 }

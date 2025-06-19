@@ -3,9 +3,6 @@ function logToExtension(message) {
   vscode.postMessage({ command: "log", message });
 }
 
-function runTarget(name) {
-  vscode.postMessage({ command: "runFuzz", target: name });
-}
 
 var pathSelected = null;
 
@@ -33,8 +30,8 @@ entryButton.addEventListener("click", () => {
   vscode.postMessage({ command: "requestEntries", target: "none" });
 });
 
-const startButton = document.getElementById("start-analyzer");
 
+const startButton = document.getElementById("start-analyzer");
 startButton.addEventListener("click", () => {
   vscode.postMessage({
     command: "runAnalyzer",
@@ -43,6 +40,10 @@ startButton.addEventListener("click", () => {
   });
 });
 
+const testVis = document.getElementById("test-vis");
+testVis.addEventListener("click", () => {
+  vscode.postMessage({ command: "testVisualization" });
+});
 
 window.addEventListener("message", (event) => {
   const message = event.data;
@@ -54,10 +55,10 @@ window.addEventListener("message", (event) => {
     for (let i = 0; i < results.length; i++) {
       const result = results[i];
       const resultDiv = document.createElement("div");
-      resultDiv.className = "result-item function-button";
+      resultDiv.className = "function-button";
       resultDiv.innerHTML = `
-      <div style="font-weight:bold; margin-bottom:4px;">${result.functionName}</div>
-      <div>${result.functionLocation.filePath}</div>
+      <div style="font-weight:bold; margin-bottom:4px;"> ${result.functionName}::${result.functionName}</div>
+      <div>${result.functionLocation.filePath.replace(pathSelected, "")}</div>
     `;
 
       resultDiv.onclick = () => {

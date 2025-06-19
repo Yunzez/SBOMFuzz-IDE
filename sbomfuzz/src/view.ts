@@ -82,6 +82,18 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
           });
         });
       }
+
+      if (message.command === "testVisualization") {
+        const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
+        console.log("Loading function results from:", outputPath);
+        const results = loadFunctionResults(outputPath) ?? [];
+        console.log("Loaded function results:", results);
+
+        webviewView.webview.postMessage({
+          command: "rustAnalysisDone",
+          results,
+        });
+      }
     });
   }
 
