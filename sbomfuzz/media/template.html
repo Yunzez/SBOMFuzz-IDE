@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="${webviewUri}/webview.css" rel="stylesheet" />
-</head>
-<body>
-  <h2>SBOMFuzz Dashboard</h2>
-  <div id="path-display-container"></div>
-  <button class="md-button"id="refresh-button">Refresh</button>
-  <button class="md-button" id="clear-button">Clear</button>
-  <button class="md-button" id="entry-button">List Entry Functions</button>
-  <button class="md-button" id="start-analyzer">test analyzer</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="${webviewUri}/webview.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h2>SBOMFuzz Dashboard</h2>
+    <div id="path-display-container"></div>
+    <button class="md-button" id="refresh-button">Refresh</button>
+    <button class="md-button" id="clear-button">Clear</button>
+    <button class="md-button" id="entry-button">List Entry Functions</button>
+    <button class="md-button" id="start-analyzer">test analyzer</button>
     <button class="md-button" id="test-vis">test vis</button>
-  <div class="container" id="entry-list"></div>
-  <script src="${webviewUri}/webview.js"></script>
-</body>
+    <div class="container" id="entry-list"></div>
+    <div class="collapsible-section">
+      <div class="collapsible-header">
+        ▶ Function Details
+      </div>
+      <div class="collapsible-content">
+        <p>This is hidden until expanded.</p>
+      </div>
+    </div>
+
+    <script src="${webviewUri}/webview.js"></script>
+  </body>
 </html>

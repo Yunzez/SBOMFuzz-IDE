@@ -6,37 +6,70 @@ button {
   margin-left: 0.5em;
 }
 
-.md-button{
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-    padding: 0.5em 1em;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 0.25em;
-    cursor: pointer;
+.md-button {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  padding: 0.5em 1em;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.25em;
+  cursor: pointer;
 }
 
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: start;
-    flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  flex-wrap: wrap;
 }
 
-.item{
-    margin: 0.5em;
-    padding: 0.5em;
-    border: 1px solid #ccc;
-    border-radius: 0.25em;
+.item {
+  margin: 0.5em;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 0.25em;
 }
 
 .function-button {
-    border: 2px solid #f9f9f9;
-    border-radius: 0.5em;
-    color: white;
-    padding: 0.5em 1em;
-    cursor: pointer;
-    margin: 0.5em;
-    display: inline-block; /* Ensure it behaves like a button or link */
+  border: 2px solid #f9f9f9;
+  border-radius: 0.5em;
+  color: white;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  margin: 0.5em;
+  display: inline-block; /* Ensure it behaves like a button or link */
+}
+
+.collapsible-section {
+  margin: 8px 0;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+.collapsible-header {
+  background-color: #1e1e1e;
+  color: #ccc;
+  padding: 6px 10px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapsible-header::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.2s ease;
+}
+
+.collapsible-header.expanded::before {
+  transform: rotate(90deg);
+}
+
+.collapsible-content {
+  display: none;
+  padding: 8px 12px;
+  background-color: #252526;
+  color: #ccc;
 }
