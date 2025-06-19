@@ -107,7 +107,6 @@ function jumpToFunctionLocation(loc: FunctionLocation) {
     // Use the offset to get the position in the document
     const position = doc.positionAt(loc.offset);
     let line = position.line;
-    const column = position.character;
 
     // Jump past doc comments
     while (line < doc.lineCount) {

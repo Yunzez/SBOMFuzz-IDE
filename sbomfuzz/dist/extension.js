@@ -273,7 +273,6 @@ function jumpToFunctionLocation(loc) {
   vscode4.workspace.openTextDocument(uri).then((doc) => {
     const position = doc.positionAt(loc.offset);
     let line = position.line;
-    const column = position.character;
     while (line < doc.lineCount) {
       const text = doc.lineAt(line).text;
       if (/^\s*\/\/\//.test(text)) {

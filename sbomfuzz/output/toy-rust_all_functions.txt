@@ -1,6 +1,17 @@
 All Functions Summary:
 - Total Functions: 6
 
+Function Key: 16087102652566354695
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: divide
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=669
+
 Function Key: 5598621925455889547
 - Macro: false
 - Crate: toy_rust
@@ -34,7 +45,7 @@ Function Key: 6267734885793165406
 - Is Entry Node: false
 - Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=569
 
-Function Key: 10262539890973499544
+Function Key: 3468234288576103598
 - Macro: false
 - Crate: rand
 - From Crate: toy_rust
@@ -45,17 +56,6 @@ Function Key: 10262539890973499544
 - Is Entry Node: true
 - Location: /home/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/rngs/thread.rs|offset=3478
 
-Function Key: 16087102652566354695
-- Macro: false
-- Crate: toy_rust
-- From Crate: toy_rust
-- Module Path: toy_rust
-- Use Statement: None
-- Function Name: divide
-- Parameters: a: i32, b: i32
-- Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=669
-
 Function Key: 9267734104974067823
 - Macro: false
 - Crate: rand
@@ -64,8 +64,8 @@ Function Key: 9267734104974067823
 - Use Statement: None
 - Function Name: gen_range
 - Parameters: self:   RngCore: {}
-, range:   SampleRange: {}
-  Sized: {}
+, range:   Sized: {}
+  SampleRange: {}
 
 - Is Entry Node: true
 - Location: /home/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/rng.rs|offset=3545

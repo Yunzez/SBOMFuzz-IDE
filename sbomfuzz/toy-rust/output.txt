@@ -1,275 +1,275 @@
-16:11:27 [INFO] Logger setup complete.
-16:11:30 [INFO] Database loaded: 3.21s, 885minstr, 297mb
-16:11:30 [INFO] Analyzing local root: AbsPathBuf("/home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust")
-16:11:30 [INFO] Number of project files in the workspace: 1
-16:11:30 [INFO] manifest_or_root: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/Cargo.toml
-16:11:30 [INFO] workspace_root: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust
-16:11:30 [INFO] n_packages: 36
-16:11:30 [INFO] workspace: Cargo { root: Some("toy-rust"), n_packages: 9, n_sysroot_crates: 27, n_rustc_compiler_crates: 0, n_rustc_cfg: 33, n_cfg_overrides: 0, n_extra_includes: 0, toolchain: Some(Version { major: 1, minor: 87, patch: 0 }), data_layout: Ok("e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"), set_test: false, build_scripts: "ok" }
-16:11:30 [INFO] Dependency Crate: "rand_core-0.9.0"
-16:11:30 [INFO] Dependency Crate: "panic_abort-0.0.0"
-16:11:30 [INFO] Dependency Crate: "unwind-0.0.0"
-16:11:30 [INFO] Dependency Crate: "zerocopy-0.8.17"
-16:11:30 [INFO] Dependency Crate: "rustc_demangle-0.1.24"
-16:11:30 [INFO] Dependency Crate: "rand_chacha-0.3.1"
-16:11:30 [INFO] Dependency Crate: "getrandom-0.2.16"
-16:11:30 [INFO] Dependency Crate: "cfg_if-1.0.1"
-16:11:30 [INFO] Dependency Crate: "ppv_lite86-0.2.21"
-16:11:30 [INFO] Dependency Crate: "getopts-0.2.21"
-16:11:30 [INFO] Dependency Crate: "std_detect-0.1.5"
-16:11:30 [INFO] Dependency Crate: "allocator_api2-0.2.21"
-16:11:30 [INFO] Dependency Crate: "libc-0.2.171"
-16:11:30 [INFO] Dependency Crate: "cfg_if-1.0.0"
-16:11:30 [INFO] Dependency Crate: "unicode_width-0.1.14"
-16:11:30 [INFO] Dependency Crate: "hashbrown-0.15.2"
-16:11:30 [INFO] Dependency Crate: "compiler_builtins-0.1.152"
-16:11:30 [INFO] Dependency Crate: "zerocopy-0.8.26"
-16:11:30 [INFO] Dependency Crate: "libc-0.2.174"
-16:11:30 [INFO] Dependency Crate: "rand_xorshift-0.4.0"
-16:11:30 [INFO] Dependency Crate: "rand_core-0.6.4"
-16:11:30 [INFO] Dependency Crate: "panic_unwind-0.0.0"
-16:11:30 [INFO] Dependency Crate: "rand-0.8.5"
-16:11:30 [INFO] Dependency Crate: "rand-0.9.0"
-16:11:30 [INFO] Package: toy-rust (is_member: true)
-16:11:30 [INFO] Running local analysis for 1 roots
-16:11:30 [INFO] Source Root SourceRootId(23) contains 2 files
-16:11:30 [INFO] Total number of files in the database: 2
-16:11:30 [INFO] Analyzing file: AbsPathBuf("/home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs")
-16:11:30 [INFO] Module found: Some(Module { id: ModuleId { krate: Crate(Id(3c1d)), block: None, local_id: Idx::<ModuleData>(0) } })
-16:11:30 [INFO] Use statement: use rand::Rng;
-16:11:30 [INFO] Found def function: main
-16:11:30 [INFO] Found function: main, fn token: fn
-16:11:30 [INFO] 
+16:43:27 [INFO] Logger setup complete.
+16:43:30 [INFO] Database loaded: 3.16s, 876minstr, 297mb
+16:43:30 [INFO] Analyzing local root: AbsPathBuf("/home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust")
+16:43:30 [INFO] Number of project files in the workspace: 1
+16:43:30 [INFO] manifest_or_root: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/Cargo.toml
+16:43:30 [INFO] workspace_root: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust
+16:43:30 [INFO] n_packages: 36
+16:43:30 [INFO] workspace: Cargo { root: Some("toy-rust"), n_packages: 9, n_sysroot_crates: 27, n_rustc_compiler_crates: 0, n_rustc_cfg: 33, n_cfg_overrides: 0, n_extra_includes: 0, toolchain: Some(Version { major: 1, minor: 87, patch: 0 }), data_layout: Ok("e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"), set_test: false, build_scripts: "ok" }
+16:43:30 [INFO] Dependency Crate: "zerocopy-0.8.17"
+16:43:30 [INFO] Dependency Crate: "rand_core-0.6.4"
+16:43:30 [INFO] Dependency Crate: "unicode_width-0.1.14"
+16:43:30 [INFO] Dependency Crate: "getrandom-0.2.16"
+16:43:30 [INFO] Dependency Crate: "unwind-0.0.0"
+16:43:30 [INFO] Dependency Crate: "libc-0.2.174"
+16:43:30 [INFO] Dependency Crate: "rand_core-0.9.0"
+16:43:30 [INFO] Dependency Crate: "rand-0.9.0"
+16:43:30 [INFO] Dependency Crate: "std_detect-0.1.5"
+16:43:30 [INFO] Dependency Crate: "rand_xorshift-0.4.0"
+16:43:30 [INFO] Dependency Crate: "panic_unwind-0.0.0"
+16:43:30 [INFO] Dependency Crate: "libc-0.2.171"
+16:43:30 [INFO] Dependency Crate: "cfg_if-1.0.0"
+16:43:30 [INFO] Dependency Crate: "ppv_lite86-0.2.21"
+16:43:30 [INFO] Dependency Crate: "hashbrown-0.15.2"
+16:43:30 [INFO] Dependency Crate: "getopts-0.2.21"
+16:43:30 [INFO] Dependency Crate: "rand_chacha-0.3.1"
+16:43:30 [INFO] Dependency Crate: "panic_abort-0.0.0"
+16:43:30 [INFO] Dependency Crate: "cfg_if-1.0.1"
+16:43:30 [INFO] Dependency Crate: "allocator_api2-0.2.21"
+16:43:30 [INFO] Dependency Crate: "rustc_demangle-0.1.24"
+16:43:30 [INFO] Dependency Crate: "compiler_builtins-0.1.152"
+16:43:30 [INFO] Dependency Crate: "rand-0.8.5"
+16:43:30 [INFO] Dependency Crate: "zerocopy-0.8.26"
+16:43:30 [INFO] Package: toy-rust (is_member: true)
+16:43:30 [INFO] Running local analysis for 1 roots
+16:43:30 [INFO] Source Root SourceRootId(23) contains 2 files
+16:43:30 [INFO] Total number of files in the database: 2
+16:43:30 [INFO] Analyzing file: AbsPathBuf("/home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs")
+16:43:30 [INFO] Module found: Some(Module { id: ModuleId { krate: Crate(Id(3c1d)), block: None, local_id: Idx::<ModuleData>(0) } })
+16:43:30 [INFO] Use statement: use rand::Rng;
+16:43:30 [INFO] Found def function: main
+16:43:30 [INFO] Found function: main, fn token: fn
+16:43:30 [INFO] 
  ---------
-16:11:30 [INFO] FUNCTION: "fn main() {\n    println!(\"Hello, world!\");\n    let a = 10;\n    let b = 5;\n    let sum = add(a, b);\n    let difference = subtract(a, b);\n    let product = multiply(a, b);\n    let quotient = divide(a, b);\n    println!(\"Sum: {}\", sum);\n    println!(\"Difference: {}\", difference);\n    println!(\"Product: {}\", product);\n    println!(\"Quotient: {}\", quotient);\n}"
-16:11:30 [INFO] Function belongs to crate: toy_rust
-16:11:30 [INFO] Macro calls found: 5
-16:11:30 [INFO] macro call resolved: "println!(\"Hello, world!\")"
-16:11:30 [INFO] macro crate name: "std"
-16:11:30 [INFO] macro call resolved: "println!(\"Sum: {}\", sum)"
-16:11:30 [INFO] macro crate name: "std"
-16:11:30 [INFO] macro call resolved: "println!(\"Difference: {}\", difference)"
-16:11:30 [INFO] macro crate name: "std"
-16:11:30 [INFO] macro call resolved: "println!(\"Product: {}\", product)"
-16:11:30 [INFO] macro crate name: "std"
-16:11:30 [INFO] macro call resolved: "println!(\"Quotient: {}\", quotient)"
-16:11:30 [INFO] macro crate name: "std"
-16:11:30 [INFO] Extracted path: "add"
-16:11:30 [INFO] callable test call: "add(a, b)"
-16:11:30 [INFO] callable call.expr(): "add"
-16:11:32 [INFO] callable call.expr() type: "fn add(i32, i32) -> i32"
-16:11:32 [INFO] callable &ast::Expr::cast: "add(a, b)"
-16:11:32 [INFO] callable &ast::Expr::cast type: "i32"
-16:11:32 [INFO] 🧭 Resolving function call: "add(a, b)"
-16:11:32 [INFO] ❌ No callable function found for this expr: add(a, b)
-16:11:32 [INFO] This is a callee: "add"
-16:11:32 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
-16:11:32 [INFO] This is a function call from sema: Name { symbol: "add", ctx: () }
-16:11:32 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b5d))<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b5d))), is_bound_method: false }
-16:11:32 [INFO] Analyzing function call chain for: Name { symbol: "add", ctx: () }
-16:11:32 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "add", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
-16:11:32 [INFO] Found 0 expanded use statements
-16:11:32 [INFO] syntax node: "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}"
-16:11:32 [INFO] No macro found
-16:11:32 [INFO] Start analyzing function named : Name { symbol: "add", ctx: () }
-16:11:32 [INFO] Storing function in cache: Name { symbol: "add", ctx: () }
-16:11:32 [INFO] Storing function: Name { symbol: "add", ctx: () }
-16:11:32 [INFO] function: Name { symbol: "add", ctx: () }
-16:11:32 [INFO] parent param type: "i32"
-16:11:32 [INFO] parent param type: "i32"
-16:11:32 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1d)) }
-16:11:32 [INFO] Extracted path: "subtract"
-16:11:32 [INFO] callable test call: "subtract(a, b)"
-16:11:32 [INFO] callable call.expr(): "subtract"
-16:11:32 [INFO] callable call.expr() type: "fn subtract(i32, i32) -> i32"
-16:11:32 [INFO] callable &ast::Expr::cast: "subtract(a, b)"
-16:11:32 [INFO] callable &ast::Expr::cast type: "i32"
-16:11:32 [INFO] 🧭 Resolving function call: "subtract(a, b)"
-16:11:32 [INFO] ❌ No callable function found for this expr: subtract(a, b)
-16:11:32 [INFO] This is a callee: "subtract"
-16:11:32 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
-16:11:32 [INFO] This is a function call from sema: Name { symbol: "subtract", ctx: () }
-16:11:32 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b5f))<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b5f))), is_bound_method: false }
-16:11:32 [INFO] Analyzing function call chain for: Name { symbol: "subtract", ctx: () }
-16:11:32 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "subtract", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
-16:11:32 [INFO] Found 0 expanded use statements
-16:11:32 [INFO] syntax node: "fn subtract(a: i32, b: i32) -> i32 {\n    a - b\n}"
-16:11:32 [INFO] No macro found
-16:11:32 [INFO] Start analyzing function named : Name { symbol: "subtract", ctx: () }
-16:11:32 [INFO] Storing function in cache: Name { symbol: "subtract", ctx: () }
-16:11:32 [INFO] Storing function: Name { symbol: "subtract", ctx: () }
-16:11:32 [INFO] function: Name { symbol: "subtract", ctx: () }
-16:11:32 [INFO] parent param type: "i32"
-16:11:32 [INFO] parent param type: "i32"
-16:11:32 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1d)) }
-16:11:32 [INFO] Extracted path: "multiply"
-16:11:32 [INFO] callable test call: "multiply(a, b)"
-16:11:32 [INFO] callable call.expr(): "multiply"
-16:11:32 [INFO] callable call.expr() type: "fn multiply(i32, i32) -> i32"
-16:11:32 [INFO] callable &ast::Expr::cast: "multiply(a, b)"
-16:11:32 [INFO] callable &ast::Expr::cast type: "i32"
-16:11:32 [INFO] 🧭 Resolving function call: "multiply(a, b)"
-16:11:32 [INFO] ❌ No callable function found for this expr: multiply(a, b)
-16:11:32 [INFO] This is a callee: "multiply"
-16:11:32 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
-16:11:32 [INFO] This is a function call from sema: Name { symbol: "multiply", ctx: () }
-16:11:32 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b60))<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b60))), is_bound_method: false }
-16:11:32 [INFO] Analyzing function call chain for: Name { symbol: "multiply", ctx: () }
-16:11:32 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "multiply", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
-16:11:32 [INFO] Found 0 expanded use statements
-16:11:32 [INFO] syntax node: "fn multiply(a: i32, b: i32) -> i32 {\n    a * b\n}"
-16:11:32 [INFO] No macro found
-16:11:32 [INFO] Start analyzing function named : Name { symbol: "multiply", ctx: () }
-16:11:32 [INFO] Storing function in cache: Name { symbol: "multiply", ctx: () }
-16:11:32 [INFO] Storing function: Name { symbol: "multiply", ctx: () }
-16:11:32 [INFO] function: Name { symbol: "multiply", ctx: () }
-16:11:32 [INFO] parent param type: "i32"
-16:11:32 [INFO] parent param type: "i32"
-16:11:32 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1d)) }
-16:11:32 [INFO] Extracted path: "divide"
-16:11:32 [INFO] callable test call: "divide(a, b)"
-16:11:32 [INFO] callable call.expr(): "divide"
-16:11:32 [INFO] callable call.expr() type: "fn divide(i32, i32) -> i32"
-16:11:32 [INFO] callable &ast::Expr::cast: "divide(a, b)"
-16:11:32 [INFO] callable &ast::Expr::cast type: "i32"
-16:11:32 [INFO] 🧭 Resolving function call: "divide(a, b)"
-16:11:32 [INFO] ❌ No callable function found for this expr: divide(a, b)
-16:11:32 [INFO] This is a callee: "divide"
-16:11:32 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
-16:11:32 [INFO] This is a function call from sema: Name { symbol: "divide", ctx: () }
-16:11:32 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b61))<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b61))), is_bound_method: false }
-16:11:32 [INFO] Analyzing function call chain for: Name { symbol: "divide", ctx: () }
-16:11:32 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "divide", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
-16:11:32 [INFO] Found 0 expanded use statements
-16:11:32 [INFO] syntax node: "fn divide(a: i32, b: i32) -> i32 {\n    if b == 0 {\n        panic!(\"Cannot divide by zero\");\n    }\n    a / b\n}"
-16:11:32 [INFO] Macro calls found: 1
-16:11:32 [INFO] macro call resolved: "panic!(\"Cannot divide by zero\")"
-16:11:32 [INFO] macro crate name: "std"
-16:11:32 [INFO] Start analyzing function named : Name { symbol: "divide", ctx: () }
-16:11:32 [INFO] Storing function in cache: Name { symbol: "divide", ctx: () }
-16:11:32 [INFO] Storing function: Name { symbol: "divide", ctx: () }
-16:11:32 [INFO] function: Name { symbol: "divide", ctx: () }
-16:11:32 [INFO] parent param type: "i32"
-16:11:32 [INFO] parent param type: "i32"
-16:11:32 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1d)) }
-16:11:32 [INFO] Found def function: add
-16:11:32 [INFO] Found function: add, fn token: fn
-16:11:32 [INFO] 
+16:43:30 [INFO] FUNCTION: "fn main() {\n    println!(\"Hello, world!\");\n    let a = 10;\n    let b = 5;\n    let sum = add(a, b);\n    let difference = subtract(a, b);\n    let product = multiply(a, b);\n    let quotient = divide(a, b);\n    println!(\"Sum: {}\", sum);\n    println!(\"Difference: {}\", difference);\n    println!(\"Product: {}\", product);\n    println!(\"Quotient: {}\", quotient);\n}"
+16:43:30 [INFO] Function belongs to crate: toy_rust
+16:43:30 [INFO] Macro calls found: 5
+16:43:30 [INFO] macro call resolved: "println!(\"Hello, world!\")"
+16:43:30 [INFO] macro crate name: "std"
+16:43:30 [INFO] macro call resolved: "println!(\"Sum: {}\", sum)"
+16:43:30 [INFO] macro crate name: "std"
+16:43:30 [INFO] macro call resolved: "println!(\"Difference: {}\", difference)"
+16:43:30 [INFO] macro crate name: "std"
+16:43:30 [INFO] macro call resolved: "println!(\"Product: {}\", product)"
+16:43:30 [INFO] macro crate name: "std"
+16:43:30 [INFO] macro call resolved: "println!(\"Quotient: {}\", quotient)"
+16:43:30 [INFO] macro crate name: "std"
+16:43:30 [INFO] Extracted path: "add"
+16:43:30 [INFO] callable test call: "add(a, b)"
+16:43:30 [INFO] callable call.expr(): "add"
+16:43:31 [INFO] callable call.expr() type: "fn add(i32, i32) -> i32"
+16:43:31 [INFO] callable &ast::Expr::cast: "add(a, b)"
+16:43:31 [INFO] callable &ast::Expr::cast type: "i32"
+16:43:31 [INFO] 🧭 Resolving function call: "add(a, b)"
+16:43:31 [INFO] ❌ No callable function found for this expr: add(a, b)
+16:43:31 [INFO] This is a callee: "add"
+16:43:31 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+16:43:31 [INFO] This is a function call from sema: Name { symbol: "add", ctx: () }
+16:43:31 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b5d))<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b5d))), is_bound_method: false }
+16:43:31 [INFO] Analyzing function call chain for: Name { symbol: "add", ctx: () }
+16:43:31 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "add", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
+16:43:31 [INFO] Found 0 expanded use statements
+16:43:31 [INFO] syntax node: "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}"
+16:43:31 [INFO] No macro found
+16:43:31 [INFO] Start analyzing function named : Name { symbol: "add", ctx: () }
+16:43:31 [INFO] Storing function in cache: Name { symbol: "add", ctx: () }
+16:43:31 [INFO] Storing function: Name { symbol: "add", ctx: () }
+16:43:31 [INFO] function: Name { symbol: "add", ctx: () }
+16:43:31 [INFO] parent param type: "i32"
+16:43:31 [INFO] parent param type: "i32"
+16:43:31 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1d)) }
+16:43:31 [INFO] Extracted path: "subtract"
+16:43:31 [INFO] callable test call: "subtract(a, b)"
+16:43:31 [INFO] callable call.expr(): "subtract"
+16:43:31 [INFO] callable call.expr() type: "fn subtract(i32, i32) -> i32"
+16:43:31 [INFO] callable &ast::Expr::cast: "subtract(a, b)"
+16:43:31 [INFO] callable &ast::Expr::cast type: "i32"
+16:43:31 [INFO] 🧭 Resolving function call: "subtract(a, b)"
+16:43:31 [INFO] ❌ No callable function found for this expr: subtract(a, b)
+16:43:31 [INFO] This is a callee: "subtract"
+16:43:31 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+16:43:31 [INFO] This is a function call from sema: Name { symbol: "subtract", ctx: () }
+16:43:31 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b5f))<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b5f))), is_bound_method: false }
+16:43:31 [INFO] Analyzing function call chain for: Name { symbol: "subtract", ctx: () }
+16:43:31 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "subtract", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
+16:43:31 [INFO] Found 0 expanded use statements
+16:43:31 [INFO] syntax node: "fn subtract(a: i32, b: i32) -> i32 {\n    a - b\n}"
+16:43:31 [INFO] No macro found
+16:43:31 [INFO] Start analyzing function named : Name { symbol: "subtract", ctx: () }
+16:43:31 [INFO] Storing function in cache: Name { symbol: "subtract", ctx: () }
+16:43:31 [INFO] Storing function: Name { symbol: "subtract", ctx: () }
+16:43:31 [INFO] function: Name { symbol: "subtract", ctx: () }
+16:43:31 [INFO] parent param type: "i32"
+16:43:31 [INFO] parent param type: "i32"
+16:43:31 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1d)) }
+16:43:31 [INFO] Extracted path: "multiply"
+16:43:31 [INFO] callable test call: "multiply(a, b)"
+16:43:31 [INFO] callable call.expr(): "multiply"
+16:43:31 [INFO] callable call.expr() type: "fn multiply(i32, i32) -> i32"
+16:43:31 [INFO] callable &ast::Expr::cast: "multiply(a, b)"
+16:43:31 [INFO] callable &ast::Expr::cast type: "i32"
+16:43:31 [INFO] 🧭 Resolving function call: "multiply(a, b)"
+16:43:31 [INFO] ❌ No callable function found for this expr: multiply(a, b)
+16:43:31 [INFO] This is a callee: "multiply"
+16:43:31 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+16:43:31 [INFO] This is a function call from sema: Name { symbol: "multiply", ctx: () }
+16:43:31 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b60))<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b60))), is_bound_method: false }
+16:43:31 [INFO] Analyzing function call chain for: Name { symbol: "multiply", ctx: () }
+16:43:31 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "multiply", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
+16:43:31 [INFO] Found 0 expanded use statements
+16:43:31 [INFO] syntax node: "fn multiply(a: i32, b: i32) -> i32 {\n    a * b\n}"
+16:43:31 [INFO] No macro found
+16:43:31 [INFO] Start analyzing function named : Name { symbol: "multiply", ctx: () }
+16:43:31 [INFO] Storing function in cache: Name { symbol: "multiply", ctx: () }
+16:43:31 [INFO] Storing function: Name { symbol: "multiply", ctx: () }
+16:43:31 [INFO] function: Name { symbol: "multiply", ctx: () }
+16:43:31 [INFO] parent param type: "i32"
+16:43:31 [INFO] parent param type: "i32"
+16:43:31 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1d)) }
+16:43:31 [INFO] Extracted path: "divide"
+16:43:31 [INFO] callable test call: "divide(a, b)"
+16:43:31 [INFO] callable call.expr(): "divide"
+16:43:31 [INFO] callable call.expr() type: "fn divide(i32, i32) -> i32"
+16:43:31 [INFO] callable &ast::Expr::cast: "divide(a, b)"
+16:43:31 [INFO] callable &ast::Expr::cast type: "i32"
+16:43:31 [INFO] 🧭 Resolving function call: "divide(a, b)"
+16:43:31 [INFO] ❌ No callable function found for this expr: divide(a, b)
+16:43:31 [INFO] This is a callee: "divide"
+16:43:31 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+16:43:31 [INFO] This is a function call from sema: Name { symbol: "divide", ctx: () }
+16:43:31 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b61))<[]> }, sig: CallableSig { params_and_return: [Int(I32), Int(I32), Int(I32)], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b61))), is_bound_method: false }
+16:43:31 [INFO] Analyzing function call chain for: Name { symbol: "divide", ctx: () }
+16:43:31 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "divide", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("toy_rust"), canonical_name: "toy-rust" }), caller crate: toy_rust
+16:43:31 [INFO] Found 0 expanded use statements
+16:43:31 [INFO] syntax node: "fn divide(a: i32, b: i32) -> i32 {\n    if b == 0 {\n        panic!(\"Cannot divide by zero\");\n    }\n    a / b\n}"
+16:43:31 [INFO] Macro calls found: 1
+16:43:31 [INFO] macro call resolved: "panic!(\"Cannot divide by zero\")"
+16:43:31 [INFO] macro crate name: "std"
+16:43:31 [INFO] Start analyzing function named : Name { symbol: "divide", ctx: () }
+16:43:31 [INFO] Storing function in cache: Name { symbol: "divide", ctx: () }
+16:43:31 [INFO] Storing function: Name { symbol: "divide", ctx: () }
+16:43:31 [INFO] function: Name { symbol: "divide", ctx: () }
+16:43:31 [INFO] parent param type: "i32"
+16:43:31 [INFO] parent param type: "i32"
+16:43:31 [INFO] Is entry node: false, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1d)) }
+16:43:31 [INFO] Found def function: add
+16:43:31 [INFO] Found function: add, fn token: fn
+16:43:31 [INFO] 
  ---------
-16:11:32 [INFO] FUNCTION: "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}"
-16:11:32 [INFO] Function belongs to crate: toy_rust
-16:11:32 [INFO] No macro found
-16:11:32 [INFO] Found def function: add_random
-16:11:32 [INFO] Found function: add_random, fn token: fn
-16:11:32 [INFO] 
+16:43:31 [INFO] FUNCTION: "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}"
+16:43:31 [INFO] Function belongs to crate: toy_rust
+16:43:31 [INFO] No macro found
+16:43:31 [INFO] Found def function: add_random
+16:43:31 [INFO] Found function: add_random, fn token: fn
+16:43:31 [INFO] 
  ---------
-16:11:32 [INFO] FUNCTION: "fn add_random(a: i32) -> i32 {\n    let mut rng = rand::thread_rng();\n    let random_number: i32 = rng.gen_range(1..=10);\n    a + random_number\n}"
-16:11:32 [INFO] Function belongs to crate: toy_rust
-16:11:32 [INFO] No macro found
-16:11:32 [INFO] Extracted path: "rand::thread_rng"
-16:11:32 [INFO] callable test call: "rand::thread_rng()"
-16:11:32 [INFO] callable call.expr(): "rand::thread_rng"
-16:11:32 [INFO] callable call.expr() type: "fn thread_rng() -> ThreadRng"
-16:11:32 [INFO] callable &ast::Expr::cast: "rand::thread_rng()"
-16:11:32 [INFO] callable &ast::Expr::cast type: "ThreadRng"
-16:11:32 [INFO] 🧭 Resolving function call: "rand::thread_rng()"
-16:11:32 [INFO] ❌ No callable function found for this expr: rand::thread_rng()
-16:11:32 [INFO] This is a callee: "rand::thread_rng"
-16:11:32 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
-16:11:32 [INFO] This is a function call from sema: Name { symbol: "thread_rng", ctx: () }
-16:11:32 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b46))<[]> }, sig: CallableSig { params_and_return: [AdtId(StructId(StructId(162ac)))<[]>], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b46))), is_bound_method: false }
-16:11:32 [INFO] Analyzing function call chain for: Name { symbol: "thread_rng", ctx: () }
-16:11:32 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "thread_rng", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("rand"), canonical_name: "rand" }), caller crate: toy_rust
-16:11:32 [INFO] Found 0 expanded use statements
-16:11:32 [INFO] syntax node: "/// Retrieve the lazily-initialized thread-local random number generator,\n/// seeded by the system. Intended to be used in method chaining style,\n/// e.g. `thread_rng().gen::<i32>()`, or cached locally, e.g.\n/// `let mut rng = thread_rng();`.  Invoked by the `Default` trait, making\n/// `ThreadRng::default()` equivalent.\n///\n/// For more information see [`ThreadRng`].\n#[cfg_attr(doc_cfg, doc(cfg(all(feature = \"std\", feature = \"std_rng\"))))]\npub fn thread_rng() -> ThreadRng {\n    let rng = THREAD_RNG_KEY.with(|t| t.clone());\n    ThreadRng { rng }\n}"
-16:11:32 [INFO] No macro found
-16:11:32 [INFO] Start analyzing function named : Name { symbol: "thread_rng", ctx: () }
-16:11:32 [INFO] Storing function in cache: Name { symbol: "thread_rng", ctx: () }
-16:11:32 [INFO] Storing function: Name { symbol: "thread_rng", ctx: () }
-16:11:32 [INFO] function: Name { symbol: "thread_rng", ctx: () }
-16:11:32 [INFO] Is entry node: true, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1c)) }
-16:11:32 [INFO] Extracted path: "rng"
-16:11:32 [INFO] callable test method call: "rng.gen_range(1..=10)"
-16:11:32 [INFO] This is a function call: Name { symbol: "gen_range", ctx: () }
-16:11:32 [INFO] Substitution[0]: ThreadRng
-16:11:32 [INFO] Substitution[1]: i32
-16:11:32 [INFO] Substitution[2]: RangeInclusive<i32>
-16:11:32 [INFO] 🔍 Matched concrete type in substitution: i32
-16:11:32 [INFO] Matched function: [], rand
-16:11:32 [INFO] Analyzing function call chain for: Name { symbol: "gen_range", ctx: () }
-16:11:32 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "gen_range", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("rand"), canonical_name: "rand" }), caller crate: toy_rust
-16:11:32 [INFO] Found 0 expanded use statements
-16:11:32 [INFO] syntax node: "/// Generate a random value in the given range.\n    ///\n    /// This function is optimised for the case that only a single sample is\n    /// made from the given range. See also the [`Uniform`] distribution\n    /// type which may be faster if sampling from the same range repeatedly.\n    ///\n    /// Only `gen_range(low..high)` and `gen_range(low..=high)` are supported.\n    ///\n    /// # Panics\n    ///\n    /// Panics if the range is empty.\n    ///\n    /// # Example\n    ///\n    /// ```\n    /// use rand::{thread_rng, Rng};\n    ///\n    /// let mut rng = thread_rng();\n    ///\n    /// // Exclusive range\n    /// let n: u32 = rng.gen_range(0..10);\n    /// println!(\"{}\", n);\n    /// let m: f64 = rng.gen_range(-40.0..1.3e5);\n    /// println!(\"{}\", m);\n    ///\n    /// // Inclusive range\n    /// let n: u32 = rng.gen_range(0..=10);\n    /// println!(\"{}\", n);\n    /// ```\n    ///\n    /// [`Uniform`]: distributions::uniform::Uniform\n    fn gen_range<T, R>(&mut self, range: R) -> T\n    where\n        T: SampleUniform,\n        R: SampleRange<T>\n    {\n        assert!(!range.is_empty(), \"cannot sample empty range\");\n        range.sample_single(self)\n    }"
-16:11:32 [INFO] Macro calls found: 1
-16:11:32 [INFO] macro call resolved: "assert!(!range.is_empty(), \"cannot sample empty range\")"
-16:11:32 [INFO] macro crate name: "core"
-16:11:32 [INFO] Start analyzing function named : Name { symbol: "gen_range", ctx: () }
-16:11:32 [INFO] Storing function in cache: Name { symbol: "gen_range", ctx: () }
-16:11:32 [INFO] Storing function: Name { symbol: "gen_range", ctx: () }
-16:11:32 [INFO] function: Name { symbol: "gen_range", ctx: () }
-16:11:32 [INFO] parent param type: "&mut Self"
-16:11:32 [INFO] Resolving type: "Self"
-16:11:32 [INFO] as type param: Some(TypeParam { id: TypeParamId(TypeOrConstParamId { parent: TraitId(TraitId(5616)), local_id: Idx::<TypeOrConstParamData>(0) }) })
-16:11:32 [INFO] Walking type parameter: Self
-16:11:32 [INFO] Trait bound: RngCore
-16:11:32 [INFO] Resolved targets: [Trait(Trait { id: TraitId(5605) }), Module(Module { id: ModuleId { krate: Crate(Id(3c1a)), block: None, local_id: Idx::<ModuleData>(0) } })]
-16:11:32 [INFO] Skipping unresolved target: Module(Module { id: ModuleId { krate: Crate(Id(3c1a)), block: None, local_id: Idx::<ModuleData>(0) } })
-16:11:32 [INFO] parent param type: "R"
-16:11:32 [INFO] Resolving type: "R"
-16:11:32 [INFO] as type param: Some(TypeParam { id: TypeParamId(TypeOrConstParamId { parent: FunctionId(FunctionId(2f100)), local_id: Idx::<TypeOrConstParamData>(1) }) })
-16:11:32 [INFO] Pre-checking type parameter: R
-16:11:32 [INFO] Trait bound: SampleRange
-16:11:32 [INFO] Trait bound: Sized
-16:11:32 [INFO] Trait bound: Sized
-16:11:32 [INFO] Resolved targets: [Trait(Trait { id: TraitId(5614) }), Module(Module { id: ModuleId { krate: Crate(Id(3c1c)), block: None, local_id: Idx::<ModuleData>(11) } }), Trait(Trait { id: TraitId(5515) })]
-16:11:32 [INFO] Skipping unresolved target: Module(Module { id: ModuleId { krate: Crate(Id(3c1c)), block: None, local_id: Idx::<ModuleData>(11) } })
-16:11:32 [INFO] Is entry node: true, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1c)) }
-16:11:32 [INFO] Found def function: subtract
-16:11:32 [INFO] Found function: subtract, fn token: fn
-16:11:32 [INFO] 
+16:43:31 [INFO] FUNCTION: "fn add_random(a: i32) -> i32 {\n    let mut rng = rand::thread_rng();\n    let random_number: i32 = rng.gen_range(1..=10);\n    a + random_number\n}"
+16:43:31 [INFO] Function belongs to crate: toy_rust
+16:43:31 [INFO] No macro found
+16:43:31 [INFO] Extracted path: "rand::thread_rng"
+16:43:31 [INFO] callable test call: "rand::thread_rng()"
+16:43:31 [INFO] callable call.expr(): "rand::thread_rng"
+16:43:32 [INFO] callable call.expr() type: "fn thread_rng() -> ThreadRng"
+16:43:32 [INFO] callable &ast::Expr::cast: "rand::thread_rng()"
+16:43:32 [INFO] callable &ast::Expr::cast type: "ThreadRng"
+16:43:32 [INFO] 🧭 Resolving function call: "rand::thread_rng()"
+16:43:32 [INFO] ❌ No callable function found for this expr: rand::thread_rng()
+16:43:32 [INFO] This is a callee: "rand::thread_rng"
+16:43:32 [INFO] ❌ No method resolution or assoc resolutions for this expr_id.
+16:43:32 [INFO] This is a function call from sema: Name { symbol: "thread_rng", ctx: () }
+16:43:32 [INFO] last resort from sema resolved to callable: Callable { ty: Type { env: TraitEnvironment { krate: Crate(Id(3c1d)), block: None, traits_from_clauses: [], env: Env([]) }, ty: FnDefId(Id(17b53))<[]> }, sig: CallableSig { params_and_return: [AdtId(StructId(StructId(162ac)))<[]>], is_varargs: false, safety: Safe, abi: Rust }, callee: Def(FunctionId(FunctionId(17b53))), is_bound_method: false }
+16:43:32 [INFO] Analyzing function call chain for: Name { symbol: "thread_rng", ctx: () }
+16:43:32 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "thread_rng", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("rand"), canonical_name: "rand" }), caller crate: toy_rust
+16:43:32 [INFO] Found 0 expanded use statements
+16:43:32 [INFO] syntax node: "/// Retrieve the lazily-initialized thread-local random number generator,\n/// seeded by the system. Intended to be used in method chaining style,\n/// e.g. `thread_rng().gen::<i32>()`, or cached locally, e.g.\n/// `let mut rng = thread_rng();`.  Invoked by the `Default` trait, making\n/// `ThreadRng::default()` equivalent.\n///\n/// For more information see [`ThreadRng`].\n#[cfg_attr(doc_cfg, doc(cfg(all(feature = \"std\", feature = \"std_rng\"))))]\npub fn thread_rng() -> ThreadRng {\n    let rng = THREAD_RNG_KEY.with(|t| t.clone());\n    ThreadRng { rng }\n}"
+16:43:32 [INFO] No macro found
+16:43:32 [INFO] Start analyzing function named : Name { symbol: "thread_rng", ctx: () }
+16:43:32 [INFO] Storing function in cache: Name { symbol: "thread_rng", ctx: () }
+16:43:32 [INFO] Storing function: Name { symbol: "thread_rng", ctx: () }
+16:43:32 [INFO] function: Name { symbol: "thread_rng", ctx: () }
+16:43:32 [INFO] Is entry node: true, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1c)) }
+16:43:32 [INFO] Extracted path: "rng"
+16:43:32 [INFO] callable test method call: "rng.gen_range(1..=10)"
+16:43:32 [INFO] This is a function call: Name { symbol: "gen_range", ctx: () }
+16:43:32 [INFO] Substitution[0]: ThreadRng
+16:43:32 [INFO] Substitution[1]: i32
+16:43:32 [INFO] Substitution[2]: RangeInclusive<i32>
+16:43:32 [INFO] 🔍 Matched concrete type in substitution: i32
+16:43:32 [INFO] Matched function: [], rand
+16:43:32 [INFO] Analyzing function call chain for: Name { symbol: "gen_range", ctx: () }
+16:43:32 [INFO] Analyzing function call chain at depth: 0, function name: Name { symbol: "gen_range", ctx: () }, function in crate: Some(CrateDisplayName { crate_name: CrateName("rand"), canonical_name: "rand" }), caller crate: toy_rust
+16:43:32 [INFO] Found 0 expanded use statements
+16:43:32 [INFO] syntax node: "/// Generate a random value in the given range.\n    ///\n    /// This function is optimised for the case that only a single sample is\n    /// made from the given range. See also the [`Uniform`] distribution\n    /// type which may be faster if sampling from the same range repeatedly.\n    ///\n    /// Only `gen_range(low..high)` and `gen_range(low..=high)` are supported.\n    ///\n    /// # Panics\n    ///\n    /// Panics if the range is empty.\n    ///\n    /// # Example\n    ///\n    /// ```\n    /// use rand::{thread_rng, Rng};\n    ///\n    /// let mut rng = thread_rng();\n    ///\n    /// // Exclusive range\n    /// let n: u32 = rng.gen_range(0..10);\n    /// println!(\"{}\", n);\n    /// let m: f64 = rng.gen_range(-40.0..1.3e5);\n    /// println!(\"{}\", m);\n    ///\n    /// // Inclusive range\n    /// let n: u32 = rng.gen_range(0..=10);\n    /// println!(\"{}\", n);\n    /// ```\n    ///\n    /// [`Uniform`]: distributions::uniform::Uniform\n    fn gen_range<T, R>(&mut self, range: R) -> T\n    where\n        T: SampleUniform,\n        R: SampleRange<T>\n    {\n        assert!(!range.is_empty(), \"cannot sample empty range\");\n        range.sample_single(self)\n    }"
+16:43:32 [INFO] Macro calls found: 1
+16:43:32 [INFO] macro call resolved: "assert!(!range.is_empty(), \"cannot sample empty range\")"
+16:43:32 [INFO] macro crate name: "core"
+16:43:32 [INFO] Start analyzing function named : Name { symbol: "gen_range", ctx: () }
+16:43:32 [INFO] Storing function in cache: Name { symbol: "gen_range", ctx: () }
+16:43:32 [INFO] Storing function: Name { symbol: "gen_range", ctx: () }
+16:43:32 [INFO] function: Name { symbol: "gen_range", ctx: () }
+16:43:32 [INFO] parent param type: "&mut Self"
+16:43:32 [INFO] Resolving type: "Self"
+16:43:32 [INFO] as type param: Some(TypeParam { id: TypeParamId(TypeOrConstParamId { parent: TraitId(TraitId(5616)), local_id: Idx::<TypeOrConstParamData>(0) }) })
+16:43:32 [INFO] Walking type parameter: Self
+16:43:32 [INFO] Trait bound: RngCore
+16:43:32 [INFO] Resolved targets: [Trait(Trait { id: TraitId(5605) }), Module(Module { id: ModuleId { krate: Crate(Id(3c1a)), block: None, local_id: Idx::<ModuleData>(0) } })]
+16:43:32 [INFO] Skipping unresolved target: Module(Module { id: ModuleId { krate: Crate(Id(3c1a)), block: None, local_id: Idx::<ModuleData>(0) } })
+16:43:32 [INFO] parent param type: "R"
+16:43:32 [INFO] Resolving type: "R"
+16:43:32 [INFO] as type param: Some(TypeParam { id: TypeParamId(TypeOrConstParamId { parent: FunctionId(FunctionId(2f100)), local_id: Idx::<TypeOrConstParamData>(1) }) })
+16:43:32 [INFO] Pre-checking type parameter: R
+16:43:32 [INFO] Trait bound: SampleRange
+16:43:32 [INFO] Trait bound: Sized
+16:43:32 [INFO] Trait bound: Sized
+16:43:32 [INFO] Resolved targets: [Trait(Trait { id: TraitId(5614) }), Module(Module { id: ModuleId { krate: Crate(Id(3c1c)), block: None, local_id: Idx::<ModuleData>(11) } }), Trait(Trait { id: TraitId(5515) })]
+16:43:32 [INFO] Skipping unresolved target: Module(Module { id: ModuleId { krate: Crate(Id(3c1c)), block: None, local_id: Idx::<ModuleData>(11) } })
+16:43:32 [INFO] Is entry node: true, caller_crate: Some(Crate { id: Crate(Id(3c1d)) }),  current_crate: Crate { id: Crate(Id(3c1c)) }
+16:43:32 [INFO] Found def function: subtract
+16:43:32 [INFO] Found function: subtract, fn token: fn
+16:43:32 [INFO] 
  ---------
-16:11:32 [INFO] FUNCTION: "fn subtract(a: i32, b: i32) -> i32 {\n    a - b\n}"
-16:11:32 [INFO] Function belongs to crate: toy_rust
-16:11:32 [INFO] No macro found
-16:11:32 [INFO] Found def function: multiply
-16:11:32 [INFO] Found function: multiply, fn token: fn
-16:11:32 [INFO] 
+16:43:32 [INFO] FUNCTION: "fn subtract(a: i32, b: i32) -> i32 {\n    a - b\n}"
+16:43:32 [INFO] Function belongs to crate: toy_rust
+16:43:32 [INFO] No macro found
+16:43:32 [INFO] Found def function: multiply
+16:43:32 [INFO] Found function: multiply, fn token: fn
+16:43:32 [INFO] 
  ---------
-16:11:32 [INFO] FUNCTION: "fn multiply(a: i32, b: i32) -> i32 {\n    a * b\n}"
-16:11:32 [INFO] Function belongs to crate: toy_rust
-16:11:32 [INFO] No macro found
-16:11:32 [INFO] Found def function: divide
-16:11:32 [INFO] Found function: divide, fn token: fn
-16:11:32 [INFO] 
+16:43:32 [INFO] FUNCTION: "fn multiply(a: i32, b: i32) -> i32 {\n    a * b\n}"
+16:43:32 [INFO] Function belongs to crate: toy_rust
+16:43:32 [INFO] No macro found
+16:43:32 [INFO] Found def function: divide
+16:43:32 [INFO] Found function: divide, fn token: fn
+16:43:32 [INFO] 
  ---------
-16:11:32 [INFO] FUNCTION: "fn divide(a: i32, b: i32) -> i32 {\n    if b == 0 {\n        panic!(\"Cannot divide by zero\");\n    }\n    a / b\n}"
-16:11:32 [INFO] Function belongs to crate: toy_rust
-16:11:32 [INFO] Macro calls found: 1
-16:11:32 [INFO] macro call resolved: "panic!(\"Cannot divide by zero\")"
-16:11:32 [INFO] macro crate name: "std"
-16:11:32 [INFO] 
+16:43:32 [INFO] FUNCTION: "fn divide(a: i32, b: i32) -> i32 {\n    if b == 0 {\n        panic!(\"Cannot divide by zero\");\n    }\n    a / b\n}"
+16:43:32 [INFO] Function belongs to crate: toy_rust
+16:43:32 [INFO] Macro calls found: 1
+16:43:32 [INFO] macro call resolved: "panic!(\"Cannot divide by zero\")"
+16:43:32 [INFO] macro crate name: "std"
+16:43:32 [INFO] 
  ----------- done with file ----------- 
 
-16:11:33 [INFO] number of resolved external functions / Number of external functions: 18893 / 66612
-16:11:33 [INFO] number of resolved internal functions / Number of internal functions: 6 / 6
-16:11:33 [INFO] name: "0.1.0"
-16:11:33 [INFO] name: "cfg_if"
-16:11:33 [INFO] name: "getrandom"
-16:11:33 [INFO] name: "libc"
-16:11:33 [INFO] name: "ppv_lite86"
-16:11:33 [INFO] name: "rand"
-16:11:33 [INFO] name: "rand_chacha"
-16:11:33 [INFO] name: "rand_core"
-16:11:33 [INFO] name: "zerocopy"
-16:11:33 [INFO] name: "0.1.0"
-16:11:33 [INFO] name: "cfg_if"
-16:11:33 [INFO] name: "getrandom"
-16:11:33 [INFO] name: "libc"
-16:11:33 [INFO] name: "ppv_lite86"
-16:11:33 [INFO] name: "rand"
-16:11:33 [INFO] name: "rand_chacha"
-16:11:33 [INFO] name: "rand_core"
-16:11:33 [INFO] name: "zerocopy"
-16:11:33 [INFO] SBOM dep num 8
-16:11:33 [INFO] crate_link, rand0.8.5: None :  "https://rust-random.github.io/book"
-16:11:33 [INFO] crate_link, rand0.8.5: None :  "https://rust-random.github.io/book"
+16:43:33 [INFO] number of resolved external functions / Number of external functions: 18893 / 66612
+16:43:33 [INFO] number of resolved internal functions / Number of internal functions: 6 / 6
+16:43:33 [INFO] name: "0.1.0"
+16:43:33 [INFO] name: "cfg_if"
+16:43:33 [INFO] name: "getrandom"
+16:43:33 [INFO] name: "libc"
+16:43:33 [INFO] name: "ppv_lite86"
+16:43:33 [INFO] name: "rand"
+16:43:33 [INFO] name: "rand_chacha"
+16:43:33 [INFO] name: "rand_core"
+16:43:33 [INFO] name: "zerocopy"
+16:43:33 [INFO] name: "0.1.0"
+16:43:33 [INFO] name: "cfg_if"
+16:43:33 [INFO] name: "getrandom"
+16:43:33 [INFO] name: "libc"
+16:43:33 [INFO] name: "ppv_lite86"
+16:43:33 [INFO] name: "rand"
+16:43:33 [INFO] name: "rand_chacha"
+16:43:33 [INFO] name: "rand_core"
+16:43:33 [INFO] name: "zerocopy"
+16:43:33 [INFO] SBOM dep num 8
+16:43:33 [INFO] crate_link, rand0.8.5: None :  "https://rust-random.github.io/book"
+16:43:33 [INFO] crate_link, rand0.8.5: None :  "https://rust-random.github.io/book"
