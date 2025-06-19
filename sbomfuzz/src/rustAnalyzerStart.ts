@@ -68,7 +68,6 @@ export function runRustAnalyzer(
 
 
 function get_platform_specific_binary() {
-  console.log("PLATFORM: ", process.platform);
   switch(process.platform) {
     case "win32":
       return "rust-analyzer-win32.exe"
