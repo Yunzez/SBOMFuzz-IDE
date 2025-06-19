@@ -1,40 +1,7 @@
 All Functions Summary:
 - Total Functions: 6
 
-Function Key: 4825780689967349298
-- Macro: false
-- Crate: toy_rust
-- From Crate: toy_rust
-- Module Path: toy_rust
-- Use Statement: None
-- Function Name: add
-- Parameters: a: i32, b: i32
-- Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=377
-
-Function Key: 6267734885793165406
-- Macro: false
-- Crate: toy_rust
-- From Crate: toy_rust
-- Module Path: toy_rust
-- Use Statement: None
-- Function Name: subtract
-- Parameters: a: i32, b: i32
-- Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=640
-
-Function Key: 10262539890973499544
-- Macro: false
-- Crate: rand
-- From Crate: toy_rust
-- Module Path: rand::rngs::thread
-- Use Statement: None
-- Function Name: thread_rng
-- Parameters: 
-- Is Entry Node: true
-- Location: /home/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/rngs/thread.rs|offset=3478
-
-Function Key: 9267734104974067823
+Function Key: 11142169472444022727
 - Macro: false
 - Crate: rand
 - From Crate: toy_rust
@@ -42,13 +9,13 @@ Function Key: 9267734104974067823
 - Use Statement: None
 - Function Name: gen_range
 - Parameters: self:   RngCore: {}
-, range:   Sized: {}
-  SampleRange: {}
+, range:   SampleRange: {}
+  Sized: {}
 
 - Is Entry Node: true
-- Location: /home/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/rng.rs|offset=3545
+- Location: C:\Users\wowkn\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\rand-0.8.5\src\rng.rs|offset=3545
 
-Function Key: 5598621925455889547
+Function Key: 15838047623345370574
 - Macro: false
 - Crate: toy_rust
 - From Crate: toy_rust
@@ -57,9 +24,9 @@ Function Key: 5598621925455889547
 - Function Name: multiply
 - Parameters: a: i32, b: i32
 - Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=690
+- Location: c:\Users\wowkn\Desktop\repos\SBOMFuzz-IDE\sbomfuzz\toy-rust\src\main.rs|offset=722
 
-Function Key: 16087102652566354695
+Function Key: 10306848671516669046
 - Macro: false
 - Crate: toy_rust
 - From Crate: toy_rust
@@ -68,6 +35,39 @@ Function Key: 16087102652566354695
 - Function Name: divide
 - Parameters: a: i32, b: i32
 - Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=740
+- Location: c:\Users\wowkn\Desktop\repos\SBOMFuzz-IDE\sbomfuzz\toy-rust\src\main.rs|offset=776
+
+Function Key: 17547988432855206318
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: subtract
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: c:\Users\wowkn\Desktop\repos\SBOMFuzz-IDE\sbomfuzz\toy-rust\src\main.rs|offset=668
+
+Function Key: 10649772251314453203
+- Macro: false
+- Crate: rand
+- From Crate: toy_rust
+- Module Path: rand::rngs::thread
+- Use Statement: None
+- Function Name: thread_rng
+- Parameters: 
+- Is Entry Node: true
+- Location: C:\Users\wowkn\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\rand-0.8.5\src\rngs\thread.rs|offset=3478
+
+Function Key: 7595260482173201306
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: add
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: c:\Users\wowkn\Desktop\repos\SBOMFuzz-IDE\sbomfuzz\toy-rust\src\main.rs|offset=393
 
 Finished writing all functions.

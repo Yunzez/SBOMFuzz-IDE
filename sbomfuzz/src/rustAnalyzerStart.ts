@@ -71,8 +71,7 @@ function get_platform_specific_binary() {
   console.log("PLATFORM: ", process.platform);
   switch(process.platform) {
     case "win32":
-      console.log("WINDOWS RUST ANALYZER IS UNIMPLEMENTED");
-      return "rust-analyzer-windows"
+      return "rust-analyzer-win32.exe"
     case "linux":
       return "rust-analyzer-linux"
     case "darwin":
