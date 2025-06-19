@@ -275,7 +275,7 @@ var SbomFuzzWebviewViewProvider = class {
     const webviewUri = webview.asWebviewUri(mediaPath);
     const templatePath = path4.join(
       this.context.extensionPath,
-      "media",
+      "public",
       "template.html"
     );
     let html = fs4.readFileSync(templatePath, "utf-8");

@@ -105,7 +105,7 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
 
     const templatePath = path.join(
       this.context.extensionPath,
-      "media",
+      "public",
       "template.html"
     );
     let html = fs.readFileSync(templatePath, "utf-8");

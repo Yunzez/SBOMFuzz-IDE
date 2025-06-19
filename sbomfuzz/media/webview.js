@@ -1,76 +1,8 @@
-const vscode = acquireVsCodeApi();
-function logToExtension(message) {
-  vscode.postMessage({ command: "log", message });
-}
-
-
-var pathSelected = null;
-
-// Ask extension backend to find project root
-vscode.postMessage({ command: "getCargoProjectRoot" });
-// Listen for reply
-window.addEventListener("message", (event) => {
-  const msg = event.data;
-  if (msg.command === "cargoProjectRoot") {
-    const pathDiv = document.getElementById("path-display-container");
-    if (msg.path) {
-      console.log("Got Cargo root:", msg.path);
-      pathDiv.innerHTML = `Cargo Project Root: ${msg.path}`;
-      pathSelected = msg.path;
-    } else {
-      pathDiv.innerHTML = "No Cargo project found.";
-    }
-  }
-});
-
-
-const targetContainer = document.getElementById("entry-list");
-const entryButton = document.getElementById("entry-button");
-entryButton.addEventListener("click", () => {
-  vscode.postMessage({ command: "requestEntries", target: "none" });
-});
-
-
-const startButton = document.getElementById("start-analyzer");
-startButton.addEventListener("click", () => {
-  vscode.postMessage({
-    command: "runAnalyzer",
-    target: "none",
-    projectPath: pathSelected,
-  });
-});
-
-const testVis = document.getElementById("test-vis");
-testVis.addEventListener("click", () => {
-  vscode.postMessage({ command: "testVisualization" });
-});
-
-window.addEventListener("message", (event) => {
-  const message = event.data;
-
-  if (message.command === "rustAnalysisDone") {
-    logToExtension("Rust analysis completed successfully, results available.");
-    
-    let results = message.results || [];
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i];
-      const resultDiv = document.createElement("div");
-      resultDiv.className = "function-button";
-      resultDiv.innerHTML = `
-      <div style="font-weight:bold; margin-bottom:4px;"> ${result.functionName}::${result.functionName}</div>
-      <div>${result.functionLocation.filePath.replace(pathSelected, "")}</div>
-    `;
-
-      resultDiv.onclick = () => {
-        vscode.postMessage({
-          command: "openLocation",
-          filePath: result.functionLocation.filePath,
-          offset: result.functionLocation.offset,
-        });
-      };
-      targetContainer.appendChild(resultDiv);
-    }
-    // Display results in DOM, or call some render function
-    //   displayResults(message.results);
-  }
-});
+const r=acquireVsCodeApi();let a=null,s=null;function d(e={}){a=e.onRustAnalysisDone||(()=>{}),s=e.onCargoProjectRoot||(()=>{}),window.addEventListener("message",t=>{const n=t.data;switch(n.command){case"cargoProjectRoot":s&&s(n.path);break;case"rustAnalysisDone":c("Rust analysis completed successfully"),a&&a(n.results||[]);break;default:console.warn("Unhandled message from extension:",n);break}}),o({command:"getCargoProjectRoot"})}function o(e){r.postMessage(e)}function c(e){o({command:"log",message:e})}let i=null;const u=document.getElementById("entry-list"),l=document.getElementById("path-display-container");d({onCargoProjectRoot:e=>{e?(c("📦 Got Cargo project root: "+e),i=e,l.innerHTML=`Cargo Project Root: ${e}`):l.innerHTML="No Cargo project found."},onRustAnalysisDone:e=>{c("Rendering function results");for(const t of e){const n=document.createElement("div");n.className="function-button",n.innerHTML=`
+        <div style="font-weight:bold; margin-bottom:4px;">
+          ${t.functionName}::${t.functionName}
+        </div>
+        <div>
+          ${t.functionLocation.filePath.replace(i,"")}
+        </div>
+      `,n.onclick=()=>{o({command:"openLocation",filePath:t.functionLocation.filePath,offset:t.functionLocation.offset})},u.appendChild(n)}}});document.getElementById("entry-button").addEventListener("click",()=>{o({command:"requestEntries",target:"none"})});document.getElementById("start-analyzer").addEventListener("click",()=>{o({command:"runAnalyzer",target:"none",projectPath:i})});document.getElementById("test-vis").addEventListener("click",()=>{o({command:"testVisualization"})});
