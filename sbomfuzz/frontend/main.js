@@ -50,7 +50,7 @@ setupMessaging({
       const createRootButton = document.createElement("button");
       createRootButton.textContent = "Create a Root";
       createRootButton.addEventListener("click", () => {
-        sendMessage({ command: "createFuzzRoot" });
+        sendMessage({ command: "createFuzzRoot", target: pathSelected });
       });
       fuzzPathDiv.appendChild(createRootButton);
     }

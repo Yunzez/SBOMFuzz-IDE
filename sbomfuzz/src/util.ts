@@ -35,3 +35,21 @@ export function findFuzzRoot(): string | undefined {
 
   return;
 }
+
+
+export function waitForDir(dir: string, timeout = 5000): Promise<boolean> {
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (fs.existsSync(dir)) {
+        clearInterval(interval);
+        resolve(true);
+      }
+    }, 500);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      resolve(false);
+    }, timeout);
+  });
+}
+

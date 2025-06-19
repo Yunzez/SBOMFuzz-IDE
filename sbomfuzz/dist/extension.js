@@ -225,6 +225,20 @@ function findFuzzRoot() {
   }
   return;
 }
+function waitForDir(dir, timeout = 5e3) {
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (fs3.existsSync(dir)) {
+        clearInterval(interval);
+        resolve(true);
+      }
+    }, 500);
+    setTimeout(() => {
+      clearInterval(interval);
+      resolve(false);
+    }, timeout);
+  });
+}
 
 // src/view.ts
 var SbomFuzzWebviewViewProvider = class {
@@ -282,6 +296,37 @@ var SbomFuzzWebviewViewProvider = class {
       }
       if (message.command === "openLocation") {
         jumpToFunctionLocation(message);
+      }
+      if (message.command === "createFuzzRoot") {
+        const targetDir = message.target;
+        if (!targetDir) {
+          vscode4.window.showErrorMessage("No project path selected.");
+          return;
+        }
+        const fuzzDir = path4.join(targetDir, "fuzz");
+        if (fs4.existsSync(fuzzDir)) {
+          vscode4.window.showWarningMessage("Fuzz directory already exists.");
+          return;
+        }
+        const terminal = vscode4.window.createTerminal({
+          name: "cargo-fuzz-init",
+          cwd: targetDir
+        });
+        terminal.show();
+        terminal.sendText("cargo fuzz init");
+        waitForDir(fuzzDir).then((ok) => {
+          if (ok) {
+            vscode4.window.showInformationMessage("\u2705 Fuzz root created!");
+            webviewView.webview.postMessage({
+              command: "fuzzRoot",
+              path: fuzzDir
+            });
+          } else {
+            vscode4.window.showWarningMessage(
+              "\u26A0\uFE0F Fuzz root may failed, please check."
+            );
+          }
+        });
       }
       if (message.command === "testVisualization") {
         const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
