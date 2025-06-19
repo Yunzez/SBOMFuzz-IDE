@@ -1,28 +1,6 @@
 All Functions Summary:
 - Total Functions: 6
 
-Function Key: 16087102652566354695
-- Macro: false
-- Crate: toy_rust
-- From Crate: toy_rust
-- Module Path: toy_rust
-- Use Statement: None
-- Function Name: divide
-- Parameters: a: i32, b: i32
-- Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=669
-
-Function Key: 5598621925455889547
-- Macro: false
-- Crate: toy_rust
-- From Crate: toy_rust
-- Module Path: toy_rust
-- Use Statement: None
-- Function Name: multiply
-- Parameters: a: i32, b: i32
-- Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=619
-
 Function Key: 4825780689967349298
 - Macro: false
 - Crate: toy_rust
@@ -32,7 +10,7 @@ Function Key: 4825780689967349298
 - Function Name: add
 - Parameters: a: i32, b: i32
 - Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=378
+- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=377
 
 Function Key: 6267734885793165406
 - Macro: false
@@ -43,9 +21,9 @@ Function Key: 6267734885793165406
 - Function Name: subtract
 - Parameters: a: i32, b: i32
 - Is Entry Node: false
-- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=569
+- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=640
 
-Function Key: 3468234288576103598
+Function Key: 10262539890973499544
 - Macro: false
 - Crate: rand
 - From Crate: toy_rust
@@ -69,5 +47,27 @@ Function Key: 9267734104974067823
 
 - Is Entry Node: true
 - Location: /home/jack/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/rng.rs|offset=3545
+
+Function Key: 5598621925455889547
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: multiply
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=690
+
+Function Key: 16087102652566354695
+- Macro: false
+- Crate: toy_rust
+- From Crate: toy_rust
+- Module Path: toy_rust
+- Use Statement: None
+- Function Name: divide
+- Parameters: a: i32, b: i32
+- Is Entry Node: false
+- Location: /home/jack/repos/SBOMFuzz-IDE/sbomfuzz/toy-rust/src/main.rs|offset=740
 
 Finished writing all functions.

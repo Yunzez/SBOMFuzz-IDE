@@ -135,9 +135,13 @@ function parseFunctionLocation(locationStr) {
 // src/rustAnalyzerStart.ts
 function runRustAnalyzer(context, projectPath, webview) {
   vscode2.window.showInformationMessage(
-    "Starting Rust analyzer, this may take a while."
+    "Starting Rust analyzer, this may take a while"
   );
-  const binaryPath = path2.join(context.extensionPath, "core", "rust-analyzer");
+  const binary_name = get_platform_specific_binary();
+  if (binary_name === void 0) {
+    return;
+  }
+  const binaryPath = path2.join(context.extensionPath, "core", binary_name);
   const outputPath = path2.join(context.extensionPath, "output");
   if (fs2.existsSync(outputPath)) {
     fs2.rmSync(outputPath, { recursive: true, force: true });
@@ -173,6 +177,21 @@ function runRustAnalyzer(context, projectPath, webview) {
       vscode2.window.showErrorMessage(`Rust analyzer failed: ${stderr}`);
     }
   });
+}
+function get_platform_specific_binary() {
+  console.log("PLATFORM: ", process.platform);
+  switch (process.platform) {
+    case "win32":
+      console.log("WINDOWS RUST ANALYZER IS UNIMPLEMENTED");
+      return "rust-analyzer-windows";
+    case "linux":
+      return "rust-analyzer-linux";
+    case "darwin":
+      return "rust-analyzer-darwin";
+    default:
+      console.log("UNKNOWN PLATFORM: ", process.platform);
+      return void 0;
+  }
 }
 
 // src/util.ts
