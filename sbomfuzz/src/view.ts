@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
-import { findCargoProjectRoot, findFuzzRoot, waitForDir } from "./util";
+import { findCargoProjectRoot, findFuzzRoot, getFuzzTargets, waitForDir } from "./util";
 import {
   FunctionLocation,
   loadFunctionResults,
@@ -124,6 +124,14 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.postMessage({
           command: "rustAnalysisDone",
           results,
+        });
+      }
+
+      if (message.command === "getFuzzTargets") {
+        const targets = getFuzzTargets(message.fuzzRoot); // ✅ safe to use fs here
+        webviewView.webview.postMessage({
+          command: "fuzzTargetsListed",
+          targets,
         });
       }
     });

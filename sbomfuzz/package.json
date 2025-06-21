@@ -74,5 +74,8 @@
     "npm-run-all": "^4.1.5",
     "typescript": "^5.8.3",
     "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "toml": "^3.0.0"
   }
 }

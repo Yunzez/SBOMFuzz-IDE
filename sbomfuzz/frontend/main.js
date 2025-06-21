@@ -1,5 +1,5 @@
 import { setupMessaging, sendMessage, log } from "./messaging.js";
-
+import { getFuzzTargets } from "./fuzzTarget.js";
 let pathSelected = null;
 let fuzzRootSelected = null;
 const targetContainer = document.getElementById("entry-list");
@@ -38,14 +38,15 @@ setupMessaging({
   },
 
   onFuzzRoot: (fuzzRootPath) => {
-     const fuzzPathDiv = document.getElementById("fuzz-path-display");
-      
+    const fuzzPathDiv = document.getElementById("fuzz-path-display");
+
     if (fuzzRootPath) {
       log("🧪 Got Fuzz root: " + fuzzRootPath);
       fuzzRootSelected = fuzzRootPath;
       fuzzPathDiv.innerHTML = `Fuzz Root: ${fuzzRootPath}`;
+      log("Getting Fuzz targets: ");
+      sendMessage({ command: "getFuzzTargets", fuzzRoot: fuzzRootPath });
     } else {
-
       fuzzPathDiv.innerText = "No Fuzz root found.";
       const createRootButton = document.createElement("button");
       createRootButton.textContent = "Create a Root";
@@ -54,6 +55,38 @@ setupMessaging({
       });
       fuzzPathDiv.appendChild(createRootButton);
     }
+  },
+
+  onFuzzTargetsListed: (targets) => {
+    log("🧪 Fuzz targets listed:", targets);
+    const targetList = document.getElementById("harness-list");
+    targetList.innerHTML = ""; // Clear previous targets
+    if (targets.length === 0) {
+      targetList.innerHTML = "<div>No fuzz targets found.</div>";
+      return;
+    }
+    for (const target of targets) {
+      const targetDiv = document.createElement("div");
+      targetDiv.className = "function-button";
+      targetDiv.innerHTML = `
+        <div style="font-weight:bold; margin-bottom:4px;">
+          ${target.name}
+        </div>
+        <div>
+          ${target.path.replace(fuzzRootSelected, "")}
+        </div>
+      `;
+
+      targetDiv.onclick = () => {
+        sendMessage({
+          command: "openFuzzTarget",
+          filePath: target.path,
+        });
+      };
+
+      targetList.appendChild(targetDiv);
+    }
+
   },
 
   onRustAnalysisDone: (results) => {
