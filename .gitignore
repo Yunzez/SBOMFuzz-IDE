@@ -8,3 +8,4 @@ sbomfuzz/.DS_Store
 .DS_Store
 sbomfuzz/harnessGen/.env
 sbomfuzz/.env
+sbomfuzz/.env
