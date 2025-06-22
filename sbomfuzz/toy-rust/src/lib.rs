@@ -34,7 +34,9 @@ fn multiply(a: i32, b: i32) -> i32 {
     a * b
 }
 
-fn divide(a: i32, b: i32) -> i32 {
+// ! this divide has a bug that can cause a panic
+// ! -i32::MIN = +2_147_483_648 → which does not fit in an i32
+pub fn divide(a: i32, b: i32) -> i32 {
     if b == 0 {
         panic!("Cannot divide by zero");
     }

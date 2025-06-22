@@ -1,0 +1,7 @@
+Given the following Rust fuzz harness and its error message, fix the code so it compiles and runs. Output only the corrected code.
+
+<HARNESS-CODE>
+
+Error message:
+
+<ERROR-LOG>
