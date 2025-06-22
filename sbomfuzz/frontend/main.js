@@ -29,36 +29,6 @@ collapsibleHeaders.forEach((header) => {
 });
 
 setupMessaging({
-  onCargoProjectRoot: (projectRootPath) => {
-    if (projectRootPath) {
-      log("📦 Got Cargo project root: " + projectRootPath);
-      pathSelected = projectRootPath;
-      pathDiv.innerHTML = `Cargo Project Root: ${projectRootPath}`;
-    } else {
-      pathDiv.innerHTML = "No Cargo project found.";
-    }
-  },
-
-  onFuzzRoot: (fuzzRootPath) => {
-    const fuzzPathDiv = document.getElementById("fuzz-path-display");
-
-    if (fuzzRootPath) {
-      log("🧪 Got Fuzz root: " + fuzzRootPath);
-      fuzzRootSelected = fuzzRootPath;
-      fuzzPathDiv.innerHTML = `Fuzz Root: ${fuzzRootPath}`;
-      log("Getting Fuzz targets: ");
-      sendMessage({ command: "getFuzzTargets", fuzzRoot: fuzzRootPath });
-    } else {
-      fuzzPathDiv.innerText = "No Fuzz root found.";
-      const createRootButton = document.createElement("button");
-      createRootButton.textContent = "Create a Root";
-      createRootButton.addEventListener("click", () => {
-        sendMessage({ command: "createFuzzRoot", target: pathSelected });
-      });
-      fuzzPathDiv.appendChild(createRootButton);
-    }
-  },
-
   onFuzzTargetsListed: (targets) => {
     log("🧪 Fuzz targets listed:", targets);
     const targetList = document.getElementById("harness-list");
@@ -92,7 +62,6 @@ setupMessaging({
 
   onRustAnalysisDone: (results) => {
     log("Rendering function results");
-    functionTargets = results;
     targetContainer.innerHTML = ""; // Clear previous results
     for (const result of results) {
       const resultDiv = document.createElement("div");
@@ -115,6 +84,61 @@ setupMessaging({
       };
 
       targetContainer.appendChild(resultDiv);
+    }
+  },
+
+  onGlobalContext: (context) => {
+    log("Global context received:", context.projectRoot);
+    const projectRootPath = context.projectRoot;
+    if (projectRootPath) {
+      log("📦 Got Cargo project root: " + projectRootPath);
+      pathSelected = projectRootPath;
+      pathDiv.innerHTML = `Cargo Project Root: ${projectRootPath}`;
+    } else {
+      pathDiv.innerHTML = "No Cargo project found.";
+    }
+
+    const fuzzPathDiv = document.getElementById("fuzz-path-display");
+    const fuzzRootPath = context.fuzzRoot;
+    if (fuzzRootPath) {
+      log("🧪 Got Fuzz root: " + fuzzRootPath);
+      fuzzRootSelected = fuzzRootPath;
+      fuzzPathDiv.innerHTML = `Fuzz Root: ${fuzzRootPath}`;
+      log("Getting Fuzz targets: ");
+      sendMessage({ command: "getFuzzTargets", fuzzRoot: fuzzRootPath });
+    } else {
+      fuzzPathDiv.innerText = "No Fuzz root found.";
+      const createRootButton = document.createElement("button");
+      createRootButton.textContent = "Create a Root";
+      createRootButton.addEventListener("click", () => {
+        sendMessage({ command: "createFuzzRoot", target: pathSelected });
+      });
+      fuzzPathDiv.appendChild(createRootButton);
+    }
+    if (context.results && context.results.length > 0) {
+      targetContainer.innerHTML = ""; // Clear previous results
+      for (const result of context.results ) {
+        const resultDiv = document.createElement("div");
+        resultDiv.className = "function-button";
+        resultDiv.innerHTML = `
+        <div style="font-weight:bold; margin-bottom:4px;">
+          ${result.functionModulePath}::${result.functionName}
+        </div>
+        <div>
+          ${result.functionLocation.filePath.replace(pathSelected, "")}
+        </div>
+      `;
+
+        resultDiv.onclick = () => {
+          sendMessage({
+            command: "openLocation",
+            filePath: result.functionLocation.filePath,
+            offset: result.functionLocation.offset,
+          });
+        };
+
+        targetContainer.appendChild(resultDiv);
+      }
     }
   },
 

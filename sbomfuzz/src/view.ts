@@ -13,7 +13,7 @@ import {
   loadFunctionResults,
 } from "./functionOutputProcesser";
 import { generateHarness, optimizeHarness } from "./harnessGen";
-
+import { getGlobalContext } from "./globalContextProvider";
 let currentWebview: vscode.Webview | undefined;
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
@@ -29,6 +29,7 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       enableScripts: true,
     };
     currentWebview = webviewView.webview;
+    const globalContext = getGlobalContext();
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage((message) => {
@@ -43,16 +44,12 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         );
       }
 
-      if (message.command === "showSbom") {
-        vscode.window.showInformationMessage(
-          `Showing SBOM for target: ${message.target}`
-        );
-      }
-
-      if (message.command === "requestEntries") {
-        vscode.window.showInformationMessage(
-          `Running sbomfuzz for entry list ${message.target}, this may take a while`
-        );
+      if (message.command === "getGlobaclContext") {
+        console.log("Requesting global context", globalContext);
+        webviewView.webview.postMessage({
+          command: "globalContext",
+          context: globalContext,
+        });
       }
 
       if (message.command === "runAnalyzer") {
@@ -60,24 +57,10 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         console.log("Resolved analyzer path:", projectRoot);
         console.log("Exists:", fs.existsSync(projectRoot));
         console.log("Is file:", fs.statSync(projectRoot).isFile());
-        runRustAnalyzer(this.context, projectRoot, webviewView.webview);
-      }
-
-      if (message.command === "getCargoProjectRoot") {
-        console.log("Requesting Cargo project root");
-        const root = findCargoProjectRoot(); // your helper function
+        const results = runRustAnalyzer(this.context, projectRoot);
         webviewView.webview.postMessage({
-          command: "cargoProjectRoot",
-          path: root,
-        });
-      }
-
-      if (message.command === "getFuzzRoot") {
-        console.log("Requesting Fuzz root");
-        const fuzzRoot = findFuzzRoot();
-        webviewView.webview.postMessage({
-          command: "fuzzRoot",
-          path: fuzzRoot,
+          command: "rustAnalysisDone",
+          results,
         });
       }
 

@@ -3,13 +3,11 @@
 const vscode = acquireVsCodeApi();
 
 let onRustAnalysisDone = null;
-let onCargoProjectRoot = null;
 
 export function setupMessaging(handlers = {}) {
   // Assign callback functions
   onRustAnalysisDone = handlers.onRustAnalysisDone || (() => {});
-  onCargoProjectRoot = handlers.onCargoProjectRoot || (() => {});
-  onFuzzRoot = handlers.onFuzzRoot || (() => {});
+  onGlobalContext = handlers.onGlobalContext || (() => {});
   onFuzzTargetsListed = handlers.onFuzzTargetsListed || (() => {});
   onCodeLensClicked = handlers.onCodeLensClicked || (() => {});
   // Listen for messages from the extension
@@ -18,9 +16,10 @@ export function setupMessaging(handlers = {}) {
     const msg = event.data;
 
     switch (msg.command) {
-      case "cargoProjectRoot":
-        if (onCargoProjectRoot) {
-          onCargoProjectRoot(msg.path);
+     
+      case "globalContext":
+        if (onGlobalContext) {
+          onGlobalContext(msg.context || {});
         }
         break;
 
@@ -30,13 +29,7 @@ export function setupMessaging(handlers = {}) {
           onRustAnalysisDone(msg.results || []);
         }
         break;
-
-      case "fuzzRoot":
-        if (onFuzzRoot) {
-          onFuzzRoot(msg.path);
-        }
-        break;
-
+        
       case "fuzzTargetsListed":
         if (onFuzzTargetsListed) {
           onFuzzTargetsListed(msg.targets || []);
@@ -55,10 +48,11 @@ export function setupMessaging(handlers = {}) {
     }
   });
 
-  // Request project root immediately
-  sendMessage({ command: "getCargoProjectRoot" });
-  // Request fuzz root immediately
-  sendMessage({ command: "getFuzzRoot" });
+  sendMessage({ command: "getGlobaclContext" });
+  // // Request project root immediately
+  // sendMessage({ command: "getCargoProjectRoot" });
+  // // Request fuzz root immediately
+  // sendMessage({ command: "getFuzzRoot" });
 }
 
 // 🔼 Used to send messages to the extension

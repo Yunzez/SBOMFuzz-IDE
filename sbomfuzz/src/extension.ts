@@ -3,15 +3,18 @@
 import * as vscode from "vscode";
 import { SbomFuzzWebviewViewProvider } from "./view";
 import { RustFunctionCodeLensProvider } from "./rustFunctionCodeLensProvider";
-let globalWebview: vscode.Webview | undefined;
+import { findFuzzRoot } from "./util";
+import { useGlobalContext } from "./globalContextProvider";
+import path from "path";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "sbomfuzz" is now active!');
+  await useGlobalContext(context);
 
+  console.log('Congratulations, your extension "sbomfuzz" is now active!');
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
@@ -45,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "sbomfuzz.showFunctionInfo", // same as used in CodeLens
       (functionName: string, filePath: string) => {
-		// ? we get the webview from the provider, the webview is static
+        // ? we get the webview from the provider, the webview is static
         const webview = SbomFuzzWebviewViewProvider.getWebview();
         if (webview) {
           webview.postMessage({
@@ -60,7 +63,6 @@ export function activate(context: vscode.ExtensionContext) {
     )
   );
 
-  
   context.subscriptions.push(disposable);
 }
 
