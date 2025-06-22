@@ -16,8 +16,8 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
         const range = new vscode.Range(i, 0, i, line.text.length);
         const cmd: vscode.Command = {
           title: 'Show Function Info',
-          command: 'workbench.view.extension.sbomfuzzContainer',
-          arguments: [functionName]
+          command: 'sbomfuzz.showFunctionInfo',
+          arguments: [functionName, document.uri.fsPath]
         };
         lenses.push(new vscode.CodeLens(range, cmd));
       }

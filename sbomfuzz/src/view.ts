@@ -2,11 +2,19 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
-import { findCargoProjectRoot, findFuzzRoot, getFuzzTargets, waitForDir } from "./util";
+import {
+  findCargoProjectRoot,
+  findFuzzRoot,
+  getFuzzTargets,
+  waitForDir,
+} from "./util";
 import {
   FunctionLocation,
   loadFunctionResults,
 } from "./functionOutputProcesser";
+import { generateHarness } from "./harnessGen";
+
+let currentWebview: vscode.Webview | undefined;
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
 
@@ -20,7 +28,7 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
     webviewView.webview.options = {
       enableScripts: true,
     };
-
+    currentWebview = webviewView.webview;
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage((message) => {
@@ -128,11 +136,18 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       }
 
       if (message.command === "getFuzzTargets") {
-        const targets = getFuzzTargets(message.fuzzRoot); // ✅ safe to use fs here
+        const targets = getFuzzTargets(message.fuzzRoot); 
         webviewView.webview.postMessage({
           command: "fuzzTargetsListed",
           targets,
         });
+      }
+
+      if (message.command === "generateHarness") {
+        const target = message.target;
+        const root = message.fuzzRoot; 
+        console.log("Generating harness for target:", target);
+        generateHarness(target, root, this.context.extensionPath);
       }
     });
   }
@@ -153,6 +168,11 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
     html = html.replace(/\$\{webviewUri\}/g, webviewUri.toString());
 
     return html;
+  }
+
+  // Expose the current webview to other modules
+  static getWebview(): vscode.Webview | undefined {
+    return currentWebview;
   }
 }
 

@@ -11,8 +11,10 @@ export function setupMessaging(handlers = {}) {
   onCargoProjectRoot = handlers.onCargoProjectRoot || (() => {});
   onFuzzRoot = handlers.onFuzzRoot || (() => {});
   onFuzzTargetsListed = handlers.onFuzzTargetsListed || (() => {});
+  onCodeLensClicked = handlers.onCodeLensClicked || (() => {});
   // Listen for messages from the extension
   window.addEventListener("message", (event) => {
+    // ! this handles messages sent from the extension
     const msg = event.data;
 
     switch (msg.command) {
@@ -35,10 +37,17 @@ export function setupMessaging(handlers = {}) {
         }
         break;
 
-        case "fuzzTargetsListed":
+      case "fuzzTargetsListed":
         if (onFuzzTargetsListed) {
           onFuzzTargetsListed(msg.targets || []);
         }
+        break;
+
+      case "showFunctionInfo":
+        if (onCodeLensClicked) {
+          onCodeLensClicked(msg);
+        }
+        break;
 
       default:
         console.warn("Unhandled message from extension:", msg);

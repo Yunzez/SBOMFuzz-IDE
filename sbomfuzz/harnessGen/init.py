@@ -48,15 +48,6 @@ def prepare_prompt(fuzzer_choice):
 def main(function_info_path, software_dir, fuzzer_choice):
 
     load_dotenv()
-    # Validate function entry information file
-    if not os.path.isfile(function_info_path):
-        print(f"Error: Function entry information file '{function_info_path}' not found.")
-        return
-
-    # Validate software directory
-    if not os.path.isdir(software_dir):
-        print(f"Error: Software directory '{software_dir}' not found.")
-        return
 
     # Validate fuzzer choice (placeholder, expand based on available fuzzers)
     supported_fuzzers = ["libfuzzer", "afl", "honggfuzz"]

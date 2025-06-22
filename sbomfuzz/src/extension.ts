@@ -3,6 +3,7 @@
 import * as vscode from "vscode";
 import { SbomFuzzWebviewViewProvider } from "./view";
 import { RustFunctionCodeLensProvider } from "./rustFunctionCodeLensProvider";
+let globalWebview: vscode.Webview | undefined;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -33,9 +34,33 @@ export function activate(context: vscode.ExtensionContext) {
 
   const codeLensProvider = new RustFunctionCodeLensProvider();
   context.subscriptions.push(
-    vscode.languages.registerCodeLensProvider({ language: 'rust' }, codeLensProvider)
+    vscode.languages.registerCodeLensProvider(
+      { language: "rust" },
+      codeLensProvider
+    )
   );
 
+  // connect the lens with webview
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "sbomfuzz.showFunctionInfo", // same as used in CodeLens
+      (functionName: string, filePath: string) => {
+		// ? we get the webview from the provider, the webview is static
+        const webview = SbomFuzzWebviewViewProvider.getWebview();
+        if (webview) {
+          webview.postMessage({
+            command: "showFunctionInfo",
+            functionName,
+            filePath,
+          });
+        } else {
+          vscode.window.showWarningMessage("Webview not available.");
+        }
+      }
+    )
+  );
+
+  
   context.subscriptions.push(disposable);
 }
 

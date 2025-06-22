@@ -1,7 +1,9 @@
 import { setupMessaging, sendMessage, log } from "./messaging.js";
-import { getFuzzTargets } from "./fuzzTarget.js";
+import { findFuzzTargets } from "./fuzzTarget.js";
+
 let pathSelected = null;
 let fuzzRootSelected = null;
+let functionTargets = null;
 const targetContainer = document.getElementById("entry-list");
 const pathDiv = document.getElementById("path-display-container");
 
@@ -86,11 +88,11 @@ setupMessaging({
 
       targetList.appendChild(targetDiv);
     }
-
   },
 
   onRustAnalysisDone: (results) => {
     log("Rendering function results");
+    functionTargets = results;
     targetContainer.innerHTML = ""; // Clear previous results
     for (const result of results) {
       const resultDiv = document.createElement("div");
@@ -115,11 +117,26 @@ setupMessaging({
       targetContainer.appendChild(resultDiv);
     }
   },
-});
 
-// 📤 Button actions
-document.getElementById("entry-button").addEventListener("click", () => {
-  sendMessage({ command: "requestEntries", target: "none" });
+  onCodeLensClicked: (message) => {
+    log(
+      "Code lens clicked:",
+      message.functionName,
+      "in file:",
+      message.filePath
+    );
+    let focustarget = findFuzzTargets(
+      message.functionName,
+      message.filePath,
+      functionTargets
+    );
+    log("Fuzz target found:", focustarget);
+    sendMessage({
+      command: "generateHarness",
+      target: focustarget,
+      fuzzRoot: fuzzRootSelected,
+    });
+  },
 });
 
 document.getElementById("start-analyzer").addEventListener("click", () => {

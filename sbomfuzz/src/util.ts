@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import * as toml from "toml";
+import dotenv from "dotenv";
+dotenv.config();
 export function findCargoProjectRoot(): string | undefined {
   const folders = vscode.workspace.workspaceFolders;
   if (!folders) {
