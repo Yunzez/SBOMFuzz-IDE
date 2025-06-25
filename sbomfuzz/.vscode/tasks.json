@@ -6,7 +6,7 @@
         {
             "label": "build webview",
             "type": "shell",
-            "command": "npm run compile && npm run build:webview",
+            "command": "npm run compile_build",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
