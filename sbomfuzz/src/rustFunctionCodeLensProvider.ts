@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import * as fs from "fs";
 
 export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
   provideCodeLenses(
@@ -27,5 +28,29 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
     }
 
     return lenses;
+  }
+}
+
+
+
+export function make_function_public(file_path: string, function_name: string) {
+  let file_content = fs.readFileSync(file_path, 'utf-8');
+  const lines = file_content.split('\n');
+
+  // Regex to match function with function_name that isn't already public
+  const fn_regex = new RegExp(`^\\s*(?!pub\\s)(async\\s+)?fn\\s+${function_name}\\s*\\(`);
+
+  // Search for function in each line
+  for (let i = 0; i < lines.length; i++) {
+    if (fn_regex.test(lines[i])) {
+      // Skip whitespace
+      const indent_match = lines[i].match(/^(\s*)/);
+      const indent = indent_match ? indent_match[1] : '';
+      // Insert pub on front of the function signature
+      // Fairly certain "pub" always needs to go on the front of the signature in rust syntax
+      lines[i] = lines[i].replace(fn_regex, `${indent}pub $1fn ${function_name}(`);
+      fs.writeFileSync(file_path, lines.join('\n'), 'utf-8');
+      return;
+    }
   }
 }

@@ -59,7 +59,8 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test",
-    "build:webview": "vite build"
+    "build:webview": "vite build",
+    "compile_build": "npm run compile && npm run build:webview"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
