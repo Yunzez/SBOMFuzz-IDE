@@ -2,9 +2,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.3",
   "version": 1,
-  "serialNumber": "urn:uuid:4b572cdd-9528-4edc-8e49-dcb833763a42",
+  "serialNumber": "urn:uuid:d5426b9a-a9ff-4fec-8f68-2ab28507567e",
   "metadata": {
-    "timestamp": "2025-06-22T21:39:01.997555000Z",
+    "timestamp": "2025-06-26T19:28:23.735002000Z",
     "tools": [
       {
         "vendor": "CycloneDX",
@@ -13,7 +13,7 @@
       }
     ],
     "component": {
-      "type": "library",
+      "type": "application",
       "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust#0.1.0",
       "name": "toy-rust",
       "version": "0.1.0",
@@ -26,6 +26,13 @@
           "name": "toy_rust",
           "version": "0.1.0",
           "purl": "pkg:cargo/toy-rust@0.1.0?download_url=file://.#src/lib.rs"
+        },
+        {
+          "type": "application",
+          "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/toy-rust#0.1.0 bin-target-1",
+          "name": "toy-rust",
+          "version": "0.1.0",
+          "purl": "pkg:cargo/toy-rust@0.1.0?download_url=file://.#src/main.rs"
         }
       ]
     },
