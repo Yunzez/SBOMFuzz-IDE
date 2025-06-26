@@ -9,3 +9,4 @@ sbomfuzz/.DS_Store
 sbomfuzz/harnessGen/.env
 sbomfuzz/.env
 sbomfuzz/.env
+.DS_Store

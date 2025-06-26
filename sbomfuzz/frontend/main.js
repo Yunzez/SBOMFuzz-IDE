@@ -116,6 +116,7 @@ setupMessaging({
       fuzzPathDiv.appendChild(createRootButton);
     }
     if (context.results && context.results.length > 0) {
+      functionTargets = context.results;
       targetContainer.innerHTML = ""; // Clear previous results
       for (const result of context.results ) {
         const resultDiv = document.createElement("div");

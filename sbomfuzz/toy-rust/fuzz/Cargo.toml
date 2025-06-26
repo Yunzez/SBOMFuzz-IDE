@@ -20,6 +20,7 @@ test = false
 doc = false
 bench = false
 
+
 [[bin]]
 name = "fuzz_target_divide"
 path = "fuzz_targets/fuzz_target_divide.rs"
