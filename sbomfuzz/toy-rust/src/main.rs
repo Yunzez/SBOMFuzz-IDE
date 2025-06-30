@@ -1,6 +1,5 @@
-use toy_rust::{add, subtract, multiply, divide};
+use toy_rust::{ add, divide, multiply, parser, subtract };
 use toy_rust::create_todo::TodoList;
-
 
 fn main() {
     println!("Hello, world!");
@@ -22,8 +21,13 @@ fn main() {
 
     todo_list.print_todo();
 
+    println!("{}", todo_list.sugguest_something());
+
     todo_list.mark_done(1);
     todo_list.delete(2);
 
     todo_list.print();
+
+    let input = "this is unsafe parsing";
+    let tokens = parser::parse_tokens(input);
 }
