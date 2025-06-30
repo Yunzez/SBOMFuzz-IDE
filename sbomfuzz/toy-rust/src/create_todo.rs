@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use rand::Rng;
+
 #[derive(Debug, Clone)]
 pub(crate) struct TodoItem {
     id: u32,
@@ -43,6 +45,24 @@ impl TodoList {
     pub fn mark_done(&mut self, id: u32) {
         if let Some(todo) = self.todos.get_mut(&id) {
             todo.done = true;
+        }
+    }
+
+    pub fn random_todo(&self) -> usize {
+        let mut rng = rand::thread_rng();
+        let random_index = rng.gen_range(0..self.todos.len());
+        let todo_id = self.todos.keys().nth(random_index).unwrap();
+        *todo_id as usize
+    }
+
+    pub fn sugguest_something(&self) -> String {
+        let mut rng = rand::thread_rng();
+        let random_index = rng.gen_range(0..self.todos.len());
+        let todo_id = self.todos.keys().nth(random_index).unwrap();
+        if let Some(todo) = self.todos.get(todo_id) {
+            format!("Suggestion: {}", todo.description)
+        } else {
+            "No suggestions available".to_string()
         }
     }
 

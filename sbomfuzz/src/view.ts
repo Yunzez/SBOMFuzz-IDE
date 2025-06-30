@@ -164,6 +164,19 @@ function jumpToFunctionLocation(loc: FunctionLocation) {
 
   vscode.workspace.openTextDocument(uri).then((doc) => {
     // Use the offset to get the position in the document
+    if (loc.offset === undefined) {
+      vscode.window.showTextDocument(doc).then((editor) => {
+        const pos = new vscode.Position(0, 0);
+        const selection = new vscode.Selection(pos, pos);
+        editor.selection = selection;
+        editor.revealRange(
+          new vscode.Range(pos, pos),
+          vscode.TextEditorRevealType.InCenter
+        );
+      });
+      return;
+    }
+
     const position = doc.positionAt(loc.offset);
     let line = position.line;
 

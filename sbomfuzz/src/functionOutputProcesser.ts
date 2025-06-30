@@ -10,6 +10,11 @@ export type FunctionResult = {
   functionDescription: string;
   functionParameters: Record<string, string>;
   functionLocation?: FunctionLocation;
+  paramCount: number;
+  usageCount: number;
+  centralityScore: number;
+  unsafeScore: number;
+  priorityScore: number;
 };
 
 function findAllFunctionsFile(outputPath: string): string | undefined {
@@ -42,7 +47,7 @@ export function loadFunctionResults(
   }
 
   vscode.window.showInformationMessage(
-    `Rust analyzer resuted processed, checking output path: ${resultFilePath}`
+    `Rust analyzer result processed, checking output path: ${resultFilePath}`
   );
 
   if (!fs.existsSync(resultFilePath)) {
@@ -83,12 +88,17 @@ export function loadFunctionResults(
         functionDescription: r["Function Description"] || "",
         functionParameters: r["Parameters"],
         functionLocation: parseFunctionLocation(r["Location"]),
+        paramCount: parseInt(r["Number of Parameters"]),
+        usageCount: parseInt(r["Count"], 10) || 0,
+        centralityScore: parseFloat(r["Centrality Score"]),
+        unsafeScore: parseFloat(r["Unsafe Score"]),
+        priorityScore: parseFloat(r["Priority Score"]),
       };
     });
   }
 
   vscode.window.showInformationMessage(
-    `Rust analyzer resuted processed, ${result.length} functions found`
+    `Rust analyzer result processed, ${result.length} functions found`
   );
 
   return undefined;
