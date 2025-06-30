@@ -12,7 +12,7 @@ import {
   FunctionLocation,
   loadFunctionResults,
 } from "./functionOutputProcesser";
-import { generateHarness, optimizeHarness } from "./harnessGen";
+import { generateHarness, optimizeHarness, runGenerateAndOptimizeHarness } from "./harnessGen";
 import { getGlobalContext } from "./globalContextProvider";
 let currentWebview: vscode.Webview | undefined;
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
@@ -129,57 +129,8 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       if (message.command === "generateHarness") {
         const target = message.target;
         const root = message.fuzzRoot;
-        console.log("Generating harness for target:", target);
-        vscode.window.withProgress(
-          {
-            location: vscode.ProgressLocation.Notification,
-            title: "Optimizing fuzz harness...",
-            cancellable: false,
-          },
-          async (progress) => {
-            progress.report({ increment: 0 });
-
-            const { success, targetPath } = await generateHarness(
-              target,
-              root,
-              this.context.extensionPath
-            );
-            if (!success || !targetPath) {
-              vscode.window.showErrorMessage("❌ Failed to generate harness.");
-              return;
-            }
-
-            progress.report({ increment: 30, message: "Harness generated." });
-            vscode.window.showInformationMessage(
-              "✅ Harness generated successfully!"
-            );
-
-            const optimized = await optimizeHarness(
-              target,
-              root,
-              targetPath,
-              this.context.extensionPath
-            );
-
-            if (optimized.success) {
-              progress.report({
-                increment: 70,
-                message: "Harness optimized and ready.",
-              });
-              vscode.window.showInformationMessage(
-                "🚀 Harness is ready to run!"
-              );
-            } else {
-              progress.report({
-                increment: 70,
-                message: "Optimization failed.",
-              });
-              vscode.window.showWarningMessage(
-                "⚠️ Harness optimization failed."
-              );
-            }
-          }
-        );
+        const extensionPath = this.context.extensionPath;
+        runGenerateAndOptimizeHarness(target, root, extensionPath);
       }
     });
   }

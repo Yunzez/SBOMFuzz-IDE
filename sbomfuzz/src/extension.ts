@@ -2,9 +2,9 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { SbomFuzzWebviewViewProvider } from "./view";
-import { make_function_public, RustFunctionCodeLensProvider } from "./rustFunctionCodeLensProvider";
+import { make_function_public, onCodeLensClicked, RustFunctionCodeLensProvider } from "./rustFunctionCodeLensProvider";
 import { findFuzzRoot } from "./util";
-import { useGlobalContext } from "./globalContextProvider";
+import { getGlobalContext, useGlobalContext } from "./globalContextProvider";
 import path from "path";
 
 // This method is called when your extension is activated
@@ -43,26 +43,10 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
-  // connect the lens with webview
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "sbomfuzz.showFunctionInfo", // same as used in CodeLens
-      (functionName: string, filePath: string) => {
-        // Make sure function is public
-        make_function_public(filePath, functionName);
-
-        // ? we get the webview from the provider, the webview is static
-        const webview = SbomFuzzWebviewViewProvider.getWebview();
-        if (webview) {
-          webview.postMessage({
-            command: "showFunctionInfo",
-            functionName,
-            filePath,
-          });
-        } else {
-          vscode.window.showWarningMessage("Webview not available.");
-        }
-      }
+      (functionName, filePath) => onCodeLensClicked(functionName, filePath, context.extensionPath)
     )
   );
 

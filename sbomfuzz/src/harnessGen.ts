@@ -4,6 +4,7 @@ import * as toml from "toml";
 import { OpenAI } from "openai";
 import * as dotenv from "dotenv";
 import { spawn } from "child_process";
+import * as vscode from "vscode";
 export async function generateHarness(
   target: any,
   fuzzRoot: string,
@@ -227,4 +228,65 @@ function stripMarkdownCodeBlock(text: string): string {
     .replace(/^```[a-z]*\n/, "")
     .replace(/```$/, "")
     .trim();
+}
+
+
+
+
+export function runGenerateAndOptimizeHarness(
+  target: any,
+  fuzzRoot: string,
+  extensionPath: string,
+) {
+  console.log("Generating harness for target:", target);
+  vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: "Optimizing fuzz harness...",
+      cancellable: false,
+    },
+    async (progress) => {
+      progress.report({ increment: 0 });
+
+      const { success, targetPath } = await generateHarness(
+        target,
+        fuzzRoot,
+        extensionPath
+      );
+      if (!success || !targetPath) {
+        vscode.window.showErrorMessage("❌ Failed to generate harness.");
+        return;
+      }
+
+      progress.report({ increment: 30, message: "Harness generated." });
+      vscode.window.showInformationMessage(
+        "✅ Harness generated successfully!"
+      );
+
+      const optimized = await optimizeHarness(
+        target,
+        fuzzRoot,
+        targetPath,
+        extensionPath
+      );
+
+      if (optimized.success) {
+        progress.report({
+          increment: 70,
+          message: "Harness optimized and ready.",
+        });
+        vscode.window.showInformationMessage(
+          "🚀 Harness is ready to run!"
+        );
+      } else {
+        progress.report({
+          increment: 70,
+          message: "Optimization failed.",
+        });
+        vscode.window.showWarningMessage(
+          "⚠️ Harness optimization failed."
+        );
+      }
+    }
+  );
 }

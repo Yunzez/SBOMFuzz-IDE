@@ -1,5 +1,9 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
+import { getGlobalContext } from "./globalContextProvider";
+import { log } from "console";
+import { runGenerateAndOptimizeHarness } from "./harnessGen";
+import { ExtensionContext } from "vscode";
 
 export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
   provideCodeLenses(
@@ -32,7 +36,32 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
 }
 
 
+export function onCodeLensClicked(
+  functionName: string,
+  filePath: string,
+  extensionPath: string,
+) {
+  // Make sure function is public
+  make_function_public(filePath, functionName);
 
+  let globalContext = getGlobalContext();
+  let fuzzTargets = globalContext.results ?? [];
+
+  // Find the function's info in the analyzer results
+  const targetInfo = fuzzTargets.find(
+    (fn) => fn.functionName === functionName && fn.functionLocation.filePath === filePath
+  );
+  if (!targetInfo) {
+    log(`Function ${functionName} not found in ${filePath}`);
+    return;
+  }
+
+  // Generate the fuzzing harness for the function
+  runGenerateAndOptimizeHarness(targetInfo, globalContext.fuzzRoot ?? "", extensionPath);
+}
+
+/// Given a file path and function name, make that function public /
+/// Does nothing if the function is already public
 export function make_function_public(file_path: string, function_name: string) {
   let file_content = fs.readFileSync(file_path, 'utf-8');
   const lines = file_content.split('\n');

@@ -1,5 +1,4 @@
 import { setupMessaging, sendMessage, log } from "./messaging.js";
-import { findFuzzTargets } from "./fuzzTarget.js";
 
 let pathSelected = null;
 let fuzzRootSelected = null;
@@ -144,6 +143,10 @@ setupMessaging({
   },
 
   onCodeLensClicked: (message) => {
+    // The code lens logic should be entirely restricted to the backend now
+    // Nothing should directly come through the webview
+    console.warn("How did you get here? Code lens frontend logic should be unused.");
+    /*
     log(
       "Code lens clicked:",
       message.functionName,
@@ -161,6 +164,7 @@ setupMessaging({
       target: focustarget,
       fuzzRoot: fuzzRootSelected,
     });
+    */
   },
 });
 
