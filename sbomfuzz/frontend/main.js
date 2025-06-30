@@ -146,25 +146,6 @@ setupMessaging({
     // The code lens logic should be entirely restricted to the backend now
     // Nothing should directly come through the webview
     console.warn("How did you get here? Code lens frontend logic should be unused.");
-    /*
-    log(
-      "Code lens clicked:",
-      message.functionName,
-      "in file:",
-      message.filePath
-    );
-    let focustarget = findFuzzTargets(
-      message.functionName,
-      message.filePath,
-      functionTargets
-    );
-    log("Fuzz target found:", focustarget);
-    sendMessage({
-      command: "generateHarness",
-      target: focustarget,
-      fuzzRoot: fuzzRootSelected,
-    });
-    */
   },
 });
 
