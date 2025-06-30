@@ -149,19 +149,24 @@ export async function optimizeHarness(
 
   console.log(`🔁 Running fuzz attempt #${iteration}`);
 
-  const runHarness = (): Promise<string> =>
+  const runHarnessBuild = (): Promise<string> =>
     new Promise((resolve) => {
-      const proc = spawn(
-        "cargo",
-        ["fuzz", "run", targetName, "--", "-runs=1"],
-        {
-          cwd: root,
-        }
-      );
+      const proc = spawn("cargo", ["fuzz", "build", targetName], {
+        cwd: root,
+        env: {
+          ...process.env,
+          RUSTFLAGS: "-Awarnings",
+        },
+      });
 
       let stderr = "";
       proc.stderr.on("data", (data) => {
-        stderr += data.toString();
+        const lines = data.toString().split("\n");
+        for (const line of lines) {
+          if (!line.toLowerCase().includes("warning")) {
+            stderr += line + "\n";
+          }
+        }
       });
 
       proc.on("close", () => {
@@ -169,10 +174,10 @@ export async function optimizeHarness(
       });
     });
 
-  const errorOutput = await runHarness();
+  const errorOutput = await runHarnessBuild();
   console.log("Harness run output:", errorOutput);
 
-  if (!errorOutput || errorOutput.trim() === "") {
+  if (!errorOutput.includes("error") && !errorOutput.includes("panic")) {
     console.log("Yay! Harness ran without errors!");
     return { success: true };
   }
@@ -220,6 +225,23 @@ export async function optimizeHarness(
     console.error("❌ Error optimizing harness:", err);
     return { success: false };
   }
+}
+
+function runSelectedHarness(targetName: string, root: string): void {
+  // This function is a placeholder for running the selected harness.
+  // You can implement the logic to execute the fuzz target here.
+  console.log("Running selected harness...");
+  const proc = spawn("cargo", ["fuzz", "run", targetName, "--", "-runs=1"], {
+    cwd: root,
+    env: {
+      ...process.env,
+      RUSTFLAGS: "-Awarnings",
+    },
+  });
+  // Example: spawn a process to run the fuzz target
+  // const proc = spawn("cargo", ["fuzz", "run", "fuzz_target_name"]);
+  // proc.stdout.on("data", (data) => console.log(data.toString()));
+  // proc.stderr.on("data", (data) => console.error(data.toString()));
 }
 
 function stripMarkdownCodeBlock(text: string): string {

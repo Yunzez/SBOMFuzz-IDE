@@ -1,4 +1,4 @@
-Given the following Rust fuzz harness and its error message, fix the code so it compiles and runs. Output only the corrected code.
+Given the following Rust fuzz harness and its error message, fix the code so it compiles and runs. Output only the corrected code. We are using Cargo-fuzz for rust, so don't forget about #![no_main] on the first line.
 
 <HARNESS-CODE>
 
