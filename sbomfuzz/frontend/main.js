@@ -51,8 +51,9 @@ setupMessaging({
 
       targetDiv.onclick = () => {
         sendMessage({
-          command: "openFuzzTarget",
+          command: "openLocation",
           filePath: target.path,
+          offset: 0,
         });
       };
 
@@ -63,8 +64,10 @@ setupMessaging({
   onRustAnalysisDone: (results) => {
     log("Rendering function results");
     targetContainer.innerHTML = ""; // Clear previous results
+    results = results.sort((a, b) => b.priorityScore - a.priorityScore);
     for (const result of results) {
       const resultDiv = document.createElement("div");
+      log("Rendering function result:", result.priorityScore);
       resultDiv.className = "function-button";
       resultDiv.innerHTML = `
         <div style="font-weight:bold; margin-bottom:4px;">
@@ -73,6 +76,7 @@ setupMessaging({
         <div>
           ${result.functionLocation.filePath.replace(pathSelected, "")}
         </div>
+        <div>Priority Score: ${result.priorityScore}</div>
       `;
 
       resultDiv.onclick = () => {
@@ -118,7 +122,7 @@ setupMessaging({
     if (context.results && context.results.length > 0) {
       functionTargets = context.results;
       targetContainer.innerHTML = ""; // Clear previous results
-      for (const result of context.results ) {
+      for (const result of context.results) {
         const resultDiv = document.createElement("div");
         resultDiv.className = "function-button";
         resultDiv.innerHTML = `

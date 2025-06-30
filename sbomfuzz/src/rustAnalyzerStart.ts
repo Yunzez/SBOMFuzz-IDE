@@ -27,7 +27,7 @@ export async function runRustAnalyzer(
     }
     fs.mkdirSync(outputPath, { recursive: true });
 
-    const args = ["function-analysis", projectPath, outputPath];
+    const args = ["function-analysis", projectPath, outputPath, "--no-dep"];
 
     const proc = cp.spawn(binaryPath, args, {
       cwd: projectPath,
