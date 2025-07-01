@@ -6,64 +6,14 @@
         "std::collections::hash::map::insert"
       ]
     },
-    "toy_rust::create_todo::delete": {
-      "id": 8317082388049717573,
+    "toy_rust::parser::parse_tokens": {
+      "id": 965865355408759848,
       "calls": [
-        "std::collections::hash::map::remove",
-        "std::collections::hash::map::insert"
-      ]
-    },
-    "toy_rust::create_todo::print": {
-      "id": 16531911280874296956,
-      "calls": [
-        "std::collections::hash::map::values"
-      ]
-    },
-    "toy_rust::main": {
-      "id": 17634521628522027419,
-      "calls": [
-        "toy_rust::add",
-        "toy_rust::create_todo::new",
-        "toy_rust::create_todo::print_todo",
-        "toy_rust::divide",
-        "alloc::string::to_string",
-        "toy_rust::create_todo::delete",
-        "toy_rust::create_todo::add",
-        "toy_rust::create_todo::mark_done",
-        "toy_rust::multiply",
-        "toy_rust::subtract",
-        "toy_rust::parser::parse_tokens",
-        "toy_rust::create_todo::print"
-      ]
-    },
-    "toy_rust::create_todo::print_todo": {
-      "id": 5498196304506485089,
-      "calls": [
-        "std::collections::hash::map::values"
-      ]
-    },
-    "toy_rust::create_todo::random_todo": {
-      "id": 4612824590017693291,
-      "calls": [
-        "std::collections::hash::map::len",
-        "core::option::unwrap",
-        "core::iter::traits::iterator::nth",
-        "std::collections::hash::map::keys",
-        "rand::rngs::thread::thread_rng",
-        "rand::rng::gen_range"
-      ]
-    },
-    "toy_rust::create_todo::sugguest_something": {
-      "id": 6569079967320542821,
-      "calls": [
-        "std::collections::hash::map::len",
-        "core::iter::traits::iterator::nth",
-        "alloc::string::to_string",
-        "rand::rng::gen_range",
-        "rand::rngs::thread::thread_rng",
-        "core::option::unwrap",
-        "std::collections::hash::map::get",
-        "std::collections::hash::map::keys"
+        "core::slice::len",
+        "alloc::vec::push",
+        "core::str::converts::from_utf8_unchecked",
+        "alloc::vec::new",
+        "core::str::as_bytes"
       ]
     },
     "toy_rust::create_todo::new": {
@@ -72,27 +22,77 @@
         "std::collections::hash::map::new"
       ]
     },
-    "toy_rust::add_random": {
-      "id": 10497871707259408930,
+    "toy_rust::create_todo::sugguest_something": {
+      "id": 6569079967320542821,
       "calls": [
         "rand::rng::gen_range",
-        "rand::rngs::thread::thread_rng"
+        "std::collections::hash::map::len",
+        "core::iter::traits::iterator::nth",
+        "core::option::unwrap",
+        "std::collections::hash::map::get",
+        "std::collections::hash::map::keys",
+        "rand::rngs::thread::thread_rng",
+        "alloc::string::to_string"
       ]
     },
-    "toy_rust::parser::parse_tokens": {
-      "id": 9094724356591688977,
+    "toy_rust::create_todo::print_todo": {
+      "id": 5498196304506485089,
       "calls": [
-        "alloc::vec::new",
-        "alloc::vec::push",
-        "core::str::converts::from_utf8_unchecked",
-        "core::slice::len",
-        "core::str::as_bytes"
+        "std::collections::hash::map::values"
+      ]
+    },
+    "toy_rust::add_random": {
+      "id": 13059382348335527709,
+      "calls": [
+        "rand::rngs::thread::thread_rng",
+        "rand::rng::gen_range"
+      ]
+    },
+    "toy_rust::create_todo::random_todo": {
+      "id": 4612824590017693291,
+      "calls": [
+        "rand::rngs::thread::thread_rng",
+        "core::option::unwrap",
+        "core::iter::traits::iterator::nth",
+        "std::collections::hash::map::keys",
+        "rand::rng::gen_range",
+        "std::collections::hash::map::len"
+      ]
+    },
+    "toy_rust::main": {
+      "id": 9835114330362720018,
+      "calls": [
+        "toy_rust::add",
+        "toy_rust::divide",
+        "toy_rust::create_todo::new",
+        "toy_rust::parser::parse_tokens",
+        "toy_rust::create_todo::add",
+        "alloc::string::to_string",
+        "toy_rust::subtract",
+        "toy_rust::create_todo::print_todo",
+        "toy_rust::create_todo::mark_done",
+        "toy_rust::create_todo::delete",
+        "toy_rust::multiply",
+        "toy_rust::create_todo::print"
+      ]
+    },
+    "toy_rust::create_todo::print": {
+      "id": 16531911280874296956,
+      "calls": [
+        "std::collections::hash::map::values"
       ]
     },
     "toy_rust::create_todo::mark_done": {
       "id": 15936123917144595292,
       "calls": [
         "std::collections::hash::map::get_mut"
+      ]
+    },
+    "toy_rust::create_todo::delete": {
+      "id": 8317082388049717573,
+      "calls": [
+        "std::collections::hash::map::remove",
+        "std::collections::hash::map::insert"
       ]
     }
   }
