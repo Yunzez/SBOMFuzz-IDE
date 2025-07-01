@@ -19,9 +19,8 @@ export type FunctionResult = {
 };
 
 export enum FunctionStatus {
-    Default = "Default",
+    New = "New",
     Ignore = "Ignore",
-    GenerateHarness = "GenerateHarness",
     HarnessGenerated = "HarnessGenerated"
 }
 
@@ -101,7 +100,7 @@ export function loadFunctionResults(
         centralityScore: parseFloat(r["Centrality Score"]),
         unsafeScore: parseFloat(r["Unsafe Score"]),
         priorityScore: parseFloat(r["Priority Score"]),
-        status: FunctionStatus.Default
+        status: FunctionStatus.New
       };
     });
   }
