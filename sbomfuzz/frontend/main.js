@@ -64,19 +64,53 @@ setupMessaging({
     log("Rendering function results");
     targetContainer.innerHTML = ""; // Clear previous results
     results = results.sort((a, b) => b.priorityScore - a.priorityScore);
+
     for (const result of results) {
+      // Create colored status tag
+      const statusColor =
+        {
+          Default: "gray",
+          Ignore: "darkred",
+          GenerateHarness: "darkblue",
+          HarnessGenerated: "green",
+        }[result.status] || "black";
+
+      const statusBadge = `<span class="status-badge" style="background:${statusColor};">${result.status}</span>`;
+
+      const ignoreBtn = document.createElement("button");
+      ignoreBtn.textContent = "Ignore";
+
+      const generateBtn = document.createElement("button");
+      generateBtn.textContent = "Generate Harness";
+
       const resultDiv = document.createElement("div");
-      log("Rendering function result:", result.priorityScore);
       resultDiv.className = "function-button";
       resultDiv.innerHTML = `
         <div style="font-weight:bold; margin-bottom:4px;">
-          ${result.functionModulePath}::${result.functionName}
+      ${result.functionModulePath}::${result.functionName} ${statusBadge}
         </div>
-        <div>
-          ${result.functionLocation.filePath.replace(pathSelected, "")}
-        </div>
-        <div>Priority Score: ${result.priorityScore}</div>
+        <div>${result.functionLocation?.filePath.replace(
+          pathSelected,
+          ""
+        )}</div>
+        <div>Priority Score: ${result.priorityScore.toFixed(3)}</div>
+        <div class="btns-div" style="margin-top:6px;"></div>
       `;
+
+      // Add buttons to the last div (action area)
+      const actionArea = resultDiv.getElementsByClassName("btns-div")[0];
+      actionArea.appendChild(ignoreBtn);
+      actionArea.appendChild(generateBtn);
+
+      ignoreBtn.onclick = (event) => {
+        event.stopPropagation(); // prevents triggering resultDiv.onclick
+        log("ignore");
+      };
+
+      generateBtn.onclick = (event) => {
+        event.stopPropagation();
+        log("generate");
+      };
 
       resultDiv.onclick = () => {
         sendMessage({
@@ -144,12 +178,6 @@ setupMessaging({
         targetContainer.appendChild(resultDiv);
       }
     }
-  },
-
-  onCodeLensClicked: (message) => {
-    // The code lens logic should be entirely restricted to the backend now
-    // Nothing should directly come through the webview
-    console.warn("How did you get here? Code lens frontend logic should be unused.");
   },
 });
 

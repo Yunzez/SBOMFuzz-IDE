@@ -18,6 +18,7 @@ import { runRustAnalyzer } from "./rustAnalyzerStart";
 export interface SharedContext {
   fuzzRoot?: string;
   projectRoot?: string;
+  extensionPath?: string; 
   results?: any[];
 }
 
@@ -50,6 +51,7 @@ export async function useGlobalContext(context: vscode.ExtensionContext) {
   globalContext.fuzzRoot = fuzzRoot;
   globalContext.projectRoot = root;
   globalContext.results = results;
+  globalContext.extensionPath = projectPath;
   return getGlobalContext();
 }
 

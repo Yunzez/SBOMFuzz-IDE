@@ -126,12 +126,12 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         });
       }
 
-      if (message.command === "generateHarness") {
-        const target = message.target;
-        const root = message.fuzzRoot;
-        const extensionPath = this.context.extensionPath;
-        runGenerateAndOptimizeHarness(target, root, extensionPath);
-      }
+    //   if (message.command === "generateHarness") {
+    //     const target = message.target;
+    //     const root = message.fuzzRoot;
+    //     const extensionPath = this.context.extensionPath;
+    //     runGenerateAndOptimizeHarness(target, root, extensionPath);
+    //   }
     });
   }
 

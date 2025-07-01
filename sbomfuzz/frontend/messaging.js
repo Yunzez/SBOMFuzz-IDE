@@ -9,7 +9,6 @@ export function setupMessaging(handlers = {}) {
   onRustAnalysisDone = handlers.onRustAnalysisDone || (() => {});
   onGlobalContext = handlers.onGlobalContext || (() => {});
   onFuzzTargetsListed = handlers.onFuzzTargetsListed || (() => {});
-  onCodeLensClicked = handlers.onCodeLensClicked || (() => {});
   // Listen for messages from the extension
   window.addEventListener("message", (event) => {
     // ! this handles messages sent from the extension
@@ -29,16 +28,10 @@ export function setupMessaging(handlers = {}) {
           onRustAnalysisDone(msg.results || []);
         }
         break;
-        
+
       case "fuzzTargetsListed":
         if (onFuzzTargetsListed) {
           onFuzzTargetsListed(msg.targets || []);
-        }
-        break;
-
-      case "showFunctionInfo":
-        if (onCodeLensClicked) {
-          onCodeLensClicked(msg);
         }
         break;
 
@@ -49,10 +42,6 @@ export function setupMessaging(handlers = {}) {
   });
 
   sendMessage({ command: "getGlobaclContext" });
-  // // Request project root immediately
-  // sendMessage({ command: "getCargoProjectRoot" });
-  // // Request fuzz root immediately
-  // sendMessage({ command: "getFuzzRoot" });
 }
 
 // 🔼 Used to send messages to the extension

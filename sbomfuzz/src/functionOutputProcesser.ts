@@ -15,7 +15,15 @@ export type FunctionResult = {
   centralityScore: number;
   unsafeScore: number;
   priorityScore: number;
+  status: FunctionStatus;
 };
+
+export enum FunctionStatus {
+    Default = "Default",
+    Ignore = "Ignore",
+    GenerateHarness = "GenerateHarness",
+    HarnessGenerated = "HarnessGenerated"
+}
 
 function findAllFunctionsFile(outputPath: string): string | undefined {
   if (!fs.existsSync(outputPath) || !fs.statSync(outputPath).isDirectory()) {
@@ -93,6 +101,7 @@ export function loadFunctionResults(
         centralityScore: parseFloat(r["Centrality Score"]),
         unsafeScore: parseFloat(r["Unsafe Score"]),
         priorityScore: parseFloat(r["Priority Score"]),
+        status: FunctionStatus.Default
       };
     });
   }
