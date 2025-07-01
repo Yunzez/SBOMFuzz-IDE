@@ -9,14 +9,15 @@ const pathDiv = document.getElementById("path-display-container");
 function renderFunctionResults(results, targetContainer) {
   targetContainer.innerHTML = ""; // Clear previous results
   // Separate ignored and non-ignored results
-  const nonIgnored = results.filter(r => r.status !== "Ignore");
-  const ignored = results.filter(r => r.status === "Ignore");
+  const nonIgnored = results.filter((r) => r.status !== "Ignore");
+  const ignored = results.filter((r) => r.status === "Ignore");
 
   // Sort non-ignored by priorityScore descending
   nonIgnored.sort((a, b) => b.priorityScore - a.priorityScore);
 
   // Concatenate non-ignored and ignored (ignored at the bottom)
-  results = [...nonIgnored, ...ignored];
+  // results = [...nonIgnored, ...ignored];
+  results = [...nonIgnored];
   for (const result of results) {
     log(`status: ${result.status}`);
     // Create colored status tag
@@ -38,8 +39,9 @@ function renderFunctionResults(results, targetContainer) {
     const resultDiv = document.createElement("div");
     resultDiv.className = "function-button";
     resultDiv.innerHTML = `
-        <div style="font-weight:bold; margin-bottom:4px;">
-      ${result.functionModulePath}::${result.functionName} ${statusBadge}
+        <div style="font-weight:bold; margin-bottom:4px; display: flex; gap: 2px; flex-wrap: wrap; align-items: center;">
+      <span>${result.functionModulePath}::${result.functionName}</span>
+    ${statusBadge}
         </div>
         <div>${result.functionLocation?.filePath.replace(
           pathSelected,
@@ -62,9 +64,14 @@ function renderFunctionResults(results, targetContainer) {
     };
 
     generateBtn.onclick = (event) => {
-      event.stopPropagation();
       log("generate");
+      sendMessage({
+        command: "generateHarness",
+        fuzzRoot: fuzzRootSelected,
+        target: result,
+      });
       result.status = "HarnessGenerated";
+      renderFunctionResults(results, targetContainer);
     };
 
     resultDiv.onclick = () => {

@@ -26,3 +26,9 @@ path = "fuzz_targets/fuzz_target_divide.rs"
 test = false
 doc = false
 bench = false
+[[bin]]
+name = "fuzz_target_add"
+path = "fuzz_targets/fuzz_target_add.rs"
+test = false
+doc = false
+bench = false
