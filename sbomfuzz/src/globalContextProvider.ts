@@ -36,7 +36,7 @@ export async function useGlobalContext(context: vscode.ExtensionContext) {
   const root = findCargoProjectRoot();
   const outputPath = path.join(projectPath, "output");
   if (!fs.existsSync(outputPath) && root) {
-    vscode.window.withProgress(
+    await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
         title: "Analyzing current project...", // 🌀 this is the text next to spinner
@@ -44,6 +44,7 @@ export async function useGlobalContext(context: vscode.ExtensionContext) {
       },
       async () => {
         await runRustAnalyzer(context, root);
+        console.log("Rust analyzer completed, loading results...");
       }
     );
   }
