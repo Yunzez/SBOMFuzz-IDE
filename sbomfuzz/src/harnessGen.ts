@@ -3,7 +3,7 @@ import * as path from "path";
 import * as toml from "toml";
 import { OpenAI } from "openai";
 import * as dotenv from "dotenv";
-import { spawn } from "child_process";
+import { spawn, ChildProcess } from "child_process";
 import * as vscode from "vscode";
 export async function generateHarness(
   target: any,
@@ -228,16 +228,45 @@ export async function optimizeHarness(
   }
 }
 
-function runSelectedHarness(targetName: string, root: string): void {
+export function runSelectedHarness(targetName: string, root: string): void {
+  const outputChannel = vscode.window.createOutputChannel("Fuzz Harness");
+  outputChannel.show(true); // bring it to front
   // This function is a placeholder for running the selected harness.
   // You can implement the logic to execute the fuzz target here.
   console.log("Running selected harness...");
-  const proc = spawn("cargo", ["fuzz", "run", targetName, "--", "-runs=1"], {
+  const proc = spawn("cargo", ["fuzz", "run", targetName], {
     cwd: root,
     env: {
       ...process.env,
       RUSTFLAGS: "-Awarnings",
     },
+  });
+  outputChannel.appendLine(`▶️ Running harness: ${targetName}\n`);
+
+  proc.stdout.on("data", (data) => {
+    outputChannel.append(data.toString());
+  });
+
+  proc.stderr.on("data", (data) => {
+    outputChannel.append(data.toString());
+  });
+
+  proc.on("error", (err) => {
+    outputChannel.appendLine(`❌ Error running harness: ${err.message}`);
+    vscode.window.showErrorMessage(`Harness process failed: ${err.message}`);
+  });
+
+  proc.on("close", (code, signal) => {
+    outputChannel.appendLine(
+      `\n🔚 Fuzzing process exited with code ${code}, signal ${signal}`
+    );
+    if (code !== 0) {
+      vscode.window.showWarningMessage(
+        `⚠️ Fuzzing process crashed or exited with error (code ${code}).`
+      );
+    } else {
+      vscode.window.showInformationMessage(`✅ Fuzzing completed.`);
+    }
   });
   // Example: spawn a process to run the fuzz target
   // const proc = spawn("cargo", ["fuzz", "run", "fuzz_target_name"]);
@@ -252,13 +281,10 @@ function stripMarkdownCodeBlock(text: string): string {
     .trim();
 }
 
-
-
-
 export function runGenerateAndOptimizeHarness(
   target: any,
   fuzzRoot: string,
-  extensionPath: string,
+  extensionPath: string
 ) {
   console.log("Generating harness for target:", target);
   vscode.window.withProgress(
@@ -297,17 +323,16 @@ export function runGenerateAndOptimizeHarness(
           increment: 70,
           message: "Harness optimized and ready.",
         });
-        vscode.window.showInformationMessage(
-          "🚀 Harness is ready to run!"
-        );
+        vscode.window.showInformationMessage("🚀 Harness is ready to run!");
+
+        vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
       } else {
         progress.report({
           increment: 70,
           message: "Optimization failed.",
         });
-        vscode.window.showWarningMessage(
-          "⚠️ Harness optimization failed."
-        );
+        vscode.window.showWarningMessage("⚠️ Harness optimization failed.");
+        vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
       }
     }
   );

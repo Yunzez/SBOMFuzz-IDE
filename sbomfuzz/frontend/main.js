@@ -118,6 +118,10 @@ setupMessaging({
     }
     for (const target of targets) {
       const targetDiv = document.createElement("div");
+
+      const runBtn = document.createElement("button");
+      runBtn.textContent = "Run";
+
       targetDiv.className = "function-button";
       targetDiv.innerHTML = `
         <div style="font-weight:bold; margin-bottom:4px;">
@@ -126,6 +130,7 @@ setupMessaging({
         <div>
           ${target.path.replace(fuzzRootSelected, "")}
         </div>
+          <div class="btns-div" style="margin-top:6px;"></div>
       `;
 
       targetDiv.onclick = () => {
@@ -136,6 +141,13 @@ setupMessaging({
         });
       };
 
+      const actionArea = targetDiv.getElementsByClassName("btns-div")[0];
+      actionArea.appendChild(runBtn);
+      runBtn.onclick = (event) => {
+        event.stopPropagation(); // prevents triggering targetDiv.onclick
+        log(`Running fuzz target: ${target.name}`);
+        sendMessage({ command: "runFuzzTarget", target: target.name });
+      };
       targetList.appendChild(targetDiv);
     }
   },

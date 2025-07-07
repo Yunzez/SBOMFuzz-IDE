@@ -15,7 +15,6 @@ export function setupMessaging(handlers = {}) {
     const msg = event.data;
 
     switch (msg.command) {
-     
       case "globalContext":
         if (onGlobalContext) {
           onGlobalContext(msg.context || {});
@@ -34,6 +33,11 @@ export function setupMessaging(handlers = {}) {
           onFuzzTargetsListed(msg.targets || []);
         }
         break;
+
+      case "refreshHarnessList":
+        if (onFuzzTargetsListed) {
+          onFuzzTargetsListed(msg.targets || []);
+        }
 
       default:
         console.warn("Unhandled message from extension:", msg);

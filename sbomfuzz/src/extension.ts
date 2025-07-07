@@ -6,7 +6,7 @@ import {
   make_function_public,
   RustFunctionCodeLensProvider,
 } from "./rustFunctionCodeLensProvider";
-import { findFuzzRoot } from "./util";
+import { findFuzzRoot, getFuzzTargets } from "./util";
 import { getGlobalContext, useGlobalContext } from "./globalContextProvider";
 import path from "path";
 import { get } from "http";
@@ -47,6 +47,16 @@ export async function activate(context: vscode.ExtensionContext) {
       { language: "rust" },
       codeLensProvider
     )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("sbomfuzz.refreshHarnessList", () => {
+      const webview = SbomFuzzWebviewViewProvider.getWebview();
+      const targets = getFuzzTargets(globalContext.fuzzRoot!);
+      if (webview) {
+        webview.postMessage({ command: "refreshHarnessList", targets });
+      }
+    })
   );
 
   context.subscriptions.push(

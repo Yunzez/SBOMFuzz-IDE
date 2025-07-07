@@ -14,19 +14,6 @@ toy_rust = { package = "toy-rust", path = ".." }
 
 
 [[bin]]
-name = "fuzz_target_1"
-path = "fuzz_targets/fuzz_target_1.rs"
-test = false
-doc = false
-bench = false
-
-[[bin]]
-name = "fuzz_target_divide"
-path = "fuzz_targets/fuzz_target_divide.rs"
-test = false
-doc = false
-bench = false
-[[bin]]
 name = "fuzz_target_add"
 path = "fuzz_targets/fuzz_target_add.rs"
 test = false

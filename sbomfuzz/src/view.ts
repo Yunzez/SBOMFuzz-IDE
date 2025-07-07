@@ -12,7 +12,12 @@ import {
   FunctionLocation,
   loadFunctionResults,
 } from "./functionOutputProcesser";
-import { generateHarness, optimizeHarness, runGenerateAndOptimizeHarness } from "./harnessGen";
+import {
+  generateHarness,
+  optimizeHarness,
+  runGenerateAndOptimizeHarness,
+  runSelectedHarness,
+} from "./harnessGen";
 import { getGlobalContext } from "./globalContextProvider";
 let currentWebview: vscode.Webview | undefined;
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
@@ -66,6 +71,10 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
 
       if (message.command === "openLocation") {
         jumpToFunctionLocation(message);
+      }
+
+      if (message.command === "runFuzzTarget") {
+        runSelectedHarness(message.target, globalContext.fuzzRoot!);
       }
 
       if (message.command === "createFuzzRoot") {
