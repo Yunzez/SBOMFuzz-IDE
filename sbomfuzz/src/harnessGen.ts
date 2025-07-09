@@ -228,6 +228,80 @@ export async function optimizeHarness(
   }
 }
 
+export function deleteSelectedHarness(targetName: string, root: string): void {
+  const harnessFilePath = path.join(root, "fuzz_targets", `${targetName}.rs`);
+  const cargoTomlPath = path.join(root, "Cargo.toml");
+  if (fs.existsSync(harnessFilePath)) {
+    fs.unlinkSync(harnessFilePath);
+    console.log(`🗑️ Deleted harness file: ${harnessFilePath}`);
+  } else {
+    console.log(`ℹ️ Harness file not found: ${harnessFilePath}`);
+  }
+
+  if (fs.existsSync(cargoTomlPath)) {
+    const tomlContent = fs.readFileSync(cargoTomlPath, "utf8");
+    // Split into lines for easier processing
+    const lines = tomlContent.split("\n");
+    const newLines: string[] = [];
+    let insideBin = false;
+    let binBuffer: string[] = [];
+    let found = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.trim() === "[[bin]]") {
+        if (insideBin && binBuffer.length > 0) {
+          // Check if this binBuffer matches the targetName
+          const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
+          if (nameLine && nameLine.includes(`"${targetName}"`)) {
+            found = true;
+            // skip adding this binBuffer
+          } else {
+            newLines.push(...binBuffer);
+          }
+          binBuffer = [];
+        }
+        insideBin = true;
+        binBuffer = [line];
+      } else if (insideBin) {
+        binBuffer.push(line);
+        // If next line is not part of bin or end of file, flush buffer
+        if (i === lines.length - 1 || lines[i + 1].trim() === "[[bin]]") {
+          // Check if this binBuffer matches the targetName
+          const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
+          if (nameLine && nameLine.includes(`"${targetName}"`)) {
+            found = true;
+            // skip adding this binBuffer
+          } else {
+            newLines.push(...binBuffer);
+          }
+          binBuffer = [];
+          insideBin = false;
+        }
+      } else {
+        newLines.push(line);
+      }
+    }
+    // If file ends with a bin section
+    if (binBuffer.length > 0) {
+      const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
+      if (!(nameLine && nameLine.includes(`"${targetName}"`))) {
+        newLines.push(...binBuffer);
+      } else {
+        found = true;
+      }
+    }
+
+    if (found) {
+      fs.writeFileSync(cargoTomlPath, newLines.join("\n"));
+      console.log(`🗑️ Removed [[bin]] entry for ${targetName} from Cargo.toml`);
+    } else {
+      console.log(`ℹ️ No [[bin]] entry found for ${targetName} in Cargo.toml`);
+    }
+  } else {
+    console.log(`ℹ️ Cargo.toml not found at: ${cargoTomlPath}`);
+  }
+}
 export function runSelectedHarness(targetName: string, root: string): void {
   const outputChannel = vscode.window.createOutputChannel("Fuzz Harness");
   outputChannel.show(true); // bring it to front

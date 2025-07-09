@@ -12,10 +12,3 @@ libfuzzer-sys = "0.4"
 toy_rust = { package = "toy-rust", path = ".." }
 
 
-
-[[bin]]
-name = "fuzz_target_add"
-path = "fuzz_targets/fuzz_target_add.rs"
-test = false
-doc = false
-bench = false

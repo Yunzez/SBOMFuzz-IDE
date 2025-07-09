@@ -121,6 +121,8 @@ setupMessaging({
 
       const runBtn = document.createElement("button");
       runBtn.textContent = "Run";
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "Delete";
 
       targetDiv.className = "function-button";
       targetDiv.innerHTML = `
@@ -143,6 +145,12 @@ setupMessaging({
 
       const actionArea = targetDiv.getElementsByClassName("btns-div")[0];
       actionArea.appendChild(runBtn);
+      actionArea.appendChild(deleteBtn);
+      deleteBtn.onclick = (event) => {
+        event.stopPropagation(); // prevents triggering targetDiv.onclick
+        log(`Deleting fuzz target: ${target.name}`);
+        sendMessage({ command: "deleteFuzzTarget", target: target.name });
+      };
       runBtn.onclick = (event) => {
         event.stopPropagation(); // prevents triggering targetDiv.onclick
         log(`Running fuzz target: ${target.name}`);
@@ -174,7 +182,7 @@ setupMessaging({
     if (fuzzRootPath) {
       log("🧪 Got Fuzz root: " + fuzzRootPath);
       fuzzRootSelected = fuzzRootPath;
-      fuzzPathDiv.innerHTML = `Fuzz Root: ${fuzzRootPath}`;
+      fuzzPathDiv.innerHTML = `Fuzz Harness Root: ${fuzzRootPath}`;
       log("Getting Fuzz targets: ");
       sendMessage({ command: "getFuzzTargets", fuzzRoot: fuzzRootPath });
     } else {
