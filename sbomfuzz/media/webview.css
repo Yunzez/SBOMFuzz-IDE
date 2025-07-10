@@ -41,6 +41,74 @@ button {
   display: inline-block; /* Ensure it behaves like a button or link */
 }
 
+.menu-button {
+  border: 1px solid transparent; /* Set a default transparent border */
+  border-radius: 0.25em;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  background-color: white; /* Set a default background color */
+  transition: all 0.3s ease, border-color 0.3s ease;
+  margin-top: 3px;
+  box-sizing: border-box; /* Ensure padding doesn't affect size */
+}
+
+.menu-button:hover {
+  background-color: #f0f0f0; /* Subtle light gray background on hover */
+  border-color: #ccc; /* Subtle border color change on hover */
+}
+
+.score-breakdown {
+  display: none;
+  position: absolute;
+  background: rgba(255, 255, 255, 0.4); /* Slightly more opaque white background */
+  border: 3px solid #ddd; /* Softer border color */
+  padding: 10px; /* Slightly more padding for better spacing */
+  border-radius: 6px; /* Slightly more rounded corners */
+  top: 100%;
+  left: 50%; /* Center align horizontally */
+  transform: translateX(-50%); /* Adjust for centering */
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Softer shadow */
+  backdrop-filter: blur(10px); /* Slightly stronger blur effect */
+  color: #ffffff; /* Darker text for better readability */
+  font-size: 14px; /* Slightly larger font size */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+
+.affirmative-button {
+  border: 2px solid #28a745; /* Green border */
+  border-radius: 0.25em;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  color: white; /* White text */
+  background-color: transparent; /* Transparent background */
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  font-weight: 400;
+}
+
+.affirmative-button:hover {
+  background-color: #28a745; /* Green background on hover */
+  color: white; /* White text on hover */
+}
+
+.negative-button {
+  border: 2px solid #dc3545; /* Red border */
+  border-radius: 0.25em;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  color: white; /* White text */
+  background-color: transparent; /* Transparent background */
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+}
+
+.negative-button:hover {
+  background-color: #dc3545; /* Red background on hover */
+  color: white; /* White text on hover */
+}
+
 .collapsible-section {
   margin: 8px 0;
   border: 1px solid #444;

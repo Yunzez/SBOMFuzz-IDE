@@ -17,7 +17,7 @@ function renderFunctionResults(results, targetContainer) {
 
   // Concatenate non-ignored and ignored (ignored at the bottom)
   // results = [...nonIgnored, ...ignored];
-  results = [...nonIgnored];
+  results = [...nonIgnored, ...ignored];
   for (const result of results) {
     log(`status: ${result.status}`);
     // Create colored status tag
@@ -32,24 +32,61 @@ function renderFunctionResults(results, targetContainer) {
 
     const ignoreBtn = document.createElement("button");
     ignoreBtn.textContent = "Ignore";
+    ignoreBtn.className = "negative-button";
 
     const generateBtn = document.createElement("button");
     generateBtn.textContent = "Generate Harness";
+    generateBtn.className = "affirmative-button";
+    generateBtn.style.marginLeft = "4px";
 
     const resultDiv = document.createElement("div");
     resultDiv.className = "function-button";
     resultDiv.innerHTML = `
-        <div style="font-weight:bold; margin-bottom:4px; display: flex; gap: 2px; flex-wrap: wrap; align-items: center;">
+      <div style="font-weight:bold; margin-bottom:4px; display: flex; gap: 2px; flex-wrap: wrap; align-items: center;">
       <span>${result.functionModulePath}::${result.functionName}</span>
     ${statusBadge}
-        </div>
-        <div>${result.functionLocation?.filePath.replace(
-          pathSelected,
-          ""
-        )}</div>
-        <div>Priority Score: ${result.priorityScore.toFixed(3)}</div>
-        <div class="btns-div" style="margin-top:6px;"></div>
+      </div>
+      <div>${result.functionLocation?.filePath.replace(pathSelected, "")}</div>
+      <div class="priority-score" style="margin-top: 4px;">
+      Priority Score: ${result.priorityScore.toFixed(3)}
+      <span 
+      class="info-icon" 
+      style="margin-left: 4px; cursor: pointer;" 
+      title="Hover to see score breakdown">ℹ️</span>
+      </div>
+      <div class="btns-div" style="margin-top:6px;"></div>
       `;
+
+    // Get the priority score div first
+    const priorityScoreDiv =
+      resultDiv.getElementsByClassName("priority-score")[0];
+    priorityScoreDiv.style.position = "relative"; // now works correctly
+
+    // Create the breakdown box
+    const scoreBreakdown = document.createElement("div");
+    scoreBreakdown.className = "score-breakdown";
+
+    scoreBreakdown.innerHTML = `
+    <strong>Score Breakdown:</strong>
+    <div style="margin: 0; padding-left: 16px;">
+    <div>Param Count: ${result.paramCount.toFixed(1)}</div>
+    <div>Function Usage: ${result.usageCount.toFixed(1)}</div>
+    <div>Centrality Score: ${result.centralityScore.toFixed(5)}</div>
+    <div>Unsafe Score: ${result.unsafeScore.toFixed(1)}</div>
+    </div>
+  `;
+
+    // Append to container
+    priorityScoreDiv.appendChild(scoreBreakdown);
+
+    // Add hover functionality to show/hide the score breakdown
+    const infoIcon = priorityScoreDiv.querySelector(".info-icon");
+    infoIcon.addEventListener("mouseenter", () => {
+      scoreBreakdown.style.display = "block";
+    });
+    infoIcon.addEventListener("mouseleave", () => {
+      scoreBreakdown.style.display = "none";
+    });
 
     // Add buttons to the last div (action area)
     const actionArea = resultDiv.getElementsByClassName("btns-div")[0];
@@ -121,8 +158,12 @@ setupMessaging({
 
       const runBtn = document.createElement("button");
       runBtn.textContent = "Run";
+      runBtn.className = "affirmative-button";
+
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Delete";
+      deleteBtn.className = "negative-button";
+      deleteBtn.style.marginLeft = "4px";
 
       targetDiv.className = "function-button";
       targetDiv.innerHTML = `

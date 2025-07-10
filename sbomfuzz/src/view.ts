@@ -13,7 +13,7 @@ import {
   loadFunctionResults,
 } from "./functionOutputProcesser";
 import {
-    deleteSelectedHarness,
+  deleteSelectedHarness,
   generateHarness,
   optimizeHarness,
   runGenerateAndOptimizeHarness,
@@ -80,7 +80,11 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
 
       if (message.command === "deleteFuzzTarget") {
         deleteSelectedHarness(message.target, globalContext.fuzzRoot!);
-
+        const newTargets = getFuzzTargets(globalContext.fuzzRoot!);
+        webviewView.webview.postMessage({
+          command: "refreshHarnessList",
+          targets: newTargets,
+        });
       }
 
       if (message.command === "createFuzzRoot") {
