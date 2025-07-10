@@ -125,7 +125,7 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         });
       }
 
-      if (message.command === "testVisualization") {
+      if (message.command === "showVisualization") {
         const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
         console.log("Loading function results from:", outputPath);
         const results = loadFunctionResults(outputPath) ?? [];

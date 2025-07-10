@@ -250,6 +250,7 @@ document.getElementById("start-analyzer").addEventListener("click", () => {
   });
 });
 
-document.getElementById("test-vis").addEventListener("click", () => {
-  sendMessage({ command: "testVisualization" });
+
+document.getElementById("refresh-button").addEventListener("click", () => {
+  sendMessage({ command: "showVisualization" });
 });
