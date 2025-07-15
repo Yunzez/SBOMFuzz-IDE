@@ -1,6 +1,7 @@
 pub mod arithmetic;
 pub mod parser;
 pub mod utils;
+pub mod expr_eval;
 
 use crate::arithmetic::*;
 use crate::parser::{ parse_int };
