@@ -19,19 +19,19 @@ pub fn evaluate_expression(
     // Remove whitespace
     let expr: String = expr.chars().filter(|c| c.is_whitespace() == false).collect();
     let tokens = tokenize_expr(&expr)?;
-    return Ok(eval_tokens(&tokens)?.0)
+    Ok(eval_tokens(&tokens, 0)?.0)
 }
 
 #[derive(PartialEq, Eq)]
 enum Token {
     Number(i32),
-    Operation(char),
+    Operator(char),
     Lparen,
     Rparen
 
 }
 
-pub fn tokenize_expr(
+fn tokenize_expr(
     mut expr: &str
 ) -> Result<Vec<Token>, &'static str> {
     let mut tokens = vec![];
@@ -52,7 +52,7 @@ pub fn tokenize_expr(
 /// Can be either a parenthesis, number, or operation
 /// 
 /// Returns the token, and a slice containing the rest of the expression
-pub fn parse_next_token(
+fn parse_next_token(
     expr: &str
 ) -> Result<(Token, &str), &'static str> {
     let first = expr.chars().next().ok_or("Error parsing expression: Empty expr")?;
@@ -66,7 +66,7 @@ pub fn parse_next_token(
         },
         '+' | '-' | '*' | '/' | '^' | '%' => {
             Ok((
-                Token::Operation(first),
+                Token::Operator(first),
                 remove_n_chars(1, expr)
             ))
         },
@@ -77,7 +77,7 @@ pub fn parse_next_token(
 }
 
 /// Removes the first n characters from the beginning of a string slice
-pub fn remove_n_chars(n: usize, s: &str) -> &str {
+fn remove_n_chars(n: usize, s: &str) -> &str {
     // ERROR!
     // Invalid if n is not on a unicode character boundary
     // This is fine for ascii tho
@@ -93,58 +93,43 @@ pub fn remove_n_chars(n: usize, s: &str) -> &str {
 }
 
 
-pub fn eval_tokens(mut tokens: &[Token]) -> Result<(i32, &[Token]), &'static str> {
-    // Using iterators would be a much better way to do this
-    // but I'm using indexing to introduce some oob errors
-    // Lots of direct indexing in here to produce errors
+fn eval_tokens(tokens: &[Token], mut i: usize) -> Result<(i32, usize), &'static str> {
+    // Doesnt really matter as long as result is idempotent for current_op
+    let mut result = 0;
+    let mut current_op = '+';
 
-    // Consume the first token in the expression
-    let mut lhs = match tokens[0] {
-        Token::Number(num) => {
-            tokens = &tokens[1..];
-            num
-        },
-        Token::Lparen => {
-            let (result, rem_tokens) = eval_tokens(&tokens[1..])?;
-            tokens = rem_tokens;
-            result
-        },
-        Token::Operation(_) | Token::Rparen => return Err("Expression cannot begin with operation or right paren"),
-    };
-
-    // Consume the remaining tokens in the eval chain
-    loop {
-        if tokens.is_empty() { break }
-
-        let op = match tokens[0] {
-            Token::Operation(op) => op,
-            Token::Rparen => return Ok((lhs, &tokens[1..])),
-            Token::Lparen | Token::Number(_) => return Err("Expexted operation or right paren")
-        };
-        tokens = &tokens[1..];
-
-        let rhs = match tokens[0] {
-            Token::Number(num) => {
-                tokens = &tokens[1..];
-                num
-            },
+    while i < tokens.len() {
+        match &tokens[i] {
+            Token::Number(n) => {
+                result = apply_operator(result, *n, current_op)?;
+                i += 1;
+            }
+            Token::Operator(op) => {
+                current_op = *op;
+                i += 1;
+            }
             Token::Lparen => {
-                let (result, rem_tokens) = eval_tokens(&tokens[1..])?;
-                tokens = rem_tokens;
-                result
-            },
-            Token::Operation(_) | Token::Rparen => return Err("RHS of operator cannot be another operator or right paren")
-        };
-
-        lhs = match op {
-            '+' => arithmetic::add(lhs, rhs),
-            '-' => arithmetic::subtract(lhs, rhs),
-            '*' => arithmetic::multiply(lhs, rhs),
-            '/' => arithmetic::divide(lhs, rhs).ok_or("Divide by zero error")?,
-            '^' => arithmetic::power(lhs, u32::try_from(rhs).map_err(|_| "Power RHS must be positive")?),
-            '%' => arithmetic::modulo(lhs, rhs).ok_or("Modulus RHS must not be zero")?,
-            _ => return Err("Unexpected operator")
+                let (inner_result, next_i) = eval_tokens(tokens, i + 1)?;
+                result = apply_operator(result, inner_result, current_op)?;
+                i = next_i;
+            }
+            Token::Rparen => {
+                return Ok((result, i + 1));
+            }
         }
     }
-    return Ok((lhs, &[]))
+
+    Ok((result, i))
+}
+
+fn apply_operator(lhs: i32, rhs: i32, op: char) -> Result<i32, &'static str> {
+    match op {
+        '+' => Ok(arithmetic::add(lhs, rhs)),
+        '-' => Ok(arithmetic::subtract(lhs, rhs)),
+        '*' => Ok(arithmetic::multiply(lhs, rhs)),
+        '/' => arithmetic::divide(lhs, rhs).ok_or("Divide by zero error"),
+        '^' => Ok(arithmetic::power(lhs, u32::try_from(rhs).map_err(|_| "Power RHS must be positive")?)),
+        '%' => arithmetic::modulo(lhs, rhs).ok_or("Modulus RHS must not be zero"),
+        _ => return Err("Unexpected operator")
+    }
 }
