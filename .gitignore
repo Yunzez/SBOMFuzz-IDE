@@ -15,7 +15,7 @@ sbomfuzz/.env
 
 # Ignore all target directories recursively
 **/target/
-
+**/program_a/target/
 
 # Ignore all debug directories recursively
 **/debug/
