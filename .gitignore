@@ -11,3 +11,4 @@ sbomfuzz/.env
 sbomfuzz/.env
 .DS_Store
 program_a/target/.rustc_info.json
+/program_a/target
