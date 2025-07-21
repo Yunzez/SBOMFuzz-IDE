@@ -10,5 +10,9 @@ sbomfuzz/harnessGen/.env
 sbomfuzz/.env
 sbomfuzz/.env
 .DS_Store
-*.rustc_info.json
-*/target
+# Ignore all rustc_info.json files
+**/*.rustc_info.json
+
+# Ignore all target directories recursively
+**/target/
+
