@@ -1,0 +1,27 @@
+[package]
+name = "program_a-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.program_a]
+path = ".."
+
+[[bin]]
+name = "fuzz_target_apply_operator"
+path = "fuzz_targets/fuzz_target_apply_operator.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_subtract"
+path = "fuzz_targets/fuzz_target_subtract.rs"
+test = false
+doc = false
+bench = false

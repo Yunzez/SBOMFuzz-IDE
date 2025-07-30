@@ -122,7 +122,7 @@ fn eval_tokens(tokens: &[Token], mut i: usize) -> Result<(i32, usize), &'static 
     Ok((result, i))
 }
 
-fn apply_operator(lhs: i32, rhs: i32, op: char) -> Result<i32, &'static str> {
+pub fn apply_operator(lhs: i32, rhs: i32, op: char) -> Result<i32, &'static str> {
     match op {
         '+' => Ok(arithmetic::add(lhs, rhs)),
         '-' => Ok(arithmetic::subtract(lhs, rhs)),

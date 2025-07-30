@@ -23,7 +23,7 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
         const range = new vscode.Range(i, 0, i, line.text.length);
         const cmd: vscode.Command = {
           // title: 'Show Function Info',
-          title: "Fuzz this!",
+          title: "Generate Harness!",
           command: "sbomfuzz.showFunctionInfo",
           arguments: [functionName, document.uri.fsPath],
         };

@@ -60,7 +60,12 @@ button {
 .score-breakdown {
   display: none;
   position: absolute;
-  background: rgba(255, 255, 255, 0.4); /* Slightly more opaque white background */
+  background: rgba(
+    255,
+    255,
+    255,
+    0.4
+  ); /* Slightly more opaque white background */
   border: 3px solid #ddd; /* Softer border color */
   padding: 10px; /* Slightly more padding for better spacing */
   border-radius: 6px; /* Slightly more rounded corners */
@@ -74,7 +79,6 @@ button {
   font-size: 14px; /* Slightly larger font size */
   white-space: nowrap; /* Prevent text wrapping */
 }
-
 
 .affirmative-button {
   border: 2px solid #28a745; /* Green border */
@@ -148,4 +152,42 @@ button {
   border-radius: 6px;
   font-size: 12px;
   margin-left: 8px;
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1em;
+}
+
+.filter-button {
+  margin-right: 0.5em;
+  margin-bottom: 0.3em;
+  padding: 0.3em 0.66em;
+  background-color: rgba(255, 255, 255, 1);
+  border: 2px solid transparent; /* Transparent border for smooth transition */
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    transform 0.2s ease;
+  font-weight: 500; /* Slightly bolder text for better readability */
+  color: #333; /* Darker text for contrast */
+  font-size: small;
+}
+
+.filter-button:hover {
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.8
+  ); /* Slightly transparent white on hover */
+  border-color: #bbb; /* Subtle border color change on hover */
+  transform: scale(1.03); /* Slight zoom effect on hover */
+}
+
+.filter-button.selected {
+  background-color: #007bff; /* Blue background for selected state */
+  color: white; /* White text for contrast */
+  border-color: #0056b3; /* Darker blue border for selected state */
 }

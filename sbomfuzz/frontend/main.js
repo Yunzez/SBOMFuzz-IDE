@@ -3,10 +3,11 @@ import { setupMessaging, sendMessage, log } from "./messaging.js";
 let pathSelected = null;
 let fuzzRootSelected = null;
 let functionTargets = null;
+let selectedFilter = null;
 const targetContainer = document.getElementById("entry-list");
 const pathDiv = document.getElementById("path-display-container");
 
-function renderFunctionResults(results, targetContainer) {
+function renderFunctionResults(results, targetContainer, priority) {
   targetContainer.innerHTML = ""; // Clear previous results
   // Separate ignored and non-ignored results
   const nonIgnored = results.filter((r) => r.status !== "Ignore");
@@ -17,7 +18,31 @@ function renderFunctionResults(results, targetContainer) {
 
   // Concatenate non-ignored and ignored (ignored at the bottom)
   // results = [...nonIgnored, ...ignored];
+
+  // Apply additional sorting based on the selected filter
+  switch (priority) {
+    case "unsafe-block-filter":
+      nonIgnored.sort((a, b) => b.unsafeScore - a.unsafeScore);
+      break;
+    case "parameters-filter":
+      nonIgnored.sort((a, b) => b.paramCount - a.paramCount);
+      break;
+    case "centrality-filter":
+      nonIgnored.sort((a, b) => b.centralityScore - a.centralityScore);
+      break;
+    case "usage-filter":
+      nonIgnored.sort((a, b) => b.usageCount - a.usageCount);
+      break;
+    default:
+      // Default to priorityScore sorting
+      nonIgnored.sort((a, b) => b.priorityScore - a.priorityScore);
+      break;
+  }
+
+  console.log("Sorted non-ignored results:", nonIgnored);
+
   results = [...nonIgnored, ...ignored];
+
   for (const result of results) {
     log(`status: ${result.status}`);
     // Create colored status tag
@@ -235,12 +260,66 @@ setupMessaging({
       });
       fuzzPathDiv.appendChild(createRootButton);
     }
+    const filtersDiv = document.createElement("div");
+    filtersDiv.id = "filters-container";
+    const functionListDiv = document.createElement("div");
+    targetContainer.appendChild(filtersDiv);
+    targetContainer.appendChild(functionListDiv);
     if (context.results && context.results.length > 0) {
       functionTargets = context.results;
-      renderFunctionResults(functionTargets, targetContainer);
+
+      loadFilters(functionTargets, filtersDiv, functionListDiv);
+      renderFunctionResults(functionTargets, functionListDiv, "priority-filter");
     }
   },
 });
+
+const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
+  console.log("Loading filters");
+
+  const filters = [
+    { id: "priority-filter", label: "Priority Score", default: true },
+    { id: "unsafe-block-filter", label: "Unsafe Block", default: false },
+    {
+      id: "parameters-filter",
+      label: "Parameters Count",
+      default: false,
+    },
+    {
+      id: "centrality-filter",
+      label: "Centrality Score",
+      default: false,
+    },
+    { id: "usage-filter", label: "Usage Weights", default: false },
+  ];
+
+  filters.forEach((filter) => {
+    const button = document.createElement("button");
+    button.id = filter.id;
+    button.textContent = filter.label;
+    button.className = "filter-button";
+    button.style.marginRight = "8px";
+    if (filter.default) {
+      button.classList.add("selected");
+      selectedFilter = filter; // Set the default filter
+    }
+
+    button.addEventListener("click", () => {
+      console.log(`Filter applied: ${filter.label}`);
+      selectedFilter = filter; // Update the selected filter
+      // Remove 'selected' class from all filter buttons
+      const allButtons = targetContainer.querySelectorAll(".filter-button");
+      allButtons.forEach((btn) => btn.classList.remove("selected"));
+
+      // Add 'selected' class to the clicked button
+      button.classList.add("selected");
+      renderFunctionResults(functionTargets, functionListDiv, filter.id); // Pass the button as the priority filter
+      // Add filter logic here
+    });
+
+    targetContainer.appendChild(button);
+  });
+};
 
 document.getElementById("start-analyzer").addEventListener("click", () => {
   sendMessage({
@@ -249,7 +328,6 @@ document.getElementById("start-analyzer").addEventListener("click", () => {
     projectPath: pathSelected,
   });
 });
-
 
 document.getElementById("refresh-button").addEventListener("click", () => {
   sendMessage({ command: "showVisualization" });
