@@ -6,11 +6,16 @@
     <link href="${webviewUri}/webview.css" rel="stylesheet" />
   </head>
   <body>
-    <h2>SBOMFuzz Dashboard</h2>
-    <div id="path-display-container"></div>
-    <button class="menu-button" id="refresh-button">Refresh</button>
-    <button class="menu-button" id="clear-button">Clear</button>
-    <button class="menu-button" id="start-analyzer">Run Analyzer</button>
+    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px">
+      SBOMFuzz Dashboard
+    </div>
+    <div style="display: flex; justify-content: flex-start; align-items: center;">
+      <div id="path-display-container"></div>
+      <button class="menu-button" id="refresh-button">Refresh</button>
+    </div>
+
+    <!-- <button class="menu-button" id="clear-button">Clear</button>
+    <button class="menu-button" id="start-analyzer">Run Analyzer</button> -->
     <div class="collapsible-section">
       <div class="collapsible-header">Function Details</div>
       <div class="collapsible-content">

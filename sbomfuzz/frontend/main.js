@@ -238,9 +238,19 @@ setupMessaging({
     if (projectRootPath) {
       log("📦 Got Cargo project root: " + projectRootPath);
       pathSelected = projectRootPath;
-      pathDiv.innerHTML = `Cargo Project Root: ${projectRootPath}`;
+
+      pathDiv.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px; padding: 6px; background: #f0f0f0; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <span style="font-weight: bold; color: #333;">Project Root:</span>
+        <span style="color: #007acc;">${projectRootPath}</span>
+      </div>
+      `;
     } else {
-      pathDiv.innerHTML = "No Cargo project found.";
+      pathDiv.innerHTML = `
+      <div style="padding: 8px; background: #ffe6e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <span style="font-weight: bold; color: #cc0000;">No Cargo project found.</span>
+      </div>
+      `;
     }
 
     const fuzzPathDiv = document.getElementById("fuzz-path-display");
@@ -276,21 +286,44 @@ setupMessaging({
 
 const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
   console.log("Loading filters");
+  const filterTitle = document.createElement("div");
+  filterTitle.textContent = "Filters";
+  filterTitle.style.fontWeight = "bold";
+  filterTitle.style.marginBottom = "8px";
+  targetContainer.appendChild(filterTitle);
 
+  const filterButtonsContainer = document.createElement("div");
   const filters = [
-    { id: "priority-filter", label: "Priority Score", default: true },
-    { id: "unsafe-block-filter", label: "Unsafe Block", default: false },
-    {
-      id: "parameters-filter",
-      label: "Parameters Count",
-      default: false,
+    { 
+      id: "priority-filter", 
+      label: "Priority Score", 
+      default: true, 
+      filterDescription: "Priority Score is calculated based on the function's parameters, usage, centrality, and unsafe blocks." 
     },
-    {
-      id: "centrality-filter",
-      label: "Centrality Score",
-      default: false,
+    { 
+      id: "unsafe-block-filter", 
+      label: "Unsafe Block", 
+      default: false, 
+      filterDescription: "Unsafe Block measures the presence of unsafe usage inside the function. A score of 1 is given if the function contains an unsafe block, and a score of 2 if the function itself is marked unsafe." 
     },
-    { id: "usage-filter", label: "Usage Weights", default: false },
+    { 
+      id: "parameters-filter", 
+      label: "Parameters Count", 
+      default: false, 
+      filterDescription: "Parameters Count represents the number of parameters a function takes, which can indicate its complexity or utility." 
+    },
+    { 
+      id: "centrality-filter", 
+      label: "Centrality Score", 
+      default: false, 
+      filterDescription: "Centrality Score measures how structurally embedded a function is in the crate's call/API graph. Functions with high centrality are called by many important functions, indicating their significance." 
+    },
+    { 
+      id: "usage-filter", 
+      label: "Usage Weights", 
+      default: false, 
+      filterDescription: "Usage Weights measure how frequently a function is used directly, normalized across dependency sequences or usage examples. This indicates how often a function is used in practice across different crates or over time." 
+    },
   ];
 
   filters.forEach((filter) => {
@@ -313,12 +346,22 @@ const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
 
       // Add 'selected' class to the clicked button
       button.classList.add("selected");
+      const currentFilterDescription = targetContainer.querySelector(".filter-description");
+      if (currentFilterDescription) {
+        currentFilterDescription.textContent = filter.filterDescription;
+      }
       renderFunctionResults(functionTargets, functionListDiv, filter.id); // Pass the button as the priority filter
       // Add filter logic here
     });
 
-    targetContainer.appendChild(button);
+    filterButtonsContainer.appendChild(button);
   });
+  targetContainer.appendChild(filterButtonsContainer);
+  const filterDescription = document.createElement("div");
+  filterDescription.className = "filter-description";
+  filterDescription.style.marginTop = "8px";
+  filterDescription.textContent = filters[0].filterDescription; // Default description
+  targetContainer.appendChild(filterDescription);
 };
 
 document.getElementById("start-analyzer").addEventListener("click", () => {

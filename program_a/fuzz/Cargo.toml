@@ -25,3 +25,9 @@ path = "fuzz_targets/fuzz_target_subtract.rs"
 test = false
 doc = false
 bench = false
+[[bin]]
+name = "fuzz_target_evaluate_expression"
+path = "fuzz_targets/fuzz_target_evaluate_expression.rs"
+test = false
+doc = false
+bench = false

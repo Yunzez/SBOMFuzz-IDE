@@ -1,5 +1,4 @@
 #![no_main]
-
 use libfuzzer_sys::fuzz_target;
 use program_a::arithmetic::subtract;
 
