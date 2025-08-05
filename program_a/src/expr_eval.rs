@@ -23,7 +23,7 @@ pub fn evaluate_expression(
 }
 
 #[derive(PartialEq, Eq)]
-enum Token {
+pub enum Token {
     Number(i32),
     Operator(char),
     Lparen,
@@ -31,7 +31,7 @@ enum Token {
 
 }
 
-fn tokenize_expr(
+pub fn tokenize_expr(
     mut expr: &str
 ) -> Result<Vec<Token>, &'static str> {
     let mut tokens = vec![];
@@ -52,7 +52,7 @@ fn tokenize_expr(
 /// Can be either a parenthesis, number, or operation
 /// 
 /// Returns the token, and a slice containing the rest of the expression
-fn parse_next_token(
+pub fn parse_next_token(
     expr: &str
 ) -> Result<(Token, &str), &'static str> {
     let first = expr.chars().next().ok_or("Error parsing expression: Empty expr")?;
@@ -77,7 +77,7 @@ fn parse_next_token(
 }
 
 /// Removes the first n characters from the beginning of a string slice
-fn remove_n_chars(n: usize, s: &str) -> &str {
+pub fn remove_n_chars(n: usize, s: &str) -> &str {
     // ERROR!
     // Invalid if n is not on a unicode character boundary
     // This is fine for ascii tho
@@ -93,7 +93,7 @@ fn remove_n_chars(n: usize, s: &str) -> &str {
 }
 
 
-fn eval_tokens(tokens: &[Token], mut i: usize) -> Result<(i32, usize), &'static str> {
+pub fn eval_tokens(tokens: &[Token], mut i: usize) -> Result<(i32, usize), &'static str> {
     // Doesnt really matter as long as result is idempotent for current_op
     let mut result = 0;
     let mut current_op = '+';

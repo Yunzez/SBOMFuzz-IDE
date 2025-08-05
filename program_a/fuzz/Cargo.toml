@@ -12,22 +12,3 @@ libfuzzer-sys = "0.4"
 
 [dependencies.program_a]
 path = ".."
-
-[[bin]]
-name = "fuzz_target_apply_operator"
-path = "fuzz_targets/fuzz_target_apply_operator.rs"
-test = false
-doc = false
-bench = false
-[[bin]]
-name = "fuzz_target_subtract"
-path = "fuzz_targets/fuzz_target_subtract.rs"
-test = false
-doc = false
-bench = false
-[[bin]]
-name = "fuzz_target_evaluate_expression"
-path = "fuzz_targets/fuzz_target_evaluate_expression.rs"
-test = false
-doc = false
-bench = false
