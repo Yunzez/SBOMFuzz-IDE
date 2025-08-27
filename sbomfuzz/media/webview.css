@@ -56,26 +56,37 @@ button {
   background-color: #f0f0f0; /* Subtle light gray background on hover */
   border-color: #ccc; /* Subtle border color change on hover */
 }
+.search-bar {
+  width: 80%;
+  padding: 10px; /* Slightly more padding for better spacing */
+  border: 1px solid #ccc;
+  border-radius: 6px; /* Slightly more rounded corners */
+  font-size: 14px; /* Slightly larger font size for better readability */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: box-shadow 0.3s ease, border-color 0.3s ease; /* Smooth transitions */
+  margin-top: 1em; /* Add margin on top for spacing */
+  border-top: 2px solid #eee; /* Add a separation line at the top */
+}
 
+.search-bar:focus {
+  border-color: #007bff; /* Blue border on focus */
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* Slightly stronger shadow on focus */
+  outline: none; /* Remove default outline */
+}
 .score-breakdown {
   display: none;
   position: absolute;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.4
-  ); /* Slightly more opaque white background */
-  border: 3px solid #ddd; /* Softer border color */
+  background: rgba(0, 0, 0, 0.8); /* Darker background for better contrast */
+  border: 3px solid #444; /* Darker border color */
   padding: 10px; /* Slightly more padding for better spacing */
   border-radius: 6px; /* Slightly more rounded corners */
   top: 100%;
   left: 50%; /* Center align horizontally */
   transform: translateX(-50%); /* Adjust for centering */
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Softer shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Slightly darker shadow */
   backdrop-filter: blur(10px); /* Slightly stronger blur effect */
-  color: #ffffff; /* Darker text for better readability */
+  color: #ffffff; /* White text for contrast */
   font-size: 14px; /* Slightly larger font size */
   white-space: nowrap; /* Prevent text wrapping */
 }

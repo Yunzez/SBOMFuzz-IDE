@@ -6,13 +6,48 @@ let functionTargets = null;
 let selectedFilter = null;
 const targetContainer = document.getElementById("entry-list");
 const pathDiv = document.getElementById("path-display-container");
+function renderSearchBar(results, targetContainer, priority) {
+  const searchContainer = document.createElement("div");
+  searchContainer.style.marginBottom = "10px";
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Search functions...";
+  searchInput.classList.add("search-bar");
+  const resultsDiv = document.createElement("div");
+  searchInput.addEventListener("input", () => {
+    resultsDiv.innerHTML = ""; // Clear previous results
+    log(`Search input changed: ${searchInput.value}`);
+    const query = searchInput.value.toLowerCase().trim();
+    if (query === "") {
+      // If the search query is empty, render all results
+      renderFunctionResults(results, resultsDiv, priority);
+    } else {
+      const filteredResults = results.filter(
+        (fn) =>
+          fn.functionName.toLowerCase().includes(query) ||
+          fn.functionModulePath.toLowerCase().includes(query)
+      );
+      log(`Filtered results: ${filteredResults.length}`);
+      renderFunctionResults(filteredResults, resultsDiv, priority);
+    }
+  });
+  searchContainer.appendChild(searchInput);
+  targetContainer.appendChild(searchContainer);
+  targetContainer.appendChild(resultsDiv);
+  renderFunctionResults(results, resultsDiv, priority);
+}
+
+function startRendering(results, targetContainer, priority) {
+  targetContainer.innerHTML = ""; // Clear previous results
+
+  renderSearchBar(results, targetContainer, priority);
+  // renderFunctionResults(results, targetContainer, priority);
+}
 
 function renderFunctionResults(results, targetContainer, priority) {
   targetContainer.innerHTML = ""; // Clear previous results
-  // Separate ignored and non-ignored results
   const nonIgnored = results.filter((r) => r.status !== "Ignore");
   const ignored = results.filter((r) => r.status === "Ignore");
-
   // Sort non-ignored by priorityScore descending
   nonIgnored.sort((a, b) => b.priorityScore - a.priorityScore);
 
@@ -90,16 +125,14 @@ function renderFunctionResults(results, targetContainer, priority) {
     // Create the breakdown box
     const scoreBreakdown = document.createElement("div");
     scoreBreakdown.className = "score-breakdown";
-
     scoreBreakdown.innerHTML = `
-    <strong>Score Breakdown:</strong>
-    <div style="margin: 0; padding-left: 16px;">
-    <div>Param Count: ${result.paramCount.toFixed(1)}</div>
-    <div>Function Usage: ${result.usageCount.toFixed(1)}</div>
-    <div>Centrality Score: ${result.centralityScore.toFixed(5)}</div>
-    <div>Unsafe Score: ${result.unsafeScore.toFixed(1)}</div>
+    <strong>Function Details:</strong>
+    <div style="margin: 0;">
+    <div>Parameter Count: ${result.paramCount}</div>
+    <div>Usage Count: ${result.usageCount}</div>
+    <div>Unsafe: ${result.unsafeScore > 0 ? "Yes" : "No"}</div>
     </div>
-  `;
+    `;
 
     // Append to container
     priorityScoreDiv.appendChild(scoreBreakdown);
@@ -122,7 +155,7 @@ function renderFunctionResults(results, targetContainer, priority) {
       event.stopPropagation(); // prevents triggering resultDiv.onclick
       result.status = "Ignore"; // Update status locally
       log(`ignore, ${result.status}`);
-      renderFunctionResults(results, targetContainer); // Re-render to reflect changes
+      startRendering(results, targetContainer); // Re-render to reflect changes
     };
 
     generateBtn.onclick = (event) => {
@@ -133,7 +166,7 @@ function renderFunctionResults(results, targetContainer, priority) {
         target: result,
       });
       result.status = "HarnessGenerated";
-      renderFunctionResults(results, targetContainer);
+      startRendering(results, targetContainer);
     };
 
     resultDiv.onclick = () => {
@@ -229,7 +262,7 @@ setupMessaging({
   onRustAnalysisDone: (results) => {
     log("Rendering function results");
     targetContainer.innerHTML = ""; // Clear previous results
-    renderFunctionResults(results, targetContainer);
+    startRendering(results, targetContainer);
   },
 
   onGlobalContext: (context) => {
@@ -279,7 +312,7 @@ setupMessaging({
       functionTargets = context.results;
 
       loadFilters(functionTargets, filtersDiv, functionListDiv);
-      renderFunctionResults(functionTargets, functionListDiv, "priority-filter");
+      startRendering(functionTargets, functionListDiv, "priority-filter");
     }
   },
 });
@@ -294,35 +327,40 @@ const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
 
   const filterButtonsContainer = document.createElement("div");
   const filters = [
-    { 
-      id: "priority-filter", 
-      label: "Priority Score", 
-      default: true, 
-      filterDescription: "Priority Score is calculated based on the function's parameters, usage, centrality, and unsafe blocks." 
+    {
+      id: "priority-filter",
+      label: "Priority Score",
+      default: true,
+      filterDescription:
+        "Priority Score is calculated based on the function's parameters, usage, centrality, and unsafe blocks.",
     },
-    { 
-      id: "unsafe-block-filter", 
-      label: "Unsafe Block", 
-      default: false, 
-      filterDescription: "Unsafe Block measures the presence of unsafe usage inside the function. A score of 1 is given if the function contains an unsafe block, and a score of 2 if the function itself is marked unsafe." 
+    {
+      id: "unsafe-block-filter",
+      label: "Unsafe Block",
+      default: false,
+      filterDescription:
+        "Unsafe Block measures the presence of unsafe usage inside the function. A score of 1 is given if the function contains an unsafe block, and a score of 2 if the function itself is marked unsafe.",
     },
-    { 
-      id: "parameters-filter", 
-      label: "Parameters Count", 
-      default: false, 
-      filterDescription: "Parameters Count represents the number of parameters a function takes, which can indicate its complexity or utility." 
+    {
+      id: "parameters-filter",
+      label: "Parameters Count",
+      default: false,
+      filterDescription:
+        "Parameters Count represents the number of parameters a function takes, which can indicate its complexity or utility.",
     },
-    { 
-      id: "centrality-filter", 
-      label: "Centrality Score", 
-      default: false, 
-      filterDescription: "Centrality Score measures how structurally embedded a function is in the crate's call/API graph. Functions with high centrality are called by many important functions, indicating their significance." 
+    {
+      id: "centrality-filter",
+      label: "Centrality Score",
+      default: false,
+      filterDescription:
+        "Centrality Score measures how structurally embedded a function is in the crate's call/API graph. Functions with high centrality are called by many important functions, indicating their significance.",
     },
-    { 
-      id: "usage-filter", 
-      label: "Usage Weights", 
-      default: false, 
-      filterDescription: "Usage Weights measure how frequently a function is used directly, normalized across dependency sequences or usage examples. This indicates how often a function is used in practice across different crates or over time." 
+    {
+      id: "usage-filter",
+      label: "Usage Weights",
+      default: false,
+      filterDescription:
+        "Usage Weights measure how frequently a function is used directly, normalized across dependency sequences or usage examples. This indicates how often a function is used in practice across different crates or over time.",
     },
   ];
 
@@ -346,11 +384,13 @@ const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
 
       // Add 'selected' class to the clicked button
       button.classList.add("selected");
-      const currentFilterDescription = targetContainer.querySelector(".filter-description");
+      const currentFilterDescription = targetContainer.querySelector(
+        ".filter-description"
+      );
       if (currentFilterDescription) {
         currentFilterDescription.textContent = filter.filterDescription;
       }
-      renderFunctionResults(functionTargets, functionListDiv, filter.id); // Pass the button as the priority filter
+      startRendering(functionTargets, functionListDiv, filter.id); // Pass the button as the priority filter
       // Add filter logic here
     });
 
@@ -365,13 +405,15 @@ const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
 };
 
 document.getElementById("start-analyzer").addEventListener("click", () => {
-  sendMessage({
-    command: "runAnalyzer",
-    target: "none",
-    projectPath: pathSelected,
+  vscode.postMessage({
+    command: "executeCommand",
+    commandId: "sbomfuzz.runAnalysisTool",
   });
 });
 
 document.getElementById("refresh-button").addEventListener("click", () => {
-  sendMessage({ command: "showVisualization" });
+  vscode.postMessage({
+    command: "executeCommand",
+    commandId: "sbomfuzz.runAnalysisTool",
+  });
 });

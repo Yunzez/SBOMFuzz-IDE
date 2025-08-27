@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
+import * as fs from "fs";
 import { SbomFuzzWebviewViewProvider } from "./view";
 import {
   make_function_public,
@@ -12,6 +13,7 @@ import path from "path";
 import { get } from "http";
 import { FunctionResult } from "./functionOutputProcesser";
 import { generateHarness, optimizeHarness } from "./harnessGen";
+import { runRustAnalyzer } from "./rustAnalyzerStart";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -70,8 +72,17 @@ export async function activate(context: vscode.ExtensionContext) {
           filePath,
           globalContext.results ?? []
         );
-
         if (!focusTarget) {
+          vscode.window
+            .showErrorMessage(
+              `Oops! Function ${functionName} not found in analysis. If this is a new function you wrote, please rerun the analysis tool.`,
+              "Rerun Analysis"
+            )
+            .then((selection) => {
+              if (selection === "Rerun Analysis") {
+                vscode.commands.executeCommand("sbomfuzz.runAnalysisTool");
+              }
+            });
           return;
         }
 
@@ -84,6 +95,37 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand("sbomfuzz.runAnalysisTool", async () => {
+      const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
+      if (fs.existsSync(outputPath)) {
+        fs.rmSync(outputPath, { recursive: true, force: true });
+        console.log("Output path cleared:", outputPath);
+      }
+      fs.mkdirSync(outputPath, { recursive: true });
+
+      const webview = SbomFuzzWebviewViewProvider.getWebview();
+      if (!webview) {
+        vscode.window.showErrorMessage(
+          "Webview not found. Please open the view and try again."
+        );
+        return;
+      }
+
+      const projectRoot = globalContext.projectRoot!;
+      console.log("Resolved analyzer path:", projectRoot);
+      console.log("Exists:", fs.existsSync(projectRoot));
+      console.log("Is file:", fs.statSync(projectRoot).isFile());
+
+      const results = await runRustAnalyzer(context, projectRoot);
+      globalContext.results = results;
+      webview.postMessage({
+        command: "rustAnalysisDone",
+        results,
+      });
+    })
+  );
+
   context.subscriptions.push(disposable);
 }
 
@@ -93,7 +135,7 @@ export function findFuzzTargets(
   functionTargets: FunctionResult[]
 ) {
   console.log("generate fuzzing target");
-
+  console.log(`Searching for function ${functionName} in ${filePath}`);
   // Find the function info with matching name and filePath
   const targetInfo = functionTargets.find(
     (fn) =>
@@ -154,12 +196,14 @@ export function startGeneration(
           message: "Harness optimized and ready.",
         });
         vscode.window.showInformationMessage("🚀 Harness is ready to run!");
+        vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
       } else {
         progress.report({
           increment: 70,
           message: "Optimization failed.",
         });
         vscode.window.showWarningMessage("⚠️ Harness optimization failed.");
+        vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
       }
     }
   );

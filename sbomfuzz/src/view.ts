@@ -58,7 +58,17 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         });
       }
 
+      if (message.command === "executeCommand") {
+        vscode.commands.executeCommand(message.commandId, ...(message.args ?? []));
+      }
+      
       if (message.command === "runAnalyzer") {
+         const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
+        if (fs.existsSync(outputPath)) {
+          fs.rmSync(outputPath, { recursive: true, force: true });
+          console.log("Output path cleared:", outputPath);
+        }
+        fs.mkdirSync(outputPath, { recursive: true });
         const projectRoot = message.projectPath; // send this from the webview
         console.log("Resolved analyzer path:", projectRoot);
         console.log("Exists:", fs.existsSync(projectRoot));

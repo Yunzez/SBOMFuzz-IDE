@@ -19,7 +19,12 @@ pub fn evaluate_expression(
     // Remove whitespace
     let expr: String = expr.chars().filter(|c| c.is_whitespace() == false).collect();
     let tokens = tokenize_expr(&expr)?;
+    this_is_a_test_function_3();
     Ok(eval_tokens(&tokens, 0)?.0)
+}
+
+pub fn this_is_a_test_function_3() {
+    println!("This is a test function");
 }
 
 #[derive(PartialEq, Eq)]

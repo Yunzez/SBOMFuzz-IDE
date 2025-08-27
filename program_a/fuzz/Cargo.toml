@@ -12,3 +12,10 @@ libfuzzer-sys = "0.4"
 
 [dependencies.program_a]
 path = ".."
+
+[[bin]]
+name = "fuzz_target_evaluate_expression"
+path = "fuzz_targets/fuzz_target_evaluate_expression.rs"
+test = false
+doc = false
+bench = false
