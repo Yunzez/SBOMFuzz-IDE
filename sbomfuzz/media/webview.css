@@ -57,7 +57,7 @@ button {
   border-color: #ccc; /* Subtle border color change on hover */
 }
 .search-bar {
-  width: 80%;
+  width: 90%;
   padding: 10px; /* Slightly more padding for better spacing */
   border: 1px solid #ccc;
   border-radius: 6px; /* Slightly more rounded corners */
@@ -73,6 +73,7 @@ button {
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* Slightly stronger shadow on focus */
   outline: none; /* Remove default outline */
 }
+
 .score-breakdown {
   display: none;
   position: absolute;

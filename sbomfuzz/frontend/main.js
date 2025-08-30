@@ -62,9 +62,9 @@ function renderFunctionResults(results, targetContainer, priority) {
     case "parameters-filter":
       nonIgnored.sort((a, b) => b.paramCount - a.paramCount);
       break;
-    case "centrality-filter":
-      nonIgnored.sort((a, b) => b.centralityScore - a.centralityScore);
-      break;
+    // case "centrality-filter":
+    //   nonIgnored.sort((a, b) => b.centralityScore - a.centralityScore);
+    //   break;
     case "usage-filter":
       nonIgnored.sort((a, b) => b.usageCount - a.usageCount);
       break;
@@ -91,7 +91,7 @@ function renderFunctionResults(results, targetContainer, priority) {
     const statusBadge = `<span class="status-badge" style="background:${statusColor};">${result.status}</span>`;
 
     const ignoreBtn = document.createElement("button");
-    ignoreBtn.textContent = "Ignore";
+    ignoreBtn.textContent = result.status !== "Ignore" ? "Ignore" : "Unignore";
     ignoreBtn.className = "negative-button";
 
     const generateBtn = document.createElement("button");
@@ -153,9 +153,9 @@ function renderFunctionResults(results, targetContainer, priority) {
 
     ignoreBtn.onclick = (event) => {
       event.stopPropagation(); // prevents triggering resultDiv.onclick
-      result.status = "Ignore"; // Update status locally
+      result.status = result.status === "Ignore" ? "" : "Ignore";
       log(`ignore, ${result.status}`);
-      startRendering(results, targetContainer); // Re-render to reflect changes
+      renderFunctionResults(results, targetContainer, priority); // Re-render to reflect changes
     };
 
     generateBtn.onclick = (event) => {
@@ -166,7 +166,7 @@ function renderFunctionResults(results, targetContainer, priority) {
         target: result,
       });
       result.status = "HarnessGenerated";
-      startRendering(results, targetContainer);
+      renderFunctionResults(results, targetContainer, priority);
     };
 
     resultDiv.onclick = () => {
@@ -320,7 +320,7 @@ setupMessaging({
 const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
   console.log("Loading filters");
   const filterTitle = document.createElement("div");
-  filterTitle.textContent = "Filters";
+  filterTitle.textContent = "Order By";
   filterTitle.style.fontWeight = "bold";
   filterTitle.style.marginBottom = "8px";
   targetContainer.appendChild(filterTitle);
@@ -332,35 +332,35 @@ const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
       label: "Priority Score",
       default: true,
       filterDescription:
-        "Priority Score is calculated based on the function's parameters, usage, centrality, and unsafe blocks.",
+        "Priority Score is calculated comprehensively based on the 10 different metrics.",
     },
     {
       id: "unsafe-block-filter",
       label: "Unsafe Block",
       default: false,
       filterDescription:
-        "Unsafe Block measures the presence of unsafe usage inside the function. A score of 1 is given if the function contains an unsafe block, and a score of 2 if the function itself is marked unsafe.",
+        "Unsafe Block measures the presence of unsafe usage inside the function.",
     },
     {
       id: "parameters-filter",
       label: "Parameters Count",
       default: false,
       filterDescription:
-        "Parameters Count represents the number of parameters a function takes, which can indicate its complexity or utility.",
+        "Parameters Count represents the number of parameters a function takes.",
     },
-    {
-      id: "centrality-filter",
-      label: "Centrality Score",
-      default: false,
-      filterDescription:
-        "Centrality Score measures how structurally embedded a function is in the crate's call/API graph. Functions with high centrality are called by many important functions, indicating their significance.",
-    },
+    // {
+    //   id: "centrality-filter",
+    //   label: "Centrality Score",
+    //   default: false,
+    //   filterDescription:
+    //     "Centrality Score measures how structurally embedded a function is in the crate's call/API graph. Functions with high centrality are called by many important functions, indicating their significance.",
+    // },
     {
       id: "usage-filter",
-      label: "Usage Weights",
+      label: "Usage Counts",
       default: false,
       filterDescription:
-        "Usage Weights measure how frequently a function is used directly, normalized across dependency sequences or usage examples. This indicates how often a function is used in practice across different crates or over time.",
+        "Usage Counts measure how frequently a function is used directly.",
     },
   ];
 
