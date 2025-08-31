@@ -273,7 +273,7 @@ setupMessaging({
       pathSelected = projectRootPath;
 
       pathDiv.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 10px; padding: 6px; background: #f0f0f0; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+      <div class="root-container">
         <span style="font-weight: bold; color: #333;">Project Root:</span>
         <span style="color: #007acc;">${projectRootPath}</span>
       </div>
@@ -291,7 +291,11 @@ setupMessaging({
     if (fuzzRootPath) {
       log("🧪 Got Fuzz root: " + fuzzRootPath);
       fuzzRootSelected = fuzzRootPath;
-      fuzzPathDiv.innerHTML = `Fuzz Harness Root: ${fuzzRootPath}`;
+      fuzzPathDiv.innerHTML = `
+      <div class="root-container">
+        <span style="font-weight: bold; color: #333;">Fuzz Harness Root:</span>
+        <span style="color: #007acc;">${fuzzRootPath}</span>
+      </div>`;
       log("Getting Fuzz targets: ");
       sendMessage({ command: "getFuzzTargets", fuzzRoot: fuzzRootPath });
     } else {

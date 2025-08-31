@@ -91,7 +91,7 @@ export function loadFunctionResults(
         functionKey: key,
         functionName: r["Function Name"] || "",
         functionCrate: r["Crate"] || "",
-        functionModulePath: r["Module Path"] || "",
+        functionModulePath: (r["Module Path"] || "").split("::").slice(1).join("::") || "",
         functionDescription: r["Function Description"] || "",
         functionParameters: r["Parameters"],
         functionLocation: parseFunctionLocation(r["Location"]),
