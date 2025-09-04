@@ -61,6 +61,7 @@ def main(function_info_path, software_dir, fuzzer_choice):
     # TODO: Integrate with the chosen fuzzer
     # Retrieve API key from environment variable
     api_key = os.getenv("API_KEY")
+
     if not api_key:
         print("Error: API key not found in environment variables.")
         return

@@ -2,10 +2,13 @@
   "name": "sbomfuzz",
   "displayName": "sbomfuzz",
   "description": "a auto-harness generation tool for rust",
-  "version": "0.0.1",
+  "version": "0.0.9",
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.103.0"
   },
+  "extensionKind": [
+    "workspace"
+  ],
   "categories": [
     "Other"
   ],
@@ -14,6 +17,21 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "SBOMFuzz",
+      "properties": {
+        "sbomfuzz.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key used by SBOMFuzz (stored in settings.json as plaintext)."
+        },
+        "sbomfuzz.apiBaseUrl": {
+          "type": "string",
+          "default": "https://api.openai.com/v1",
+          "description": "Override if using a proxy."
+        }
+      }
+    },
     "commands": [
       {
         "command": "sbomfuzz.helloWorld",

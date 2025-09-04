@@ -5,11 +5,13 @@ import { OpenAI } from "openai";
 import * as dotenv from "dotenv";
 import { spawn, ChildProcess } from "child_process";
 import * as vscode from "vscode";
+import { channel_log } from "./extension";
 export async function generateHarness(
   target: any,
   fuzzRoot: string,
   extensionPath: string
-): Promise<{ success: boolean; targetPath?: string }> {
+): Promise<{ success: boolean; targetPath?: string, message?: string }> {
+  channel_log("Generating harness...");
   const targetName = `fuzz_target_${target.functionName}`;
   const harnessFilePath = path.join(
     fuzzRoot,
@@ -19,10 +21,11 @@ export async function generateHarness(
 
   const promptPath = path.join(extensionPath, "src", "prompt.txt");
   console.log("prompt path", promptPath);
-  // 🔹 Load and prepare the template
+
   if (!fs.existsSync(promptPath)) {
     console.error("Missing prompt.txt");
-    return { success: false };
+    channel_log("Missing prompt.txt");
+    return { success: false, message: "Missing prompt.txt" };
   }
 
   const functionInfo =
@@ -40,7 +43,7 @@ export async function generateHarness(
     .replace(/<fuzzer>/g, "cargo-fuzz")
     .replace(/<function-info>/g, functionInfo);
   console.log("Generated harness template:", template);
-
+  channel_log("trigger generation with OpenAI...");
   const result = await generateHarnessFromPrompt(template, extensionPath);
   if (!result) {
     return { success: false };
@@ -80,15 +83,41 @@ async function generateHarnessFromPrompt(
   prompt: string,
   extensionPath: string
 ): Promise<string | null> {
-  const envPath = path.join(extensionPath, ".env");
-  dotenv.config({ path: envPath });
-  const apiKey = process.env.API_KEY;
+  // const envPath = path.join(extensionPath, ".env");
+  // dotenv.config({ path: envPath });
+  // const apiKey = process.env.API_KEY;
+  // if (!apiKey) {
+  //   console.error("❌ Missing OpenAI API key");
+  //   return null;
+  // }
+  const cfg = vscode.workspace.getConfiguration("sbomfuzz");
+  let apiKey = cfg.get<string>("apiKey");
+  channel_log("Generating harness with OpenAI...");
+  channel_log("Using API key: " + (apiKey ? "set" : "not set"));
   if (!apiKey) {
     console.error("❌ Missing OpenAI API key");
+    vscode.window.showWarningMessage(
+      'Set "sbomfuzz.apiKey" in Settings or export API_KEY.'
+    );
     return null;
   }
 
-  const openai = new OpenAI({ apiKey });
+  apiKey = apiKey.replace(/^['"]|['"]$/g, "");
+  let openai;
+  try {
+    openai = new OpenAI({ apiKey });
+    // … your request …
+  } catch (e: any) {
+    vscode.window.showErrorMessage(
+      `Failed to generate harness: OpenAI call failed - ${e?.message || e}`
+    );
+    console.error("OpenAI call failed:", e?.message || e);
+    throw e;
+  }
+  if (!openai) {
+    channel_log("❌ OpenAI initialization failed");
+    return null;
+  } 
 
   try {
     const response = await openai.chat.completions.create({
@@ -138,14 +167,16 @@ export async function optimizeHarness(
 ): Promise<{ success: boolean }> {
   iteration++;
   const targetName = `fuzz_target_${target.functionName}`;
-  const envPath = path.join(__dirname, ".env");
-  dotenv.config({ path: envPath });
-  const apiKey = process.env.API_KEY;
+  const cfg = vscode.workspace.getConfiguration("sbomfuzz");
+  let apiKey = cfg.get<string>("apiKey");
+
   if (!apiKey) {
     console.error("❌ Missing OpenAI API key");
-    return { success: false };
+    vscode.window.showWarningMessage(
+      'Set "sbomfuzz.apiKey" in Settings or export API_KEY.'
+    );
   }
-
+  apiKey = apiKey!.replace(/^['"]|['"]$/g, "");
   const openai = new OpenAI({ apiKey });
 
   console.log(`🔁 Running fuzz attempt #${iteration}`);
@@ -376,7 +407,7 @@ export function runGenerateAndOptimizeHarness(
         extensionPath
       );
       if (!success || !targetPath) {
-        vscode.window.showErrorMessage("❌ Failed to generate harness.");
+        vscode.window.showErrorMessage("runGenerateAndOptimizeHarness: Failed to generate harness.");
         return;
       }
 
