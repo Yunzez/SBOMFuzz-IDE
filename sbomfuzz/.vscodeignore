@@ -16,3 +16,4 @@ vsc-extension-quickstart.md
 **/*.key
 **/*.crt
 node_modules/**/test/**
+./harnessGen/**/*
