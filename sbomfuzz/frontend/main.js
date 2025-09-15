@@ -51,9 +51,6 @@ function renderFunctionResults(results, targetContainer, priority) {
   // Sort non-ignored by priorityScore descending
   nonIgnored.sort((a, b) => b.priorityScore - a.priorityScore);
 
-  // Concatenate non-ignored and ignored (ignored at the bottom)
-  // results = [...nonIgnored, ...ignored];
-
   // Apply additional sorting based on the selected filter
   switch (priority) {
     case "unsafe-block-filter":
@@ -79,11 +76,11 @@ function renderFunctionResults(results, targetContainer, priority) {
   results = [...nonIgnored, ...ignored];
 
   for (const result of results) {
-    log(`status: ${result.status}`);
+    // log(`status: ${result.status}`);
     // Create colored status tag
     const statusColor =
       {
-        New: "gray",
+        NoHarness: "gray",
         Ignore: "darkred",
         HarnessGenerated: "green",
       }[result.status] || "black";
@@ -216,16 +213,22 @@ setupMessaging({
 
       const runBtn = document.createElement("button");
       runBtn.textContent = "Run";
-      runBtn.className = "affirmative-button";
+      runBtn.className = `affirmative-button  ${target.name}-run-btn`;
+
+      const stopBtn = document.createElement("button");
+      stopBtn.textContent = "Stop";
+      stopBtn.className = `negative-button ${target.name}-stop-btn`;
+      stopBtn.style.marginLeft = "4px";
+      stopBtn.style.display = target.status === 'running' ? 'inline-block' : 'none';
 
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Delete";
-      deleteBtn.className = "negative-button";
+      deleteBtn.className = `negative-button ${target.name}-delete-btn`;
       deleteBtn.style.marginLeft = "4px";
 
       targetDiv.className = "function-button";
       targetDiv.innerHTML = `
-        <div style="font-weight:bold; margin-bottom:4px;">
+        <div style="font-weight:bold; margin-bottom:4px; display: flex; gap: 6px; align-items: center;">
           ${target.name}
         </div>
         <div>
@@ -233,7 +236,7 @@ setupMessaging({
         </div>
           <div class="btns-div" style="margin-top:6px;"></div>
       `;
-
+    
       targetDiv.onclick = () => {
         sendMessage({
           command: "openLocation",
@@ -244,17 +247,44 @@ setupMessaging({
 
       const actionArea = targetDiv.getElementsByClassName("btns-div")[0];
       actionArea.appendChild(runBtn);
+      actionArea.appendChild(stopBtn);
       actionArea.appendChild(deleteBtn);
+      
       deleteBtn.onclick = (event) => {
         event.stopPropagation(); // prevents triggering targetDiv.onclick
         log(`Deleting fuzz target: ${target.name}`);
         sendMessage({ command: "deleteFuzzTarget", target: target.name });
       };
+      
       runBtn.onclick = (event) => {
         event.stopPropagation(); // prevents triggering targetDiv.onclick
         log(`Running fuzz target: ${target.name}`);
-        sendMessage({ command: "runFuzzTarget", target: target.name });
+        sendMessage({ command: "runFuzzTarget", target: target.name});
+        
+        // Show stop button when running
+        stopBtn.style.display = 'inline-block';
+        runBtn.style.display = 'none';
+        
       };
+      
+      stopBtn.onclick = (event) => {
+        event.stopPropagation(); // prevents triggering targetDiv.onclick
+        log(`Stopping fuzz target: ${target.name}`);
+        sendMessage({ command: "stopFuzzTarget" });
+        
+        // Hide stop button when stopped
+        stopBtn.style.display = 'none';
+        runBtn.style.display = 'inline-block';
+        
+      };
+      
+      // Show/hide buttons based on initial status
+      if (target.status === 'running') {
+        runBtn.style.display = 'none';
+      } else {
+        stopBtn.style.display = 'none';
+      }
+      
       targetList.appendChild(targetDiv);
     }
   },

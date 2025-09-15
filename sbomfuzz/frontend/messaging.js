@@ -21,6 +21,32 @@ export function setupMessaging(handlers = {}) {
         }
         break;
 
+      case "globalBroadcast":
+        switch (msg.eventType) {
+          case "HarnessStarted":
+            // handlers.onHarnessStarted(msg.data);
+            break;
+          case "HarnessStopped":
+            // handlers.onHarnessStopped(msg.data);
+            break;
+          case "HarnessFailed":
+            console.log("HarnessFailed event received:", msg);
+            document.querySelector(`.${msg.name}-stop-btn`).style.display = 'none';
+            document.querySelector(`.${msg.name}-run-btn`).style.display = 'inline-block';
+            break;
+          case "HarnessOptimized":
+            // handlers.onHarnessOptimized(msg.data);
+            break;
+          case "UpdateFunctionStatus":
+            // handlers.onUpdateFunctionStatus(msg.data);
+            break;
+          default:
+            console.warn("Unhandled globalBroadcast type:", msg.type);
+            break;
+        }
+        break;
+
+
       case "rustAnalysisDone":
         log("Rust analysis completed successfully");
         if (onRustAnalysisDone) {

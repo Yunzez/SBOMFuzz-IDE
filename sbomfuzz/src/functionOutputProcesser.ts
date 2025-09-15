@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import path from "path";
 import * as vscode from "vscode";
-
+import { getGlobalContext } from "./globalContextProvider";
 export type FunctionResult = {
   functionKey: string;
   functionName: string;
@@ -19,9 +19,9 @@ export type FunctionResult = {
 };
 
 export enum FunctionStatus {
-    New = "New",
-    Ignore = "Ignore",
-    HarnessGenerated = "HarnessGenerated"
+  NoHarness = "No Harness",
+  Ignore = "Ignore",
+  HarnessGenerated = "HarnessGenerated",
 }
 
 function findAllFunctionsFile(outputPath: string): string | undefined {
@@ -81,17 +81,25 @@ export function loadFunctionResults(
       }
     }
   }
-
+  const globalContext = getGlobalContext();
+  const fuzzTargetNames = new Set(
+    (globalContext.fuzzTargets || []).map((t: any) => t.target_function)
+  );
+  console.log("Fuzz target names:", globalContext.fuzzTargets);
   // Return all parsed FunctionResults if available
   const keys = Object.keys(result);
   if (keys.length > 0) {
+   
     return keys.map((key) => {
       const r = result[key];
+      const functionName = r["Function Name"] || "";
+       console.log(r.functionName, );
       return {
         functionKey: key,
-        functionName: r["Function Name"] || "",
+        functionName,
         functionCrate: r["Crate"] || "",
-        functionModulePath: (r["Module Path"] || "").split("::").slice(1).join("::") || "",
+        functionModulePath:
+          (r["Module Path"] || "").split("::").slice(1).join("::") || "",
         functionDescription: r["Function Description"] || "",
         functionParameters: r["Parameters"],
         functionLocation: parseFunctionLocation(r["Location"]),
@@ -100,7 +108,9 @@ export function loadFunctionResults(
         centralityScore: parseFloat(r["Centrality Score"]),
         unsafeScore: parseFloat(r["Unsafe Score"]),
         priorityScore: parseFloat(r["Priority Score"]),
-        status: FunctionStatus.New
+        status: fuzzTargetNames.has(functionName.split("::").pop() || functionName)
+          ? FunctionStatus.HarnessGenerated
+          : FunctionStatus.NoHarness,
       };
     });
   }
@@ -113,23 +123,29 @@ export function loadFunctionResults(
 }
 
 export type FunctionLocation = {
-    filePath: string;
-    offset: number;
-};
-
-export function parseFunctionLocation(locationStr: string): {
   filePath: string;
   offset: number;
-} | undefined {
-  if (!locationStr || !locationStr.includes("|offset=")) {return undefined;}
+};
+
+export function parseFunctionLocation(locationStr: string):
+  | {
+      filePath: string;
+      offset: number;
+    }
+  | undefined {
+  if (!locationStr || !locationStr.includes("|offset=")) {
+    return undefined;
+  }
 
   const [filePath, offsetStr] = locationStr.split("|offset=");
   const offset = parseInt(offsetStr, 10);
 
-  if (isNaN(offset)) {return undefined;}
+  if (isNaN(offset)) {
+    return undefined;
+  }
 
   return {
     filePath,
-    offset
+    offset,
   };
 }

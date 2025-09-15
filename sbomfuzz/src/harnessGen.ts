@@ -6,11 +6,51 @@ import * as dotenv from "dotenv";
 import { spawn, ChildProcess } from "child_process";
 import * as vscode from "vscode";
 import { channel_log } from "./extension";
+import { globalBroadcastEventType } from "./util";
+import { getGlobalContext } from "./globalContextProvider";
+import { FunctionStatus } from "./functionOutputProcesser";
+import kill from "tree-kill";
+let harnessProcess: ChildProcess | null = null;
+// Track harness statuses
+interface HarnessStatus {
+  name: string;
+  status: "created" | "running" | "stopped" | "deleted";
+  timestamp: number;
+}
+
+const harnessStatuses: Map<string, HarnessStatus> = new Map();
+
+// Function to update harness status
+export function updateHarnessStatus(
+  targetName: string,
+  status: "created" | "running" | "stopped" | "deleted"
+): void {
+  harnessStatuses.set(targetName, {
+    name: targetName,
+    status,
+    timestamp: Date.now(),
+  });
+  // Optionally notify the UI about the status change
+  channel_log(`Harness ${targetName} status updated to: ${status}`);
+}
+
+// Function to get harness status
+export function getHarnessStatus(
+  targetName: string
+): HarnessStatus | undefined {
+  return harnessStatuses.get(targetName);
+}
+
+// Function to get all harness statuses
+export function getAllHarnessStatuses(): HarnessStatus[] {
+  return Array.from(harnessStatuses.values());
+}
+
 export async function generateHarness(
   target: any,
   fuzzRoot: string,
   extensionPath: string
-): Promise<{ success: boolean; targetPath?: string, message?: string }> {
+): Promise<{ success: boolean; targetPath?: string; message?: string }> {
   channel_log("Generating harness...");
   const targetName = `fuzz_target_${target.functionName}`;
   const harnessFilePath = path.join(
@@ -44,6 +84,19 @@ export async function generateHarness(
     .replace(/<function-info>/g, functionInfo);
   console.log("Generated harness template:", template);
   channel_log("trigger generation with OpenAI...");
+
+  const globalContext = getGlobalContext();
+
+  if (globalContext) {
+    const replacement = globalContext.results;
+    replacement!.map((fn) => {
+      if (fn.functionName === target.functionName) {
+        fn.harnessStatus = FunctionStatus.HarnessGenerated;
+      }
+    });
+    globalContext.results = replacement;
+  }
+
   const result = await generateHarnessFromPrompt(template, extensionPath);
   if (!result) {
     return { success: false };
@@ -117,7 +170,7 @@ async function generateHarnessFromPrompt(
   if (!openai) {
     channel_log("❌ OpenAI initialization failed");
     return null;
-  } 
+  }
 
   try {
     const response = await openai.chat.completions.create({
@@ -332,6 +385,9 @@ export function deleteSelectedHarness(targetName: string, root: string): void {
   } else {
     console.log(`ℹ️ Cargo.toml not found at: ${cargoTomlPath}`);
   }
+
+  // Update harness status to deleted
+  updateHarnessStatus(targetName, "deleted");
 }
 export function runSelectedHarness(targetName: string, root: string): void {
   const outputChannel = vscode.window.createOutputChannel("Fuzz Harness");
@@ -346,6 +402,17 @@ export function runSelectedHarness(targetName: string, root: string): void {
       RUSTFLAGS: "-Awarnings",
     },
   });
+  if (!proc.pid) {
+    vscode.window.showErrorMessage("Failed to start harness process.");
+    return;
+  } else if (harnessProcess) {
+    vscode.window.showWarningMessage(
+      `Another harness (${harnessProcess.pid}) is already running. Stop it first.`
+    );
+    return;
+  }
+  harnessProcess = proc;
+
   outputChannel.appendLine(`▶️ Running harness: ${targetName}\n`);
 
   proc.stdout.on("data", (data) => {
@@ -359,6 +426,15 @@ export function runSelectedHarness(targetName: string, root: string): void {
   proc.on("error", (err) => {
     outputChannel.appendLine(`❌ Error running harness: ${err.message}`);
     vscode.window.showErrorMessage(`Harness process failed: ${err.message}`);
+    updateHarnessStatus(targetName, "stopped");
+
+    // Notify the extension/webview about this status change instead of touching DOM
+    vscode.commands.executeCommand("sbomfuzz.broadcast", {
+      name: targetName,
+      eventType: globalBroadcastEventType.HarnessFailed,
+    });
+
+    harnessProcess = null;
   });
 
   proc.on("close", (code, signal) => {
@@ -372,11 +448,42 @@ export function runSelectedHarness(targetName: string, root: string): void {
     } else {
       vscode.window.showInformationMessage(`✅ Fuzzing completed.`);
     }
+
+    vscode.commands.executeCommand("sbomfuzz.broadcast", {
+      name: targetName,
+      eventType: globalBroadcastEventType.HarnessFailed,
+    });
+
+    updateHarnessStatus(targetName, "stopped");
+    harnessProcess = null;
   });
   // Example: spawn a process to run the fuzz target
   // const proc = spawn("cargo", ["fuzz", "run", "fuzz_target_name"]);
   // proc.stdout.on("data", (data) => console.log(data.toString()));
   // proc.stderr.on("data", (data) => console.error(data.toString()));
+}
+
+export function stopHarness(): void {
+  if (harnessProcess) {
+    const pid = harnessProcess.pid;
+    console.log("Stopping harness process:", pid);
+
+    // Use tree-kill to terminate the process and its children
+    kill(pid!, "SIGINT", (err) => {
+      if (err) {
+        console.error("Failed to kill harness process tree:", err);
+        vscode.window.showErrorMessage("Failed to stop harness process.");
+      } else {
+        console.log("Harness process tree killed successfully.");
+        vscode.window.showInformationMessage("Harness process stopped.");
+      }
+      harnessProcess = null;
+    });
+  } else {
+    vscode.window.showWarningMessage(
+      "No harness process is currently running."
+    );
+  }
 }
 
 function stripMarkdownCodeBlock(text: string): string {
@@ -407,7 +514,9 @@ export function runGenerateAndOptimizeHarness(
         extensionPath
       );
       if (!success || !targetPath) {
-        vscode.window.showErrorMessage("runGenerateAndOptimizeHarness: Failed to generate harness.");
+        vscode.window.showErrorMessage(
+          "runGenerateAndOptimizeHarness: Failed to generate harness."
+        );
         return;
       }
 

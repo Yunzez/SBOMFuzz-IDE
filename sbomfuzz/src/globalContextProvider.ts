@@ -12,10 +12,11 @@ import path from "path";
 import fs from "fs";
 import * as vscode from "vscode";
 import { loadFunctionResults } from "./functionOutputProcesser";
-import { findCargoProjectRoot, findFuzzRoot } from "./util";
+import { findCargoProjectRoot, findFuzzRoot, getFuzzTargets } from "./util";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
 
 export interface SharedContext {
+  fuzzTargets: { name: string; path: string }[];
   fuzzRoot?: string;
   projectRoot?: string;
   extensionPath?: string;
@@ -25,7 +26,9 @@ export interface SharedContext {
 const globalContext: SharedContext = {
   fuzzRoot: undefined,
   projectRoot: undefined,
+  extensionPath: undefined,
   results: [],
+  fuzzTargets: [],
 };
 
 export async function useGlobalContext(context: vscode.ExtensionContext) {
@@ -48,11 +51,17 @@ export async function useGlobalContext(context: vscode.ExtensionContext) {
       }
     );
   }
-  const results = loadFunctionResults(path.join(projectPath, "output"));
+  const targets = getFuzzTargets(fuzzRoot!);
+
+  console.log("GC Project root:", root);
+  console.log("GC Fuzz root:", fuzzRoot);
+  console.log("GC Fuzz targets:", targets);
   globalContext.fuzzRoot = fuzzRoot;
   globalContext.projectRoot = root;
-  globalContext.results = results;
   globalContext.extensionPath = projectPath;
+  globalContext.fuzzTargets = targets;
+  const results = loadFunctionResults(path.join(projectPath, "output"));
+  globalContext.results = results;
   return getGlobalContext();
 }
 

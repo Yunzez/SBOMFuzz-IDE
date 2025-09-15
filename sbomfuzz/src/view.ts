@@ -10,6 +10,7 @@ import {
 } from "./util";
 import {
   FunctionLocation,
+  FunctionStatus,
   loadFunctionResults,
 } from "./functionOutputProcesser";
 import {
@@ -18,8 +19,10 @@ import {
   optimizeHarness,
   runGenerateAndOptimizeHarness,
   runSelectedHarness,
+  stopHarness,
 } from "./harnessGen";
-import { getGlobalContext } from "./globalContextProvider";
+import useGlobalContext, { getGlobalContext } from "./globalContextProvider";
+import { get } from "http";
 let currentWebview: vscode.Webview | undefined;
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
@@ -59,11 +62,14 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       }
 
       if (message.command === "executeCommand") {
-        vscode.commands.executeCommand(message.commandId, ...(message.args ?? []));
+        vscode.commands.executeCommand(
+          message.commandId,
+          ...(message.args ?? [])
+        );
       }
-      
+
       if (message.command === "runAnalyzer") {
-         const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
+        const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
         if (fs.existsSync(outputPath)) {
           fs.rmSync(outputPath, { recursive: true, force: true });
           console.log("Output path cleared:", outputPath);
@@ -74,9 +80,10 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         console.log("Exists:", fs.existsSync(projectRoot));
         console.log("Is file:", fs.statSync(projectRoot).isFile());
         const results = runRustAnalyzer(this.context, projectRoot);
+        
         webviewView.webview.postMessage({
           command: "rustAnalysisDone",
-          results,
+          results
         });
       }
 
@@ -88,8 +95,29 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         runSelectedHarness(message.target, globalContext.fuzzRoot!);
       }
 
+      if (message.command === "stopFuzzTarget") {
+        stopHarness();
+        // Refresh the list after stopping
+        const newTargets = getFuzzTargets(globalContext.fuzzRoot!);
+        webviewView.webview.postMessage({
+          command: "refreshHarnessList",
+          targets: newTargets,
+        });
+      }
+
       if (message.command === "deleteFuzzTarget") {
         deleteSelectedHarness(message.target, globalContext.fuzzRoot!);
+        globalContext.fuzzTargets = getFuzzTargets(globalContext.fuzzRoot!);
+        let targetName = message.target;
+        let replacement = globalContext.results;
+        replacement!.map((fn) => {
+          if (fn.functionName === targetName) {
+            fn.harnessStatus = FunctionStatus.NoHarness;
+          }
+        });
+        // Reset globalContext.results to the new targets
+        globalContext.results = replacement;
+
         const newTargets = getFuzzTargets(globalContext.fuzzRoot!);
         webviewView.webview.postMessage({
           command: "refreshHarnessList",
@@ -135,20 +163,23 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         });
       }
 
-      if (message.command === "showVisualization") {
-        const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
-        console.log("Loading function results from:", outputPath);
-        const results = loadFunctionResults(outputPath) ?? [];
-        console.log("Loaded function results:", results);
+      // if (message.command === "showVisualization") {
+      //   const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
+      //   console.log("Loading function results from:", outputPath);
+      //   const results = loadFunctionResults(outputPath) ?? [];
+      //   console.log("Loaded function results:", results);
 
-        webviewView.webview.postMessage({
-          command: "rustAnalysisDone",
-          results,
-        });
-      }
+      //   webviewView.webview.postMessage({
+      //     command: "rustAnalysisDone",
+      //     results,
+      //   });
+      // }
 
       if (message.command === "getFuzzTargets") {
+        console.log("Listing fuzz targets in:", message.fuzzRoot);
         const targets = getFuzzTargets(message.fuzzRoot);
+        const globalContext = getGlobalContext();
+        globalContext.fuzzTargets = targets;
         webviewView.webview.postMessage({
           command: "fuzzTargetsListed",
           targets,

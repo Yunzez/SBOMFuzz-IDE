@@ -99,6 +99,16 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     )
   );
+  
+  context.subscriptions.push(
+    vscode.commands.registerCommand("sbomfuzz.broadcast", (args) => {
+
+      const webview = SbomFuzzWebviewViewProvider.getWebview();
+      if (webview) {
+        webview.postMessage({ command: "globalBroadcast", ...args });
+      }
+    })
+  );
 
   context.subscriptions.push(
     vscode.commands.registerCommand("sbomfuzz.runAnalysisTool", async () => {
@@ -123,7 +133,9 @@ export async function activate(context: vscode.ExtensionContext) {
       console.log("Is file:", fs.statSync(projectRoot).isFile());
 
       const results = await runRustAnalyzer(context, projectRoot);
+      const targets = getFuzzTargets(globalContext.fuzzRoot!);
       globalContext.results = results;
+
       webview.postMessage({
         command: "rustAnalysisDone",
         results,
