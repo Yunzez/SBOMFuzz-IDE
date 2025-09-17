@@ -389,12 +389,27 @@ export function deleteSelectedHarness(targetName: string, root: string): void {
   // Update harness status to deleted
   updateHarnessStatus(targetName, "deleted");
 }
+
+let buffer = "";
+let flushTimer: NodeJS.Timeout | null = null;
+
 export function runSelectedHarness(targetName: string, root: string): void {
   const outputChannel = vscode.window.createOutputChannel("Fuzz Harness");
   outputChannel.show(true); // bring it to front
   // This function is a placeholder for running the selected harness.
   // You can implement the logic to execute the fuzz target here.
-  console.log("Running selected harness...");
+
+  function enqueue(data: Buffer) {
+    buffer += data.toString();
+    if (!flushTimer) {
+      flushTimer = setTimeout(() => {
+        outputChannel.append(buffer);
+        buffer = "";
+        flushTimer = null;
+      }, 1000); // flush once per second
+    }
+  }
+
   const proc = spawn("cargo", ["fuzz", "run", targetName], {
     cwd: root,
     env: {
@@ -402,6 +417,7 @@ export function runSelectedHarness(targetName: string, root: string): void {
       RUSTFLAGS: "-Awarnings",
     },
   });
+
   if (!proc.pid) {
     vscode.window.showErrorMessage("Failed to start harness process.");
     return;
@@ -415,13 +431,15 @@ export function runSelectedHarness(targetName: string, root: string): void {
 
   outputChannel.appendLine(`▶️ Running harness: ${targetName}\n`);
 
-  proc.stdout.on("data", (data) => {
-    outputChannel.append(data.toString());
-  });
+  // proc.stdout.on("data", (data) => {
+  //   outputChannel.append(data.toString());
+  // });
 
-  proc.stderr.on("data", (data) => {
-    outputChannel.append(data.toString());
-  });
+  // proc.stderr.on("data", (data) => {
+  //   outputChannel.append(data.toString());
+  // });
+  proc.stdout.on("data", enqueue);
+  proc.stderr.on("data", enqueue);
 
   proc.on("error", (err) => {
     outputChannel.appendLine(`❌ Error running harness: ${err.message}`);
@@ -457,10 +475,6 @@ export function runSelectedHarness(targetName: string, root: string): void {
     updateHarnessStatus(targetName, "stopped");
     harnessProcess = null;
   });
-  // Example: spawn a process to run the fuzz target
-  // const proc = spawn("cargo", ["fuzz", "run", "fuzz_target_name"]);
-  // proc.stdout.on("data", (data) => console.log(data.toString()));
-  // proc.stderr.on("data", (data) => console.error(data.toString()));
 }
 
 export function stopHarness(): void {
