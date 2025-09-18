@@ -22,7 +22,7 @@
       "properties": {
         "sbomfuzz.apiKey": {
           "type": "string",
-          "default": "",
+          "default": "sk-proj-",
           "description": "API key used by SBOMFuzz (stored in settings.json as plaintext)."
         },
         "sbomfuzz.apiBaseUrl": {
