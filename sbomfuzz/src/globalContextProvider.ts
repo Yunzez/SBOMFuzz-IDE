@@ -38,7 +38,12 @@ export async function useGlobalContext(context: vscode.ExtensionContext) {
   const fuzzRoot = findFuzzRoot();
   const root = findCargoProjectRoot();
   const outputPath = path.join(projectPath, "output");
-  if (!fs.existsSync(outputPath) && root) {
+  
+  if (root) {
+    if (fs.existsSync(outputPath)) {
+      fs.rmSync(outputPath, { recursive: true, force: true });
+      console.log("Output path cleared:", outputPath);
+    }
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
