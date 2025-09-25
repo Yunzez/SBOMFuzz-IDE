@@ -2,9 +2,9 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.3",
   "version": 1,
-  "serialNumber": "urn:uuid:47a07058-bc77-4a23-a506-2f158d471520",
+  "serialNumber": "urn:uuid:b49db7ee-16ba-4e9c-a74c-d510060b0fa5",
   "metadata": {
-    "timestamp": "2025-08-27T18:45:16.211998000Z",
+    "timestamp": "2025-09-18T20:06:26.798622000Z",
     "tools": [
       {
         "vendor": "CycloneDX",
@@ -14,7 +14,7 @@
     ],
     "component": {
       "type": "application",
-      "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/program_a#0.1.0",
+      "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/program_a_pp1#program_a@0.1.0",
       "name": "program_a",
       "version": "0.1.0",
       "scope": "required",
@@ -22,14 +22,14 @@
       "components": [
         {
           "type": "library",
-          "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/program_a#0.1.0 bin-target-0",
+          "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/program_a_pp1#program_a@0.1.0 bin-target-0",
           "name": "program_a",
           "version": "0.1.0",
           "purl": "pkg:cargo/program_a@0.1.0?download_url=file://.#src/lib.rs"
         },
         {
           "type": "application",
-          "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/program_a#0.1.0 bin-target-1",
+          "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/program_a_pp1#program_a@0.1.0 bin-target-1",
           "name": "program_a",
           "version": "0.1.0",
           "purl": "pkg:cargo/program_a@0.1.0?download_url=file://.#src/main.rs"
@@ -74,7 +74,7 @@
   ],
   "dependencies": [
     {
-      "ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/program_a#0.1.0",
+      "ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/program_a_pp1#program_a@0.1.0",
       "dependsOn": [
         "registry+https://github.com/rust-lang/crates.io-index#libc@0.2.174"
       ]
