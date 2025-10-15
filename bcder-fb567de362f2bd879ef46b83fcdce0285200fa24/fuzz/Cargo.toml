@@ -33,3 +33,24 @@ path = "fuzz_targets/decode_int.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "test"
+path = "fuzz_targets/test.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "test2"
+path = "fuzz_targets/test2.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_target_decode"
+path = "fuzz_targets/fuzz_target_decode.rs"
+test = false
+doc = false
+bench = false

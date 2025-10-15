@@ -1,0 +1,146 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.3",
+  "version": 1,
+  "serialNumber": "urn:uuid:c9920e99-dd05-4cbd-8e2a-11b0818da3fb",
+  "metadata": {
+    "timestamp": "2025-10-08T20:01:42.507652000Z",
+    "tools": [
+      {
+        "vendor": "CycloneDX",
+        "name": "cargo-cyclonedx",
+        "version": "0.5.7"
+      }
+    ],
+    "authors": [
+      {
+        "name": "The NLnet Labs RPKI Team",
+        "email": "rpki-team@nlnetlabs.nl"
+      }
+    ],
+    "component": {
+      "type": "application",
+      "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/bcder-fb567de362f2bd879ef46b83fcdce0285200fa24#bcder@0.7.2",
+      "author": "The NLnet Labs RPKI Team <rpki-team@nlnetlabs.nl>",
+      "name": "bcder",
+      "version": "0.7.2",
+      "description": "Handling of data encoded in BER, CER, and DER.",
+      "scope": "required",
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "purl": "pkg:cargo/bcder@0.7.2?download_url=file://.",
+      "externalReferences": [
+        {
+          "type": "documentation",
+          "url": "https://docs.rs/bcder/"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/nlnetlabs/bcder"
+        }
+      ],
+      "components": [
+        {
+          "type": "library",
+          "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/bcder-fb567de362f2bd879ef46b83fcdce0285200fa24#bcder@0.7.2 bin-target-0",
+          "name": "bcder",
+          "version": "0.7.2",
+          "purl": "pkg:cargo/bcder@0.7.2?download_url=file://.#src/lib.rs"
+        },
+        {
+          "type": "application",
+          "bom-ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/bcder-fb567de362f2bd879ef46b83fcdce0285200fa24#bcder@0.7.2 bin-target-1",
+          "name": "mkoid",
+          "version": "0.7.2",
+          "purl": "pkg:cargo/bcder@0.7.2?download_url=file://.#src/bin/mkoid.rs"
+        }
+      ]
+    },
+    "properties": [
+      {
+        "name": "cdx:rustc:sbom:target:triple",
+        "value": "aarch64-apple-darwin"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#bytes@1.10.1",
+      "author": "Carl Lerche <me@carllerche.com>, Sean McArthur <sean@seanmonstar.com>",
+      "name": "bytes",
+      "version": "1.10.1",
+      "description": "Types and traits for working with bytes",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d71b6127be86fdcfddb610f7182ac57211d4b18a3e9c82eb2d17662f2227ad6a"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "purl": "pkg:cargo/bytes@1.10.1",
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/tokio-rs/bytes"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#smallvec@1.15.1",
+      "author": "The Servo Project Developers",
+      "name": "smallvec",
+      "version": "1.15.1",
+      "description": "'Small vector' optimization: store up to a small number of items on the stack",
+      "scope": "required",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT OR Apache-2.0"
+        }
+      ],
+      "purl": "pkg:cargo/smallvec@1.15.1",
+      "externalReferences": [
+        {
+          "type": "documentation",
+          "url": "https://docs.rs/smallvec/"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/servo/rust-smallvec"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "path+file:///Users/yunzezhao/Code/SBOMFuzz-IDE/bcder-fb567de362f2bd879ef46b83fcdce0285200fa24#bcder@0.7.2",
+      "dependsOn": [
+        "registry+https://github.com/rust-lang/crates.io-index#bytes@1.10.1",
+        "registry+https://github.com/rust-lang/crates.io-index#smallvec@1.15.1"
+      ]
+    },
+    {
+      "ref": "registry+https://github.com/rust-lang/crates.io-index#bytes@1.10.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "registry+https://github.com/rust-lang/crates.io-index#smallvec@1.15.1",
+      "dependsOn": []
+    }
+  ]
+}
