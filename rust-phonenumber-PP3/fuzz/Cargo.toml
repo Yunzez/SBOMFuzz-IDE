@@ -1,0 +1,14 @@
+[package]
+name = "phonenumber-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = {version = "0.15", package = "libafl_libfuzzer"}
+
+[dependencies.phonenumber]
+path = ".."
