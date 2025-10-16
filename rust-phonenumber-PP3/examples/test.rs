@@ -3,7 +3,7 @@ use std::env;
 extern crate phonenumber;
 use phonenumber::Mode;
 
-fn main() {
+pub fn main() {
     let mut args = env::args().skip(1).collect::<Vec<_>>();
 
     if args.is_empty() {
@@ -30,3 +30,5 @@ fn main() {
         println!("\x1b[31m{:#?}\x1b[0m", number);
     }
 }
+
+

@@ -472,7 +472,7 @@ mod test {
     use crate::parser::helper::*;
 
     #[test]
-    fn punctuation() {
+    pub fn punctuation() {
         assert!(helper::punctuation("-").is_ok());
         assert!(helper::punctuation("x").is_ok());
         assert!(helper::punctuation("\u{2015}").is_ok());

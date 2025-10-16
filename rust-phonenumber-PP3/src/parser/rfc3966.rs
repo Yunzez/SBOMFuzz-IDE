@@ -58,14 +58,14 @@ pub fn phone_number(i: &str) -> IResult<&str, Number> {
     ))
 }
 
-fn prefix(i: &str) -> IResult<&str, &str> {
+pub fn prefix(i: &str) -> IResult<&str, &str> {
     parse! { i =>
         char('+');
         take_till1(separator)
     }
 }
 
-fn parameters(i: &str) -> IResult<&str, FnvHashMap<&str, &str>> {
+pub fn parameters(i: &str) -> IResult<&str, FnvHashMap<&str, &str>> {
     parse! { i =>
         let params = many1(parameter);
     };
@@ -73,7 +73,7 @@ fn parameters(i: &str) -> IResult<&str, FnvHashMap<&str, &str>> {
     Ok((i, params.into_iter().collect()))
 }
 
-fn parameter(i: &str) -> IResult<&str, (&str, &str)> {
+pub fn parameter(i: &str) -> IResult<&str, (&str, &str)> {
     parse! { i =>
         char(';');
         let key = take_while(pname);
@@ -92,7 +92,7 @@ fn check(i: &str) -> IResult<&str, ()> {
     }
 }
 
-fn pname(c: char) -> bool {
+pub fn pname(c: char) -> bool {
     c.is_alphanum() || c == '-'
 }
 
@@ -108,15 +108,15 @@ fn digit(c: char) -> bool {
     c.is_wide_digit() || c.is_hex_digit()
 }
 
-fn separator(c: char) -> bool {
+pub fn separator(c: char) -> bool {
     c == '-' || c == '.' || c == '(' || c == ')'
 }
 
-fn unreserved(c: char) -> bool {
+pub fn unreserved(c: char) -> bool {
     c.is_alphanum() || mark(c)
 }
 
-fn parameter_unreserved(c: char) -> bool {
+pub fn parameter_unreserved(c: char) -> bool {
     c == '[' || c == ']' || c == '/' || c == ':' || c == '&' || c == '+' || c == '$'
 }
 

@@ -7,8 +7,134 @@ edition = "2021"
 [package.metadata]
 cargo-fuzz = true
 
+[profile.release]
+panic = "abort"
+debug-assertions = true
+overflow-checks = true
+lto = "off"
+codegen-units = 1
+
 [dependencies]
 libfuzzer-sys = {version = "0.15", package = "libafl_libfuzzer"}
+# libfuzzer-sys = {version = "0.4"}
+
+# libfuzzer-sys = { git = "https://github.com/AFLplusplus/LibAFL.git", features = ["arbitrary-derive"], package = "libafl_libfuzzer" }
 
 [dependencies.phonenumber]
 path = ".."
+
+[[bin]]
+name = "fuzz_target_format"
+path = "fuzz_targets/fuzz_target_format.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_descriptor"
+path = "fuzz_targets/fuzz_target_descriptor.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_source_for"
+path = "fuzz_targets/fuzz_target_source_for.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_length"
+path = "fuzz_targets/fuzz_target_length.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_parse_with"
+path = "fuzz_targets/fuzz_target_parse_with.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_country_code"
+path = "fuzz_targets/fuzz_target_country_code.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_by_id"
+path = "fuzz_targets/fuzz_target_by_id.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_formats"
+path = "fuzz_targets/fuzz_target_formats.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_by_code"
+path = "fuzz_targets/fuzz_target_by_code.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_trim"
+path = "fuzz_targets/fuzz_target_trim.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_extension"
+path = "fuzz_targets/fuzz_target_extension.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_tranpose"
+path = "fuzz_targets/fuzz_target_tranpose.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_is_match"
+path = "fuzz_targets/fuzz_target_is_match.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_text"
+path = "fuzz_targets/fuzz_target_text.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_rfc_phonenum"
+path = "fuzz_targets/fuzz_target_rfc_phonenum.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_target_unreserved"
+path = "fuzz_targets/fuzz_target_unreserved.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_parameter_unreserved"
+path = "fuzz_targets/fuzz_target_parameter_unreserved.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_separator"
+path = "fuzz_targets/fuzz_target_separator.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_phone_number"
+path = "fuzz_targets/fuzz_target_phone_number.rs"
+test = false
+doc = false
+bench = false

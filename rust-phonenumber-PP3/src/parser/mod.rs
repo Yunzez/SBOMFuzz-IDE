@@ -32,7 +32,7 @@ pub mod valid;
 
 /// Parse a phone number.
 pub fn parse<S: AsRef<str>>(
-    country: Option<country::Id>,
+    country: Option<country::Id>, 
     string: S,
 ) -> Result<PhoneNumber, error::Parse> {
     parse_with(&DATABASE, country, string)
