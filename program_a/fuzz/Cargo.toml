@@ -20,3 +20,9 @@ path = "fuzz_targets/fuzz_target_apply_operator.rs"
 test = false
 doc = false
 bench = false
+[[bin]]
+name = "fuzz_target_add"
+path = "fuzz_targets/fuzz_target_add.rs"
+test = false
+doc = false
+bench = false

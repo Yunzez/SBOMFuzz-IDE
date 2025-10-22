@@ -119,6 +119,14 @@ button {
   color: white; /* White text on hover */
 }
 
+.affirmative-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+  background-color: rgba(40, 167, 69, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(40, 167, 69, 0.4);
+}
+
 .negative-button {
   border: 2px solid #dc3545; /* Red border */
   border-radius: 0.25em;

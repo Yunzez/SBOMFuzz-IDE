@@ -1,4 +1,3 @@
-
 function renderSearchBar(results, targetContainer, priority, options) {
   const { log } = options;
   const searchContainer = document.createElement("div");
@@ -41,13 +40,8 @@ export function renderFunctionResults(
   priority,
   options
 ) {
-  const {
-    fuzzRootSelected,
-    pathSelected,
-    sendMessage,
-    log,
-    onStatusChange,
-  } = options;
+  const { fuzzRootSelected, pathSelected, sendMessage, log, onStatusChange } =
+    options;
 
   targetContainer.innerHTML = "";
   const nonIgnored = results.filter((r) => r.status !== "Ignore");
@@ -72,7 +66,6 @@ export function renderFunctionResults(
   const orderedResults = [...nonIgnored, ...ignored];
 
   for (const result of orderedResults) {
-
     const ignoreBtn = document.createElement("button");
     ignoreBtn.textContent = result.status !== "Ignore" ? "Ignore" : "Unignore";
     ignoreBtn.className = "negative-button";
@@ -83,13 +76,51 @@ export function renderFunctionResults(
     generateBtn.className = "affirmative-button";
     generateBtn.style.marginLeft = "4px";
     if (isGenerated) {
-      generateBtn.textContent = "Harness Ready";
-      generateBtn.disabled = true;
+      generateBtn.textContent = "Jump to Harness";
+      if (result.harnessPath) {
+        generateBtn.disabled = false;
+        generateBtn.onclick = (event) => {
+          event.stopPropagation();
+          sendMessage?.({
+            command: "openLocation",
+            filePath: result.harnessPath,
+            offset: 0,
+          });
+        };
+      } else {
+        generateBtn.disabled = true;
+      }
     } else if (isPending) {
       generateBtn.textContent = "Generating...";
       generateBtn.disabled = true;
     } else {
       generateBtn.textContent = "Generate Harness";
+      generateBtn.onclick = (event) => {
+        event.stopPropagation();
+        if (!fuzzRootSelected) {
+          log?.("No fuzz root selected, cannot generate harness.");
+          return;
+        }
+        log?.("generate");
+        sendMessage?.({
+          command: "generateHarness",
+          fuzzRoot: fuzzRootSelected,
+          target: result,
+        });
+        result.pendingGeneration = true;
+        generateBtn.disabled = true;
+        generateBtn.textContent = "Generating...";
+        onStatusChange?.({
+          functionKey: result.functionKey,
+          pendingGeneration: true,
+        });
+        renderFunctionResults(
+          orderedResults,
+          targetContainer,
+          priority,
+          options
+        );
+      };
     }
 
     const resultDiv = document.createElement("div");
@@ -146,28 +177,6 @@ export function renderFunctionResults(
       event.stopPropagation();
       result.status = result.status === "Ignore" ? "" : "Ignore";
       log?.(`ignore, ${result.status}`);
-      renderFunctionResults(orderedResults, targetContainer, priority, options);
-    };
-
-    generateBtn.onclick = (event) => {
-      event.stopPropagation();
-      if (!fuzzRootSelected) {
-        log?.("No fuzz root selected, cannot generate harness.");
-        return;
-      }
-      log?.("generate");
-      sendMessage?.({
-        command: "generateHarness",
-        fuzzRoot: fuzzRootSelected,
-        target: result,
-      });
-      result.pendingGeneration = true;
-      generateBtn.disabled = true;
-      generateBtn.textContent = "Generating...";
-      onStatusChange?.({
-        functionKey: result.functionKey,
-        pendingGeneration: true,
-      });
       renderFunctionResults(orderedResults, targetContainer, priority, options);
     };
 
@@ -237,7 +246,7 @@ export function loadFilters(
     button.textContent = filter.label;
     button.className = "filter-button";
     button.style.marginRight = "8px";
-    
+
     const wrapper = document.createElement("span");
     wrapper.appendChild(button);
     filterButtonsContainer.appendChild(wrapper);
