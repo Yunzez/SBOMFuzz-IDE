@@ -13,6 +13,7 @@ import fs from "fs";
 import type * as vscode from "vscode";
 import { loadFunctionResults } from "./functionOutputProcesser";
 import { findCargoProjectRoot, findFuzzRoot, getFuzzTargets } from "./util";
+import { applyHarnessMetadata } from "./harnessRegistry";
 
 export interface SharedContext {
   fuzzTargets: { name: string; path: string }[];
@@ -50,6 +51,7 @@ export async function useGlobalContext(context: vscode.ExtensionContext) {
   fs.mkdirSync(outputPath, { recursive: true });
 
   const results = loadFunctionResults(outputPath) ?? [];
+  applyHarnessMetadata(results);
   console.log("GC loaded results count:", results.length);
   globalContext.results = results;
 

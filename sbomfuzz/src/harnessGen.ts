@@ -9,6 +9,12 @@ import { channel_log } from "./extension";
 import { globalBroadcastEventType } from "./util";
 import { getGlobalContext } from "./globalContextProvider";
 import { FunctionStatus } from "./functionOutputProcesser";
+import {
+  applyHarnessMetadata,
+  getHarnessRecordByTargetName,
+  registerHarnessForFunction,
+  removeHarnessRecordByTargetName,
+} from "./harnessRegistry";
 import kill from "tree-kill";
 let harnessProcess: ChildProcess | null = null;
 // Track harness statuses
@@ -90,8 +96,10 @@ export async function generateHarness(
   if (globalContext) {
     const replacement = globalContext.results;
     replacement!.map((fn) => {
-      if (fn.functionName === target.functionName) {
-        fn.harnessStatus = FunctionStatus.HarnessGenerated;
+      if (fn.functionKey === target.functionKey) {
+        fn.status = FunctionStatus.HarnessGenerated;
+        fn.harnessPath = harnessFilePath;
+        fn.harnessTargetName = targetName;
       }
     });
     globalContext.results = replacement;
@@ -127,6 +135,11 @@ export async function generateHarness(
     console.log(`✅ Appended new bin entry to Cargo.toml for ${targetName}`);
   } else {
     console.log(`ℹ️ Bin entry for ${targetName} already exists in Cargo.toml`);
+  }
+
+  registerHarnessForFunction(target, targetName, harnessFilePath);
+  if (globalContext?.results) {
+    applyHarnessMetadata(globalContext.results);
   }
 
   return { success: true, targetPath: harnessFilePath };
@@ -315,6 +328,7 @@ export async function optimizeHarness(
 export function deleteSelectedHarness(targetName: string, root: string): void {
   const harnessFilePath = path.join(root, "fuzz_targets", `${targetName}.rs`);
   const cargoTomlPath = path.join(root, "Cargo.toml");
+  const registryRecord = getHarnessRecordByTargetName(targetName);
   if (fs.existsSync(harnessFilePath)) {
     fs.unlinkSync(harnessFilePath);
     console.log(`🗑️ Deleted harness file: ${harnessFilePath}`);
@@ -388,6 +402,19 @@ export function deleteSelectedHarness(targetName: string, root: string): void {
 
   // Update harness status to deleted
   updateHarnessStatus(targetName, "deleted");
+  removeHarnessRecordByTargetName(targetName);
+
+  const globalContext = getGlobalContext();
+  if (registryRecord && globalContext?.results) {
+    const match = globalContext.results.find(
+      (fn) => fn.functionKey === registryRecord.functionKey
+    );
+    if (match) {
+      match.status = FunctionStatus.NoHarness;
+      delete match.harnessPath;
+      delete match.harnessTargetName;
+    }
+  }
 }
 
 let buffer = "";

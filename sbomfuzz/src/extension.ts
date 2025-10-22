@@ -11,6 +11,7 @@ import { getGlobalContext, useGlobalContext } from "./globalContextProvider";
 import { FunctionResult } from "./functionOutputProcesser";
 import { generateHarness, optimizeHarness } from "./harnessGen";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
+import { applyHarnessMetadata, initHarnessRegistry } from "./harnessRegistry";
 const out = vscode.window.createOutputChannel("SBOMFuzz_debug");
 export function channel_log(m: any) {
   out.appendLine(typeof m === "string" ? m : JSON.stringify(m));
@@ -20,6 +21,8 @@ export function channel_log(m: any) {
 export async function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
+  console.log("starting harness registry");
+  await initHarnessRegistry(context);
   console.log("starting global context");
   await useGlobalContext(context);
   const globalContext = getGlobalContext();
@@ -152,6 +155,7 @@ async function runAnalysisTask(
     },
     async () => {
       const results = await runRustAnalyzer(context, projectRoot);
+      applyHarnessMetadata(results);
       globalContext.results = results;
 
       const fuzzRoot = globalContext.fuzzRoot;

@@ -208,7 +208,7 @@ button {
   transform: scale(1.03); /* Slight zoom effect on hover */
 }
 
-.filter-button.selected {
+.filter-button.selected-filter {
   background-color: #007bff; /* Blue background for selected state */
   color: white; /* White text for contrast */
   border-color: #0056b3; /* Darker blue border for selected state */

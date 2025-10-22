@@ -16,6 +16,8 @@ export type FunctionResult = {
   unsafeScore: number;
   priorityScore: number;
   status: FunctionStatus;
+  harnessPath?: string;
+  harnessTargetName?: string;
 };
 
 export enum FunctionStatus {

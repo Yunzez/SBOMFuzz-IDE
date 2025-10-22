@@ -20,16 +20,3 @@ path = "fuzz_targets/fuzz_target_apply_operator.rs"
 test = false
 doc = false
 bench = false
-[[bin]]
-name = "bad_fuzz_target_power1"
-path = "fuzz_targets/bad_fuzz_target_power1.rs"
-test = false
-doc = false
-bench = false
-
-[[bin]]
-name = "bad_fuzz_target_power2"
-path = "fuzz_targets/bad_fuzz_target_power2.rs"
-test = false
-doc = false
-bench = false

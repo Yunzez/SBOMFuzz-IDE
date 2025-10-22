@@ -1,4 +1,6 @@
 import { setupMessaging, sendMessage, log } from "./messaging.js";
+import { startRendering, loadFilters } from "./functionList.js";
+import { renderHarnessList } from "./harnessList.js";
 
 let pathSelected = null;
 let fuzzRootSelected = null;
@@ -6,176 +8,74 @@ let functionTargets = null;
 let selectedFilter = null;
 const targetContainer = document.getElementById("entry-list");
 const pathDiv = document.getElementById("path-display-container");
-function renderSearchBar(results, targetContainer, priority) {
-  const searchContainer = document.createElement("div");
-  searchContainer.style.marginBottom = "10px";
-  const searchInput = document.createElement("input");
-  searchInput.type = "text";
-  searchInput.placeholder = "Search functions...";
-  searchInput.classList.add("search-bar");
-  const resultsDiv = document.createElement("div");
-  searchInput.addEventListener("input", () => {
-    resultsDiv.innerHTML = ""; // Clear previous results
-    log(`Search input changed: ${searchInput.value}`);
-    const query = searchInput.value.toLowerCase().trim();
-    if (query === "") {
-      // If the search query is empty, render all results
-      renderFunctionResults(results, resultsDiv, priority);
-    } else {
-      const filteredResults = results.filter(
-        (fn) =>
-          fn.functionName.toLowerCase().includes(query) ||
-          fn.functionModulePath.toLowerCase().includes(query)
-      );
-      log(`Filtered results: ${filteredResults.length}`);
-      renderFunctionResults(filteredResults, resultsDiv, priority);
+let filtersContainer = null;
+let functionListContainer = null;
+
+function createRenderOptions(overrides = {}) {
+  return {
+    fuzzRootSelected,
+    pathSelected,
+    sendMessage,
+    log,
+    onStatusChange: handleStatusChange,
+    selectedFilter,
+    onHarnessDeleted: handleHarnessDeleted,
+    ...overrides,
+  };
+}
+
+function handleStatusChange(updated) {
+  if (!functionTargets) {
+    return;
+  }
+  const index = functionTargets.findIndex(
+    (fn) => fn.functionKey === updated.functionKey
+  );
+  if (index !== -1) {
+    functionTargets[index] = {
+      ...functionTargets[index],
+      ...updated,
+    };
+  }
+}
+
+function handleFilterChange(filterId) {
+  selectedFilter = filterId;
+}
+
+function handleHarnessDeleted(targetName) {
+  if (!functionTargets || functionTargets.length === 0) {
+    return;
+  }
+  let changed = false;
+  functionTargets = functionTargets.map((fn) => {
+    if (fn.harnessTargetName === targetName) {
+      changed = true;
+      const updated = { ...fn };
+      updated.status = "NoHarness";
+      delete updated.harnessTargetName;
+      delete updated.harnessPath;
+      return updated;
     }
+    return fn;
   });
-  searchContainer.appendChild(searchInput);
-  targetContainer.appendChild(searchContainer);
-  targetContainer.appendChild(resultsDiv);
-  renderFunctionResults(results, resultsDiv, priority);
-}
 
-function startRendering(results, targetContainer, priority) {
-  targetContainer.innerHTML = ""; // Clear previous results
-
-  renderSearchBar(results, targetContainer, priority);
-  // renderFunctionResults(results, targetContainer, priority);
-}
-
-function renderFunctionResults(results, targetContainer, priority) {
-  targetContainer.innerHTML = ""; // Clear previous results
-  const nonIgnored = results.filter((r) => r.status !== "Ignore");
-  const ignored = results.filter((r) => r.status === "Ignore");
-  // Sort non-ignored by priorityScore descending
-  nonIgnored.sort((a, b) => b.priorityScore - a.priorityScore);
-
-  // Apply additional sorting based on the selected filter
-  switch (priority) {
-    case "unsafe-block-filter":
-      nonIgnored.sort((a, b) => b.unsafeScore - a.unsafeScore);
-      break;
-    case "parameters-filter":
-      nonIgnored.sort((a, b) => b.paramCount - a.paramCount);
-      break;
-    // case "centrality-filter":
-    //   nonIgnored.sort((a, b) => b.centralityScore - a.centralityScore);
-    //   break;
-    case "usage-filter":
-      nonIgnored.sort((a, b) => b.usageCount - a.usageCount);
-      break;
-    default:
-      // Default to priorityScore sorting
-      nonIgnored.sort((a, b) => b.priorityScore - a.priorityScore);
-      break;
+  if (!changed) {
+    return;
   }
 
-  console.log("Sorted non-ignored results:", nonIgnored);
-
-  results = [...nonIgnored, ...ignored];
-
-  for (const result of results) {
-    // log(`status: ${result.status}`);
-    // Create colored status tag
-    const statusColor =
-      {
-        NoHarness: "gray",
-        Ignore: "darkred",
-        HarnessGenerated: "green",
-      }[result.status] || "black";
-
-    const statusBadge = `<span class="status-badge" style="background:${statusColor};">${result.status}</span>`;
-
-    const ignoreBtn = document.createElement("button");
-    ignoreBtn.textContent = result.status !== "Ignore" ? "Ignore" : "Unignore";
-    ignoreBtn.className = "negative-button";
-
-    const generateBtn = document.createElement("button");
-    generateBtn.textContent = "Generate Harness";
-    generateBtn.className = "affirmative-button";
-    generateBtn.style.marginLeft = "4px";
-
-    const resultDiv = document.createElement("div");
-    resultDiv.className = "function-button";
-    resultDiv.innerHTML = `
-      <div style="font-weight:bold; margin-bottom:4px; display: flex; gap: 2px; flex-wrap: wrap; align-items: center;">
-      <span>${result.functionModulePath}::${result.functionName}</span>
-    ${statusBadge}
-      </div>
-      <div>${result.functionLocation?.filePath.replace(pathSelected, "")}</div>
-      <div class="priority-score" style="margin-top: 4px;">
-      Priority Score: ${result.priorityScore.toFixed(3)}
-      <span 
-      class="info-icon" 
-      style="margin-left: 4px; cursor: pointer;" 
-      title="Hover to see score breakdown">ℹ️</span>
-      </div>
-      <div class="btns-div" style="margin-top:6px;"></div>
-      `;
-
-    // Get the priority score div first
-    const priorityScoreDiv =
-      resultDiv.getElementsByClassName("priority-score")[0];
-    priorityScoreDiv.style.position = "relative"; // now works correctly
-
-    // Create the breakdown box
-    const scoreBreakdown = document.createElement("div");
-    scoreBreakdown.className = "score-breakdown";
-    scoreBreakdown.innerHTML = `
-    <strong>Function Details:</strong>
-    <div style="margin: 0;">
-    <div>Parameter Count: ${result.paramCount}</div>
-    <div>Usage Count: ${result.usageCount}</div>
-    <div>Unsafe: ${result.unsafeScore > 0 ? "Yes" : "No"}</div>
-    </div>
-    `;
-
-    // Append to container
-    priorityScoreDiv.appendChild(scoreBreakdown);
-
-    // Add hover functionality to show/hide the score breakdown
-    const infoIcon = priorityScoreDiv.querySelector(".info-icon");
-    infoIcon.addEventListener("mouseenter", () => {
-      scoreBreakdown.style.display = "block";
-    });
-    infoIcon.addEventListener("mouseleave", () => {
-      scoreBreakdown.style.display = "none";
-    });
-
-    // Add buttons to the last div (action area)
-    const actionArea = resultDiv.getElementsByClassName("btns-div")[0];
-    actionArea.appendChild(ignoreBtn);
-    actionArea.appendChild(generateBtn);
-
-    ignoreBtn.onclick = (event) => {
-      event.stopPropagation(); // prevents triggering resultDiv.onclick
-      result.status = result.status === "Ignore" ? "" : "Ignore";
-      log(`ignore, ${result.status}`);
-      renderFunctionResults(results, targetContainer, priority); // Re-render to reflect changes
-    };
-
-    generateBtn.onclick = (event) => {
-      log("generate");
-      sendMessage({
-        command: "generateHarness",
-        fuzzRoot: fuzzRootSelected,
-        target: result,
-      });
-      result.status = "HarnessGenerated";
-      renderFunctionResults(results, targetContainer, priority);
-    };
-
-    resultDiv.onclick = () => {
-      sendMessage({
-        command: "openLocation",
-        filePath: result.functionLocation.filePath,
-        offset: result.functionLocation.offset,
-      });
-    };
-
-    targetContainer.appendChild(resultDiv);
+  const listTarget = functionListContainer || targetContainer;
+  if (!listTarget) {
+    return;
   }
+
+  const activeFilter = selectedFilter || "priority-filter";
+  startRendering(
+    functionTargets,
+    listTarget,
+    activeFilter,
+    createRenderOptions()
+  );
 }
 
 export function toggleCollapse(headerEl) {
@@ -203,96 +103,35 @@ setupMessaging({
   onFuzzTargetsListed: (targets) => {
     log("🧪 Fuzz targets listed:", targets);
     const targetList = document.getElementById("harness-list");
-    targetList.innerHTML = ""; // Clear previous targets
-    if (targets.length === 0) {
-      targetList.innerHTML = "<div>No fuzz targets found.</div>";
-      return;
-    }
-    for (const target of targets) {
-      const targetDiv = document.createElement("div");
-
-      const runBtn = document.createElement("button");
-      runBtn.textContent = "Run";
-      runBtn.className = `affirmative-button  ${target.name}-run-btn`;
-
-      const stopBtn = document.createElement("button");
-      stopBtn.textContent = "Stop";
-      stopBtn.className = `negative-button ${target.name}-stop-btn`;
-      stopBtn.style.marginLeft = "4px";
-      stopBtn.style.display = target.status === 'running' ? 'inline-block' : 'none';
-
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "Delete";
-      deleteBtn.className = `negative-button ${target.name}-delete-btn`;
-      deleteBtn.style.marginLeft = "4px";
-
-      targetDiv.className = "function-button";
-      targetDiv.innerHTML = `
-        <div style="font-weight:bold; margin-bottom:4px; display: flex; gap: 6px; align-items: center;">
-          ${target.name}
-        </div>
-        <div>
-          ${target.path.replace(fuzzRootSelected, "")}
-        </div>
-          <div class="btns-div" style="margin-top:6px;"></div>
-      `;
-    
-      targetDiv.onclick = () => {
-        sendMessage({
-          command: "openLocation",
-          filePath: target.path,
-          offset: 0,
-        });
-      };
-
-      const actionArea = targetDiv.getElementsByClassName("btns-div")[0];
-      actionArea.appendChild(runBtn);
-      actionArea.appendChild(stopBtn);
-      actionArea.appendChild(deleteBtn);
-      
-      deleteBtn.onclick = (event) => {
-        event.stopPropagation(); // prevents triggering targetDiv.onclick
-        log(`Deleting fuzz target: ${target.name}`);
-        sendMessage({ command: "deleteFuzzTarget", target: target.name });
-      };
-      
-      runBtn.onclick = (event) => {
-        event.stopPropagation(); // prevents triggering targetDiv.onclick
-        log(`Running fuzz target: ${target.name}`);
-        sendMessage({ command: "runFuzzTarget", target: target.name});
-        
-        // Show stop button when running
-        stopBtn.style.display = 'inline-block';
-        runBtn.style.display = 'none';
-        
-      };
-      
-      stopBtn.onclick = (event) => {
-        event.stopPropagation(); // prevents triggering targetDiv.onclick
-        log(`Stopping fuzz target: ${target.name}`);
-        sendMessage({ command: "stopFuzzTarget" });
-        
-        // Hide stop button when stopped
-        stopBtn.style.display = 'none';
-        runBtn.style.display = 'inline-block';
-        
-      };
-      
-      // Show/hide buttons based on initial status
-      if (target.status === 'running') {
-        runBtn.style.display = 'none';
-      } else {
-        stopBtn.style.display = 'none';
-      }
-      
-      targetList.appendChild(targetDiv);
-    }
+    renderHarnessList(
+      targets,
+      targetList,
+      createRenderOptions({ onHarnessDeleted: handleHarnessDeleted })
+    );
   },
 
   onRustAnalysisDone: (results) => {
     log("Rendering function results");
-    targetContainer.innerHTML = ""; // Clear previous results
-    startRendering(results, targetContainer);
+    functionTargets = results;
+    const activeFilter = selectedFilter || "priority-filter";
+    const listTarget = functionListContainer || targetContainer;
+    if (filtersContainer && functionListContainer) {
+      loadFilters(
+        functionTargets,
+        filtersContainer,
+        functionListContainer,
+        createRenderOptions({
+          onFilterChange: handleFilterChange,
+          selectedFilter,
+        })
+      );
+    }
+    startRendering(
+      functionTargets,
+      listTarget,
+      activeFilter,
+      createRenderOptions()
+    );
   },
 
   onGlobalContext: (context) => {
@@ -337,106 +176,41 @@ setupMessaging({
       });
       fuzzPathDiv.appendChild(createRootButton);
     }
-    const filtersDiv = document.createElement("div");
-    filtersDiv.id = "filters-container";
-    const functionListDiv = document.createElement("div");
-    targetContainer.appendChild(filtersDiv);
-    targetContainer.appendChild(functionListDiv);
+    if (!filtersContainer) {
+      filtersContainer = document.createElement("div");
+      filtersContainer.id = "filters-container";
+      targetContainer.appendChild(filtersContainer);
+    } else {
+      filtersContainer.innerHTML = "";
+    }
+
+    if (!functionListContainer) {
+      functionListContainer = document.createElement("div");
+      targetContainer.appendChild(functionListContainer);
+    } else {
+      functionListContainer.innerHTML = "";
+    }
     if (context.results && context.results.length > 0) {
       functionTargets = context.results;
-
-      loadFilters(functionTargets, filtersDiv, functionListDiv);
-      startRendering(functionTargets, functionListDiv, "priority-filter");
+      loadFilters(
+        functionTargets,
+        filtersContainer,
+        functionListContainer,
+        createRenderOptions({
+          onFilterChange: handleFilterChange,
+          selectedFilter,
+        })
+      );
+      const activeFilter = selectedFilter || "priority-filter";
+      startRendering(
+        functionTargets,
+        functionListContainer,
+        activeFilter,
+        createRenderOptions()
+      );
     }
   },
 });
-
-const loadFilters = (functionTargets, targetContainer, functionListDiv) => {
-  console.log("Loading filters");
-  const filterTitle = document.createElement("div");
-  filterTitle.textContent = "Order By";
-  filterTitle.style.fontWeight = "bold";
-  filterTitle.style.marginBottom = "8px";
-  targetContainer.appendChild(filterTitle);
-
-  const filterButtonsContainer = document.createElement("div");
-  const filters = [
-    {
-      id: "priority-filter",
-      label: "Priority Score",
-      default: true,
-      filterDescription:
-        "Priority Score is calculated comprehensively based on the 10 different metrics.",
-    },
-    {
-      id: "unsafe-block-filter",
-      label: "Unsafe Block",
-      default: false,
-      filterDescription:
-        "Unsafe Block measures the presence of unsafe usage inside the function.",
-    },
-    {
-      id: "parameters-filter",
-      label: "Parameters Count",
-      default: false,
-      filterDescription:
-        "Parameters Count represents the number of parameters a function takes.",
-    },
-    // {
-    //   id: "centrality-filter",
-    //   label: "Centrality Score",
-    //   default: false,
-    //   filterDescription:
-    //     "Centrality Score measures how structurally embedded a function is in the crate's call/API graph. Functions with high centrality are called by many important functions, indicating their significance.",
-    // },
-    {
-      id: "usage-filter",
-      label: "Usage Counts",
-      default: false,
-      filterDescription:
-        "Usage Counts measure how frequently a function is used directly.",
-    },
-  ];
-
-  filters.forEach((filter) => {
-    const button = document.createElement("button");
-    button.id = filter.id;
-    button.textContent = filter.label;
-    button.className = "filter-button";
-    button.style.marginRight = "8px";
-    if (filter.default) {
-      button.classList.add("selected");
-      selectedFilter = filter; // Set the default filter
-    }
-
-    button.addEventListener("click", () => {
-      console.log(`Filter applied: ${filter.label}`);
-      selectedFilter = filter; // Update the selected filter
-      // Remove 'selected' class from all filter buttons
-      const allButtons = targetContainer.querySelectorAll(".filter-button");
-      allButtons.forEach((btn) => btn.classList.remove("selected"));
-
-      // Add 'selected' class to the clicked button
-      button.classList.add("selected");
-      const currentFilterDescription = targetContainer.querySelector(
-        ".filter-description"
-      );
-      if (currentFilterDescription) {
-        currentFilterDescription.textContent = filter.filterDescription;
-      }
-      startRendering(functionTargets, functionListDiv, filter.id); // Pass the button as the priority filter
-      // Add filter logic here
-    });
-
-    filterButtonsContainer.appendChild(button);
-  });
-  targetContainer.appendChild(filterButtonsContainer);
-  const filterDescription = document.createElement("div");
-  filterDescription.className = "filter-description";
-  filterDescription.style.marginTop = "8px";
-  filterDescription.textContent = filters[0].filterDescription; // Default description
-  targetContainer.appendChild(filterDescription);
-};
 
 document.getElementById("start-analyzer").addEventListener("click", () => {
   vscode.postMessage({
