@@ -52,9 +52,10 @@ function handleHarnessDeleted(targetName) {
     if (fn.harnessTargetName === targetName) {
       changed = true;
       const updated = { ...fn };
-      updated.status = "NoHarness";
+      updated.status = "No Harness";
       delete updated.harnessTargetName;
       delete updated.harnessPath;
+      delete updated.pendingGeneration;
       return updated;
     }
     return fn;
@@ -63,6 +64,55 @@ function handleHarnessDeleted(targetName) {
   if (!changed) {
     return;
   }
+
+  const listTarget = functionListContainer || targetContainer;
+  if (!listTarget) {
+    return;
+  }
+
+  const activeFilter = selectedFilter || "priority-filter";
+  startRendering(
+    functionTargets,
+    listTarget,
+    activeFilter,
+    createRenderOptions()
+  );
+}
+
+function handleFunctionStatusUpdate(event) {
+  if (!functionTargets || !event?.functionKey) {
+    return;
+  }
+
+  const index = functionTargets.findIndex(
+    (fn) => fn.functionKey === event.functionKey
+  );
+
+  if (index === -1) {
+    return;
+  }
+
+  const updated = { ...functionTargets[index] };
+
+  if (event.status) {
+    updated.status = event.status;
+  }
+
+  if (event.status === "HarnessGenerated") {
+    if (event.harnessPath) {
+      updated.harnessPath = event.harnessPath;
+    }
+    if (event.harnessTargetName) {
+      updated.harnessTargetName = event.harnessTargetName;
+    }
+  } else {
+    delete updated.harnessPath;
+    delete updated.harnessTargetName;
+  }
+
+  delete updated.pendingGeneration;
+
+  functionTargets[index] = updated;
 
   const listTarget = functionListContainer || targetContainer;
   if (!listTarget) {
@@ -210,6 +260,8 @@ setupMessaging({
       );
     }
   },
+
+  onUpdateFunctionStatus: handleFunctionStatusUpdate,
 });
 
 document.getElementById("start-analyzer").addEventListener("click", () => {

@@ -3,12 +3,16 @@
 const vscode = acquireVsCodeApi();
 
 let onRustAnalysisDone = null;
+let onGlobalContext = null;
+let onFuzzTargetsListed = null;
+let onUpdateFunctionStatus = null;
 
 export function setupMessaging(handlers = {}) {
   // Assign callback functions
   onRustAnalysisDone = handlers.onRustAnalysisDone || (() => {});
   onGlobalContext = handlers.onGlobalContext || (() => {});
   onFuzzTargetsListed = handlers.onFuzzTargetsListed || (() => {});
+  onUpdateFunctionStatus = handlers.onUpdateFunctionStatus || (() => {});
   // Listen for messages from the extension
   window.addEventListener("message", (event) => {
     // ! this handles messages sent from the extension
@@ -31,14 +35,18 @@ export function setupMessaging(handlers = {}) {
             break;
           case "HarnessFailed":
             console.log("HarnessFailed event received:", msg);
-            document.querySelector(`.${msg.name}-stop-btn`).style.display = 'none';
-            document.querySelector(`.${msg.name}-run-btn`).style.display = 'inline-block';
+            document
+              .querySelector(`.${msg.name}-stop-btn`)
+              ?.style.setProperty("display", "none");
+            document
+              .querySelector(`.${msg.name}-run-btn`)
+              ?.style.setProperty("display", "inline-block");
             break;
           case "HarnessOptimized":
             // handlers.onHarnessOptimized(msg.data);
             break;
           case "UpdateFunctionStatus":
-            // handlers.onUpdateFunctionStatus(msg.data);
+            onUpdateFunctionStatus?.(msg);
             break;
           default:
             console.warn("Unhandled globalBroadcast type:", msg.type);
@@ -64,6 +72,7 @@ export function setupMessaging(handlers = {}) {
         if (onFuzzTargetsListed) {
           onFuzzTargetsListed(msg.targets || []);
         }
+        break;
 
       default:
         console.warn("Unhandled message from extension:", msg);

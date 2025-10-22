@@ -10,7 +10,6 @@ import { globalBroadcastEventType } from "./util";
 import { getGlobalContext } from "./globalContextProvider";
 import { FunctionStatus } from "./functionOutputProcesser";
 import {
-  applyHarnessMetadata,
   getHarnessRecordByTargetName,
   registerHarnessForFunction,
   removeHarnessRecordByTargetName,
@@ -91,20 +90,6 @@ export async function generateHarness(
   console.log("Generated harness template:", template);
   channel_log("trigger generation with OpenAI...");
 
-  const globalContext = getGlobalContext();
-
-  if (globalContext) {
-    const replacement = globalContext.results;
-    replacement!.map((fn) => {
-      if (fn.functionKey === target.functionKey) {
-        fn.status = FunctionStatus.HarnessGenerated;
-        fn.harnessPath = harnessFilePath;
-        fn.harnessTargetName = targetName;
-      }
-    });
-    globalContext.results = replacement;
-  }
-
   const result = await generateHarnessFromPrompt(template, extensionPath);
   if (!result) {
     return { success: false };
@@ -135,11 +120,6 @@ export async function generateHarness(
     console.log(`✅ Appended new bin entry to Cargo.toml for ${targetName}`);
   } else {
     console.log(`ℹ️ Bin entry for ${targetName} already exists in Cargo.toml`);
-  }
-
-  registerHarnessForFunction(target, targetName, harnessFilePath);
-  if (globalContext?.results) {
-    applyHarnessMetadata(globalContext.results);
   }
 
   return { success: true, targetPath: harnessFilePath };
@@ -574,6 +554,27 @@ export function runGenerateAndOptimizeHarness(
       );
 
       if (optimized.success) {
+        const targetName = `fuzz_target_${target.functionName}`;
+        const globalContext = getGlobalContext();
+        registerHarnessForFunction(target, targetName, targetPath);
+        if (globalContext?.results) {
+          const match = globalContext.results.find(
+            (fn) => fn.functionKey === target.functionKey
+          );
+          if (match) {
+            match.status = FunctionStatus.HarnessGenerated;
+            match.harnessPath = targetPath;
+            match.harnessTargetName = targetName;
+            delete (match as any).pendingGeneration;
+          }
+        }
+        vscode.commands.executeCommand("sbomfuzz.broadcast", {
+          eventType: globalBroadcastEventType.UpdateFunctionStatus,
+          functionKey: target.functionKey,
+          status: FunctionStatus.HarnessGenerated,
+          harnessPath: targetPath,
+          harnessTargetName: targetName,
+        });
         progress.report({
           increment: 70,
           message: "Harness optimized and ready.",
@@ -582,6 +583,25 @@ export function runGenerateAndOptimizeHarness(
 
         vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
       } else {
+        const targetName = `fuzz_target_${target.functionName}`;
+        removeHarnessRecordByTargetName(targetName);
+        const globalContext = getGlobalContext();
+        if (globalContext?.results) {
+          const match = globalContext.results.find(
+            (fn) => fn.functionKey === target.functionKey
+          );
+          if (match) {
+            match.status = FunctionStatus.NoHarness;
+            delete match.harnessPath;
+            delete match.harnessTargetName;
+            delete (match as any).pendingGeneration;
+          }
+        }
+        vscode.commands.executeCommand("sbomfuzz.broadcast", {
+          eventType: globalBroadcastEventType.UpdateFunctionStatus,
+          functionKey: target.functionKey,
+          status: FunctionStatus.NoHarness,
+        });
         progress.report({
           increment: 70,
           message: "Optimization failed.",

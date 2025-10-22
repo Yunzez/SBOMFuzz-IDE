@@ -78,9 +78,19 @@ export function renderFunctionResults(
     ignoreBtn.className = "negative-button";
 
     const generateBtn = document.createElement("button");
-    generateBtn.textContent = "Generate Harness";
+    const isGenerated = result.status === "HarnessGenerated";
+    const isPending = Boolean(result.pendingGeneration);
     generateBtn.className = "affirmative-button";
     generateBtn.style.marginLeft = "4px";
+    if (isGenerated) {
+      generateBtn.textContent = "Harness Ready";
+      generateBtn.disabled = true;
+    } else if (isPending) {
+      generateBtn.textContent = "Generating...";
+      generateBtn.disabled = true;
+    } else {
+      generateBtn.textContent = "Generate Harness";
+    }
 
     const resultDiv = document.createElement("div");
     resultDiv.className = "function-button";
@@ -139,11 +149,6 @@ export function renderFunctionResults(
       renderFunctionResults(orderedResults, targetContainer, priority, options);
     };
 
-    if (result.status === "HarnessGenerated") {
-      generateBtn.disabled = true;
-      generateBtn.textContent = "Harness Exists";
-    }
-
     generateBtn.onclick = (event) => {
       event.stopPropagation();
       if (!fuzzRootSelected) {
@@ -156,11 +161,13 @@ export function renderFunctionResults(
         fuzzRoot: fuzzRootSelected,
         target: result,
       });
-      result.status = "HarnessGenerated";
-      result.harnessTargetName = `fuzz_target_${result.functionName}`;
+      result.pendingGeneration = true;
       generateBtn.disabled = true;
-      generateBtn.textContent = "Harness Exists";
-      onStatusChange?.(result);
+      generateBtn.textContent = "Generating...";
+      onStatusChange?.({
+        functionKey: result.functionKey,
+        pendingGeneration: true,
+      });
       renderFunctionResults(orderedResults, targetContainer, priority, options);
     };
 
