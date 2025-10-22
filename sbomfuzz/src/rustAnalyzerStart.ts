@@ -9,9 +9,6 @@ export async function runRustAnalyzer(
   projectPath: string
 ): Promise<any[]> {
   return new Promise<any[]>((resolve, reject) => {
-    vscode.window.showInformationMessage(
-      "Starting Rust analyzer, this may take a while"
-    );
     const binary_name = get_platform_specific_binary();
     console.log("Using binary: ", binary_name);
     if (binary_name === undefined) {
@@ -48,9 +45,6 @@ export async function runRustAnalyzer(
 
     proc.on("close", (code) => {
       if (code === 0) {
-        vscode.window.showInformationMessage(
-          "Rust analyzer finished successfully, processing results..."
-        );
         console.log(stdout);
 
         const results = loadFunctionResults(outputPath) ?? [];

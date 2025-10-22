@@ -1,7 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import * as fs from "fs";
 import { SbomFuzzWebviewViewProvider } from "./view";
 import {
   make_function_public,
@@ -9,8 +8,6 @@ import {
 } from "./rustFunctionCodeLensProvider";
 import { findFuzzRoot, getFuzzTargets } from "./util";
 import { getGlobalContext, useGlobalContext } from "./globalContextProvider";
-import path from "path";
-import { get } from "http";
 import { FunctionResult } from "./functionOutputProcesser";
 import { generateHarness, optimizeHarness } from "./harnessGen";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
@@ -45,10 +42,21 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  if (globalContext.projectRoot) {
+    await runAnalysisTask(context);
+  }
+
   context.subscriptions.push(
     vscode.commands.registerCommand("sbomfuzz.refreshHarnessList", () => {
       const webview = SbomFuzzWebviewViewProvider.getWebview();
-      const targets = getFuzzTargets(globalContext.fuzzRoot!);
+      const fuzzRoot = globalContext.fuzzRoot;
+      if (!fuzzRoot) {
+        vscode.window.showWarningMessage(
+          "SBOMFuzz could not find a fuzz directory."
+        );
+        return;
+      }
+      const targets = getFuzzTargets(fuzzRoot);
       if (webview) {
         webview.postMessage({ command: "refreshHarnessList", targets });
       }
@@ -99,39 +107,74 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("sbomfuzz.runAnalysisTool", async () => {
-      const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
-      if (fs.existsSync(outputPath)) {
-        fs.rmSync(outputPath, { recursive: true, force: true });
-        console.log("Output path cleared:", outputPath);
+    vscode.commands.registerCommand(
+      "sbomfuzz.runAnalysisTool",
+      async (projectRoot?: string) => {
+        const options = projectRoot ? { projectRoot } : undefined;
+        await runAnalysisTask(context, options);
       }
-      fs.mkdirSync(outputPath, { recursive: true });
-
-      const webview = SbomFuzzWebviewViewProvider.getWebview();
-      if (!webview) {
-        vscode.window.showErrorMessage(
-          "Webview not found. Please open the view and try again."
-        );
-        return;
-      }
-
-      const projectRoot = globalContext.projectRoot!;
-      console.log("Resolved analyzer path:", projectRoot);
-      console.log("Exists:", fs.existsSync(projectRoot));
-      console.log("Is file:", fs.statSync(projectRoot).isFile());
-
-      const results = await runRustAnalyzer(context, projectRoot);
-      const targets = getFuzzTargets(globalContext.fuzzRoot!);
-      globalContext.results = results;
-
-      webview.postMessage({
-        command: "rustAnalysisDone",
-        results,
-      });
-    })
+    )
   );
 
 
+}
+
+async function runAnalysisTask(
+  context: vscode.ExtensionContext,
+  options: { projectRoot?: string } = {}
+) {
+  const globalContext = getGlobalContext();
+  const projectRoot = options.projectRoot ?? globalContext.projectRoot;
+
+  if (!projectRoot) {
+    vscode.window.showErrorMessage(
+      "SBOMFuzz could not determine a Cargo project to analyze."
+    );
+    return;
+  }
+
+  if (options.projectRoot) {
+    globalContext.projectRoot = options.projectRoot;
+  }
+
+  if (!globalContext.fuzzRoot) {
+    const detectedFuzzRoot = findFuzzRoot();
+    if (detectedFuzzRoot) {
+      globalContext.fuzzRoot = detectedFuzzRoot;
+    }
+  }
+
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Window,
+      title: "SBOMFuzz: Analyzing project…",
+      cancellable: false,
+    },
+    async () => {
+      const results = await runRustAnalyzer(context, projectRoot);
+      globalContext.results = results;
+
+      const fuzzRoot = globalContext.fuzzRoot;
+      if (fuzzRoot) {
+        globalContext.fuzzTargets = getFuzzTargets(fuzzRoot);
+      }
+
+      const webview = SbomFuzzWebviewViewProvider.getWebview();
+      if (webview) {
+        webview.postMessage({
+          command: "rustAnalysisDone",
+          results,
+        });
+
+        if (globalContext.fuzzTargets) {
+          webview.postMessage({
+            command: "refreshHarnessList",
+            targets: globalContext.fuzzTargets,
+          });
+        }
+      }
+    }
+  );
 }
 
 export function findFuzzTargets(

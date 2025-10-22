@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { runRustAnalyzer } from "./rustAnalyzerStart";
 import {
   findCargoProjectRoot,
   findFuzzRoot,
@@ -22,7 +21,6 @@ import {
   stopHarness,
 } from "./harnessGen";
 import useGlobalContext, { getGlobalContext } from "./globalContextProvider";
-import { get } from "http";
 let currentWebview: vscode.Webview | undefined;
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "sbomfuzzWebview";
@@ -69,22 +67,15 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       }
 
       if (message.command === "runAnalyzer") {
-        const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
-        if (fs.existsSync(outputPath)) {
-          fs.rmSync(outputPath, { recursive: true, force: true });
-          console.log("Output path cleared:", outputPath);
+        const projectRoot = message.projectPath;
+        if (projectRoot) {
+          const globalContext = getGlobalContext();
+          globalContext.projectRoot = projectRoot;
         }
-        fs.mkdirSync(outputPath, { recursive: true });
-        const projectRoot = message.projectPath; // send this from the webview
-        console.log("Resolved analyzer path:", projectRoot);
-        console.log("Exists:", fs.existsSync(projectRoot));
-        console.log("Is file:", fs.statSync(projectRoot).isFile());
-        const results = runRustAnalyzer(this.context, projectRoot);
-        
-        webviewView.webview.postMessage({
-          command: "rustAnalysisDone",
-          results
-        });
+        vscode.commands.executeCommand(
+          "sbomfuzz.runAnalysisTool",
+          projectRoot
+        );
       }
 
       if (message.command === "openLocation") {
