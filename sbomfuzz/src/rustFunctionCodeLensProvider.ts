@@ -11,24 +11,32 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
   ): vscode.ProviderResult<vscode.CodeLens[]> {
     const lenses: vscode.CodeLens[] = [];
 
-    // Found this online, just matches all function signatures
-    // Regex to match: fn function_name(
-    const regex = /^\s*(pub\s+)?(async\s+)?fn\s+(\w+)\s*\(/;
+    // Matches Rust function signatures including optional pub qualifiers (e.g. pub(crate)),
+    // async, generics, and lifetimes. We run against the whole document so we can also
+    // capture signatures that span multiple lines.
+    const text = document.getText();
+    const regex = /^(?:\s*#.*\n)*\s*(?:pub\s*(?:\([^)]*\)\s*)?)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)\s*(?:<[^>{}]*>)?\s*\(/gm;
 
-    for (let i = 0; i < document.lineCount; i++) {
-      const line = document.lineAt(i);
-      const match = regex.exec(line.text);
-      if (match) {
-        const functionName = match[3]; // the captured function name
-        const range = new vscode.Range(i, 0, i, line.text.length);
-        const cmd: vscode.Command = {
-          // title: 'Show Function Info',
-          title: "Generate Harness!",
-          command: "sbomfuzz.showFunctionInfo",
-          arguments: [functionName, document.uri.fsPath],
-        };
-        lenses.push(new vscode.CodeLens(range, cmd));
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(text)) !== null) {
+      const functionName = match[1];
+
+      const matchText = match[0];
+      const fnKeywordOffset = matchText.indexOf("fn");
+      if (fnKeywordOffset === -1) {
+        continue;
       }
+      const absoluteFnOffset = match.index + fnKeywordOffset;
+      const fnPosition = document.positionAt(absoluteFnOffset);
+      const line = fnPosition.line;
+      const lineText = document.lineAt(line).text;
+      const range = new vscode.Range(line, 0, line, lineText.length);
+      const cmd: vscode.Command = {
+        title: "Generate Harness!",
+        command: "sbomfuzz.showFunctionInfo",
+        arguments: [functionName, document.uri.fsPath],
+      };
+      lenses.push(new vscode.CodeLens(range, cmd));
     }
 
     return lenses;

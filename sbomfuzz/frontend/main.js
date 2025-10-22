@@ -96,21 +96,29 @@ function handleFunctionStatusUpdate(event) {
 
   if (event.status) {
     updated.status = event.status;
+
+    if (event.status === "HarnessGenerated") {
+      if (event.harnessPath) {
+        updated.harnessPath = event.harnessPath;
+      }
+      if (event.harnessTargetName) {
+        updated.harnessTargetName = event.harnessTargetName;
+      }
+    } else {
+      delete updated.harnessPath;
+      delete updated.harnessTargetName;
+    }
+
+    delete updated.pendingGeneration;
   }
 
-  if (event.status === "HarnessGenerated") {
-    if (event.harnessPath) {
-      updated.harnessPath = event.harnessPath;
+  if (typeof event.pendingGeneration === "boolean") {
+    if (event.pendingGeneration) {
+      updated.pendingGeneration = true;
+    } else {
+      delete updated.pendingGeneration;
     }
-    if (event.harnessTargetName) {
-      updated.harnessTargetName = event.harnessTargetName;
-    }
-  } else {
-    delete updated.harnessPath;
-    delete updated.harnessTargetName;
   }
-
-  delete updated.pendingGeneration;
 
   functionTargets[index] = updated;
 

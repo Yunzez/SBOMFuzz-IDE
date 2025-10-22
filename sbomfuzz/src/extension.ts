@@ -6,10 +6,10 @@ import {
   make_function_public,
   RustFunctionCodeLensProvider,
 } from "./rustFunctionCodeLensProvider";
-import { findFuzzRoot, getFuzzTargets } from "./util";
+import { findFuzzRoot, getFuzzTargets, globalBroadcastEventType } from "./util";
 import { getGlobalContext, useGlobalContext } from "./globalContextProvider";
 import { FunctionResult } from "./functionOutputProcesser";
-import { generateHarness, optimizeHarness } from "./harnessGen";
+import { generateHarness, optimizeHarness, runGenerateAndOptimizeHarness } from "./harnessGen";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
 import { applyHarnessMetadata, initHarnessRegistry } from "./harnessRegistry";
 const out = vscode.window.createOutputChannel("SBOMFuzz_debug");
@@ -91,11 +91,25 @@ export async function activate(context: vscode.ExtensionContext) {
           return;
         }
 
-        startGeneration(
-          focusTarget!,
-          globalContext.fuzzRoot!,
-          globalContext.extensionPath!
-        );
+        if (!globalContext.fuzzRoot) {
+          vscode.window.showErrorMessage(
+            "SBOMFuzz could not find a fuzz root. Please create one before generating a harness."
+          );
+          return;
+        }
+
+        focusTarget.pendingGeneration = true;
+        vscode.commands.executeCommand("sbomfuzz.broadcast", {
+          eventType: globalBroadcastEventType.UpdateFunctionStatus,
+          functionKey: focusTarget.functionKey,
+          pendingGeneration: true,
+        });
+
+       runGenerateAndOptimizeHarness(
+         focusTarget!,
+         globalContext.fuzzRoot!,
+         globalContext.extensionPath!
+       );
       }
     )
   );

@@ -1,20 +1,9 @@
 {
   "functions": {
-    "program_a::parser::parse_hex": {
-      "id": 13252876978428405404,
+    "program_a::utils::allocate_buffer": {
+      "id": 4376491757636357281,
       "calls": [
-        "core::str::trim_start_matches",
-        "core::result::map_err",
-        "core::str::trim",
-        "core::num::from_str_radix"
-      ]
-    },
-    "program_a::expr_eval::tokenize_expr": {
-      "id": 12954828369711211646,
-      "calls": [
-        "program_a::expr_eval::parse_next_token",
-        "alloc::vec::push",
-        "core::str::is_empty"
+        "libc::unix::malloc"
       ]
     },
     "program_a::parser::parse_bool_or_int": {
@@ -24,75 +13,73 @@
         "program_a::parser::parse_int"
       ]
     },
-    "program_a::arithmetic::compute_expression": {
-      "id": 17465662674895702181,
+    "program_a::parser::parse_int": {
+      "id": 12782313085460345044,
       "calls": [
-        "program_a::arithmetic::multiply",
-        "program_a::arithmetic::power",
-        "program_a::arithmetic::add",
-        "program_a::arithmetic::divide",
-        "program_a::arithmetic::subtract"
-      ]
-    },
-    "program_a::parser::parse_bool": {
-      "id": 3462108478590779206,
-      "calls": [
-        "alloc::string::as_str",
-        "alloc::str::to_lowercase",
-        "core::str::trim"
-      ]
-    },
-    "program_a::expr_eval::evaluate_expression": {
-      "id": 6289203081931832336,
-      "calls": [
-        "program_a::expr_eval::eval_tokens",
-        "core::str::chars",
-        "core::iter::traits::iterator::collect",
-        "core::char::methods::is_whitespace",
-        "program_a::expr_eval::tokenize_expr",
-        "program_a::expr_eval::this_is_a_test_function_3",
-        "core::iter::traits::iterator::filter"
-      ]
-    },
-    "program_a::main": {
-      "id": 10599237949604842016,
-      "calls": [
-        "std::io::stdio::stdin",
-        "std::io::flush",
-        "std::io::stdio::read_line",
+        "core::result::map_err",
         "core::str::trim",
-        "std::io::stdio::stdout",
-        "program_a::expr_eval::evaluate_expression",
-        "alloc::string::new"
-      ]
-    },
-    "program_a::arithmetic::power": {
-      "id": 15525054682805925829,
-      "calls": [
-        "core::num::wrapping_mul"
+        "core::num::from_str"
       ]
     },
     "program_a::test_main": {
       "id": 13366889353141776218,
       "calls": [
-        "program_a::parser::parse_hex",
-        "program_a::parser::parse_csv_ints",
         "program_a::arithmetic::divide",
-        "program_a::arithmetic::square_ptr"
+        "program_a::arithmetic::square_ptr",
+        "program_a::parser::parse_hex",
+        "program_a::parser::parse_csv_ints"
+      ]
+    },
+    "program_a::parser::parse_csv_ints": {
+      "id": 13827293763132924675,
+      "calls": [
+        "core::iter::traits::iterator::collect",
+        "core::num::from_str",
+        "core::result::map_err",
+        "core::str::split",
+        "core::str::trim"
+      ]
+    },
+    "program_a::expr_eval::eval_tokens": {
+      "id": 10616181352310159587,
+      "calls": [
+        "core::slice::len",
+        "program_a::expr_eval::apply_operator",
+        "program_a::expr_eval::eval_tokens"
+      ]
+    },
+    "program_a::parser::extract_first_number": {
+      "id": 9734240634723893783,
+      "calls": [
+        "core::char::methods::is_ascii_digit",
+        "alloc::string::push",
+        "alloc::string::new",
+        "alloc::string::is_empty",
+        "core::num::from_str",
+        "core::str::chars"
       ]
     },
     "program_a::expr_eval::apply_operator": {
       "id": 6152096780951179987,
       "calls": [
-        "program_a::arithmetic::subtract",
-        "core::convert::try_from",
+        "program_a::arithmetic::divide",
         "program_a::arithmetic::modulo",
+        "program_a::arithmetic::add",
         "program_a::arithmetic::power",
         "core::result::map_err",
-        "core::option::ok_or",
-        "program_a::arithmetic::add",
         "program_a::arithmetic::multiply",
-        "program_a::arithmetic::divide"
+        "core::option::ok_or",
+        "program_a::arithmetic::subtract",
+        "core::convert::try_from"
+      ]
+    },
+    "program_a::parser::parse_hex": {
+      "id": 13252876978428405404,
+      "calls": [
+        "core::result::map_err",
+        "core::str::trim_start_matches",
+        "core::str::trim",
+        "core::num::from_str_radix"
       ]
     },
     "program_a::fill_and_sum": {
@@ -105,92 +92,105 @@
     "program_a::demo": {
       "id": 5012548651257487955,
       "calls": [
+        "program_a::utils::saturating_add",
+        "program_a::arithmetic::multiply",
+        "program_a::arithmetic::divide",
+        "program_a::parser::parse_int",
+        "program_a::parser::parse_and_sum",
+        "program_a::arithmetic::power",
+        "program_a::arithmetic::subtract",
+        "program_a::parser::parse_bool_or_int",
+        "program_a::arithmetic::square_ptr",
         "program_a::fill_and_sum",
         "program_a::utils::allocate_buffer",
-        "program_a::arithmetic::square_ptr",
-        "program_a::arithmetic::power",
         "program_a::arithmetic::compute_with_ptr",
-        "program_a::parser::parse_and_sum",
-        "libc::unix::free",
         "program_a::arithmetic::add",
-        "program_a::parser::parse_int",
-        "program_a::parser::parse_bool_or_int",
-        "program_a::arithmetic::divide",
-        "program_a::arithmetic::compute_expression",
         "program_a::arithmetic::modulo",
-        "program_a::arithmetic::multiply",
-        "program_a::utils::saturating_add",
-        "program_a::arithmetic::subtract"
+        "libc::unix::free",
+        "program_a::arithmetic::compute_expression"
       ]
     },
-    "program_a::expr_eval::eval_tokens": {
-      "id": 10616181352310159587,
+    "program_a::main": {
+      "id": 10599237949604842016,
       "calls": [
-        "program_a::expr_eval::eval_tokens",
-        "core::slice::len",
-        "program_a::expr_eval::apply_operator"
+        "std::io::stdio::read_line",
+        "std::io::stdio::stdin",
+        "alloc::string::new",
+        "std::io::flush",
+        "core::str::trim",
+        "std::io::stdio::stdout",
+        "program_a::expr_eval::evaluate_expression"
+      ]
+    },
+    "program_a::expr_eval::evaluate_expression": {
+      "id": 6289203081931832336,
+      "calls": [
+        "program_a::expr_eval::tokenize_expr",
+        "program_a::expr_eval::this_is_a_test_function_3",
+        "core::str::chars",
+        "core::iter::traits::iterator::collect",
+        "core::iter::traits::iterator::filter",
+        "core::char::methods::is_whitespace",
+        "program_a::expr_eval::eval_tokens"
+      ]
+    },
+    "program_a::expr_eval::tokenize_expr": {
+      "id": 12954828369711211646,
+      "calls": [
+        "program_a::expr_eval::parse_next_token",
+        "alloc::vec::push",
+        "core::str::is_empty"
+      ]
+    },
+    "program_a::expr_eval::parse_next_token": {
+      "id": 15253596461416805341,
+      "calls": [
+        "core::str::chars",
+        "core::iter::traits::iterator::next",
+        "program_a::expr_eval::remove_n_chars",
+        "core::str::trim_start_matches",
+        "core::option::ok_or",
+        "program_a::parser::extract_first_number",
+        "core::char::methods::is_ascii_digit"
+      ]
+    },
+    "program_a::arithmetic::compute_with_ptr": {
+      "id": 16869601329452466328,
+      "calls": [
+        "program_a::arithmetic::add",
+        "program_a::arithmetic::square_ptr"
+      ]
+    },
+    "program_a::arithmetic::compute_expression": {
+      "id": 17465662674895702181,
+      "calls": [
+        "program_a::arithmetic::divide",
+        "program_a::arithmetic::add",
+        "program_a::arithmetic::subtract",
+        "program_a::arithmetic::power",
+        "program_a::arithmetic::multiply"
+      ]
+    },
+    "program_a::arithmetic::power": {
+      "id": 15525054682805925829,
+      "calls": [
+        "core::num::wrapping_mul"
+      ]
+    },
+    "program_a::parser::parse_bool": {
+      "id": 3462108478590779206,
+      "calls": [
+        "alloc::str::to_lowercase",
+        "core::str::trim",
+        "alloc::string::as_str"
       ]
     },
     "program_a::parser::parse_and_sum": {
       "id": 8099259142885040349,
       "calls": [
         "core::slice::iter",
-        "core::iter::traits::iterator::sum",
-        "program_a::parser::parse_csv_ints"
-      ]
-    },
-    "program_a::parser::extract_first_number": {
-      "id": 9734240634723893783,
-      "calls": [
-        "alloc::string::new",
-        "core::str::chars",
-        "core::char::methods::is_ascii_digit",
-        "core::num::from_str",
-        "alloc::string::push",
-        "alloc::string::is_empty"
-      ]
-    },
-    "program_a::parser::parse_int": {
-      "id": 12782313085460345044,
-      "calls": [
-        "core::str::trim",
-        "core::result::map_err",
-        "core::num::from_str"
-      ]
-    },
-    "program_a::arithmetic::compute_with_ptr": {
-      "id": 16869601329452466328,
-      "calls": [
-        "program_a::arithmetic::square_ptr",
-        "program_a::arithmetic::add"
-      ]
-    },
-    "program_a::utils::allocate_buffer": {
-      "id": 4376491757636357281,
-      "calls": [
-        "libc::unix::malloc"
-      ]
-    },
-    "program_a::parser::parse_csv_ints": {
-      "id": 13827293763132924675,
-      "calls": [
-        "core::num::from_str",
-        "core::str::split",
-        "core::str::trim",
-        "core::result::map_err",
-        "core::iter::traits::iterator::collect"
-      ]
-    },
-    "program_a::expr_eval::parse_next_token": {
-      "id": 15253596461416805341,
-      "calls": [
-        "program_a::parser::extract_first_number",
-        "program_a::expr_eval::remove_n_chars",
-        "core::char::methods::is_ascii_digit",
-        "core::iter::traits::iterator::next",
-        "core::str::chars",
-        "core::str::trim_start_matches",
-        "core::option::ok_or"
+        "program_a::parser::parse_csv_ints",
+        "core::iter::traits::iterator::sum"
       ]
     }
   }

@@ -18,6 +18,7 @@ export type FunctionResult = {
   status: FunctionStatus;
   harnessPath?: string;
   harnessTargetName?: string;
+  pendingGeneration?: boolean;
 };
 
 export enum FunctionStatus {
