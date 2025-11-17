@@ -18,6 +18,7 @@ import {
   optimizeHarness,
   runGenerateAndOptimizeHarness,
   runSelectedHarness,
+  runSelectedHarnessGUI,
   stopHarness,
 } from "./harnessGen";
 import useGlobalContext, { getGlobalContext } from "./globalContextProvider";
@@ -83,7 +84,7 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       }
 
       if (message.command === "runFuzzTarget") {
-        runSelectedHarness(message.target, globalContext.fuzzRoot!);
+        runSelectedHarnessGUI(message.target, globalContext.fuzzRoot!);
       }
 
       if (message.command === "stopFuzzTarget") {

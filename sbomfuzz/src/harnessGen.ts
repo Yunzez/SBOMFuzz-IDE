@@ -16,6 +16,9 @@ import {
 } from "./harnessRegistry";
 import kill from "tree-kill";
 let harnessProcess: ChildProcess | null = null;
+let harnessTerminal: vscode.Terminal | null = null;
+let harnessTerminalCloseListener: vscode.Disposable | null = null;
+let harnessTerminalTarget: string | null = null;
 // Track harness statuses
 interface HarnessStatus {
   name: string;
@@ -397,6 +400,15 @@ export function deleteSelectedHarness(targetName: string, root: string): void {
   }
 }
 
+function cleanupHarnessTerminal(): void {
+  if (harnessTerminalCloseListener) {
+    harnessTerminalCloseListener.dispose();
+    harnessTerminalCloseListener = null;
+  }
+  harnessTerminal = null;
+  harnessTerminalTarget = null;
+}
+
 let buffer = "";
 let flushTimer: NodeJS.Timeout | null = null;
 
@@ -484,6 +496,75 @@ export function runSelectedHarness(targetName: string, root: string): void {
   });
 }
 
+export function runSelectedHarnessGUI(
+  targetName: string,
+  root: string
+): void {
+  if (harnessProcess) {
+    vscode.window.showWarningMessage(
+      "A harness is already running in the background. Stop it before launching the GUI."
+    );
+    return;
+  }
+
+  if (harnessTerminal) {
+    vscode.window.showWarningMessage(
+      "A harness terminal is already active. Close it before starting another GUI run."
+    );
+    return;
+  }
+
+  const terminal = vscode.window.createTerminal({
+    name: `Fuzz Harness GUI (${targetName})`,
+    cwd: root,
+    env: {
+      ...process.env,
+      RUSTFLAGS: "-Awarnings",
+    },
+  });
+
+  harnessTerminal = terminal;
+  harnessTerminalTarget = targetName;
+  harnessTerminalCloseListener = vscode.window.onDidCloseTerminal(
+    (closedTerminal) => {
+      if (closedTerminal !== terminal) {
+        return;
+      }
+
+      const finishedTarget = harnessTerminalTarget;
+      const exitCode = closedTerminal.exitStatus?.code;
+      cleanupHarnessTerminal();
+
+      if (finishedTarget) {
+        updateHarnessStatus(finishedTarget, "stopped");
+        vscode.commands.executeCommand("sbomfuzz.broadcast", {
+          name: finishedTarget,
+          eventType: globalBroadcastEventType.HarnessFailed,
+        });
+      }
+
+      if (exitCode !== undefined && exitCode !== 0) {
+        vscode.window.showWarningMessage(
+          `⚠️ Fuzz harness ${
+            finishedTarget ?? ""
+          } terminal closed with error code ${exitCode}.`
+        );
+      } else {
+        vscode.window.showInformationMessage(
+          `🔚 Fuzz harness ${finishedTarget ?? ""} terminal closed.`
+        );
+      }
+    }
+  );
+
+  updateHarnessStatus(targetName, "running");
+  vscode.window.showInformationMessage(
+    `▶️ Opening LibAFL GUI for harness ${targetName} in the integrated terminal.`
+  );
+  terminal.show(true);
+  terminal.sendText(`cargo fuzz run ${targetName}`);
+}
+
 export function stopHarness(): void {
   if (harnessProcess) {
     const pid = harnessProcess.pid;
@@ -500,7 +581,17 @@ export function stopHarness(): void {
       }
       harnessProcess = null;
     });
+    return;
   } else {
+    if (harnessTerminal) {
+      const terminalToStop = harnessTerminal;
+      const runningTarget = harnessTerminalTarget;
+      terminalToStop.dispose();
+      vscode.window.showInformationMessage(
+        `Harness ${runningTarget ?? ""} terminal stopped.`
+      );
+      return;
+    }
     vscode.window.showWarningMessage(
       "No harness process is currently running."
     );
