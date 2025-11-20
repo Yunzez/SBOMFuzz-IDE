@@ -24,7 +24,7 @@ pub fn evaluate_expression(
 }
 
 pub fn this_is_a_test_function_3() {
-    println!("This is a test function");
+    println!("");
 }
 
 #[derive(PartialEq, Eq)]
