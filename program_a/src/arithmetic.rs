@@ -1,15 +1,26 @@
 /// Returns the sum of two integers.
 pub fn add(a: i32, b: i32) -> i32 {
-    a + b
+    if a > i32::MAX - b {
+        i32::MAX
+    } else {
+        a + b
+    }
 }
 
 /// Returns the difference of two integers.
 pub fn subtract(a: i32, b: i32) -> i32 {
-    a - b
+    if a < i32::MIN + b {
+        i32::MIN
+    } else {
+        a - b
+    }
 }
 
 /// Multiplies two integers.
 pub fn multiply(a: i32, b: i32) -> i32 {
+    if a == 0 || b == 0 {
+        return 0;
+    }
     a * b
 }
 
