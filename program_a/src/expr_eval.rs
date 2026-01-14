@@ -83,18 +83,7 @@ pub fn parse_next_token(
 
 /// Removes the first n characters from the beginning of a string slice
 pub fn remove_n_chars(n: usize, s: &str) -> &str {
-    // ERROR!
-    // Invalid if n is not on a unicode character boundary
-    // This is fine for ascii tho
-    // See the valid unicode version below
     &s[n..]
-
-    /*
-    s.char_indices()
-        .nth(n)
-        .map(|(idx, _)| &s[idx..])
-        .unwrap_or("")
-    */
 }
 
 

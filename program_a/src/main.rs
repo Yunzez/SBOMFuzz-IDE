@@ -68,7 +68,6 @@ fn test_main() {
     let expr = "(1 + (3 * 3)) % 12";
     println!("Eval expression \"{expr}\" = {:?}", evaluate_expression(expr));
 
-    // Broken logic allows for invalid expressions like this
     let expr = "1 + 2 ^ 3)";
     println!("Eval expression \"{expr}\" = {:?}", evaluate_expression(expr));
 

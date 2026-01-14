@@ -1,8 +1,22 @@
-/// Parses a comma-separated list of integers, e.g., "1,2,3"
+/// Parses a comma-separated list of integers
 pub fn parse_csv_ints(input: &str) -> Result<Vec<i32>, &'static str> {
     input
         .split(',')
-        .map(|s| s.trim().parse::<i32>().map_err(|_| "parse error"))
+        .map(|s| {
+            let trimmed = s.trim();
+            let bytes = trimmed.as_bytes();
+            // Fast sign handling without extra allocations.
+            let is_negative = bytes[0] == b'-';
+            let num_str = if is_negative { &trimmed[1..] } else { trimmed };
+            if num_str.is_empty() {
+                return Err("parse error");
+            }
+            // Parse as positive then reapply the sign.
+            num_str
+                .parse::<i32>()
+                .map(|n| if is_negative { -n } else { n })
+                .map_err(|_| "parse error")
+        })
         .collect()
 }
 

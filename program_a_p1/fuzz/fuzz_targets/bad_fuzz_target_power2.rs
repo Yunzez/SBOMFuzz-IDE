@@ -9,9 +9,6 @@ struct C{
     b:u32
 }
 
-fuzz_target!(|c: C| {
-    let ok = (c.a % 7 == 0) && (c.b % 13 == 1); 
-    let a = if ok { 1 } else { 2 };             
-    let b = if ok { 3 } else { 4 };             
-    let _ = power(a, b);                        
+fuzz_target!(|c: C| {          
+    let _ = power(c.a, c.b);                        
 });

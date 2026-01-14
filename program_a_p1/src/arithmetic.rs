@@ -1,26 +1,26 @@
 /// Returns the sum of two integers.
 pub fn add(a: i32, b: i32) -> i32 {
-    a + b
+    a.wrapping_add(b)
 }
 
 /// Returns the difference of two integers.
 pub fn subtract(a: i32, b: i32) -> i32 {
-    a - b
+    a.wrapping_sub(b)
 }
 
 /// Multiplies two integers.
 pub fn multiply(a: i32, b: i32) -> i32 {
-    a * b
+    a.wrapping_mul(b)
 }
 
 /// Divides `a` by `b`, returns `None` if `b` is zero to avoid panic.
 pub fn divide(a: i32, b: i32) -> Option<i32> {
-    if b == 0 { None } else { Some(a / b) }
+    if b == 0 { None } else { Some(a.wrapping_div(b)) }
 }
 
 /// Computes the modulus (remainder). Panics if `b` is zero.
 pub fn modulo(a: i32, b: i32) -> Option<i32> {
-    if b == 0 { None } else { Some(a % b) }
+    if b == 0 { None } else { Some(a.wrapping_rem(b)) }
 }
 
 /// Computes exponentiation (a^b) with overflow risk.
@@ -53,6 +53,6 @@ pub fn compute_expression(a: i32, b: i32) -> Option<i32> {
     let sum = add(a, b);
     let diff = subtract(a, b);
     let product = multiply(sum, diff);
-    let powered = power(product, 2); // square it using power()
+    let powered = power(product.try_into().unwrap(), 2); // square it using power()
     divide(powered, 2) 
 }

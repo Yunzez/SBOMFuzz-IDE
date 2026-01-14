@@ -1,6 +1,6 @@
 
 pub fn saturating_add(a: i32, b: i32) -> i32 {
-    a + b 
+    a.checked_add(b).unwrap_or(i32::MAX)
 }
 
 /// Allocates a block of memory of the specified length using `libc::malloc`

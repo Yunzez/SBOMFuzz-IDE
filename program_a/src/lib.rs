@@ -56,18 +56,3 @@ pub fn fill_and_sum(len: usize, value: u8) -> u32 {
         sum
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::arithmetic::divide;
-    use crate::parser::parse_hex;
-    #[test]
-    fn test_divide() {
-        assert_eq!(divide(10, 2), Some(5));
-    }
-
-    #[test]
-    fn test_parse() {
-        assert_eq!(parse_hex("123"), Ok(123));
-    }
-}

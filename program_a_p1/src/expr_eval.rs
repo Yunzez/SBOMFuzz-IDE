@@ -24,7 +24,6 @@ pub fn evaluate_expression(
 }
 
 pub fn this_is_a_test_function_3() {
-    println!("This is a test function");
 }
 
 #[derive(PartialEq, Eq)]
@@ -131,9 +130,9 @@ pub fn apply_operator(lhs: i32, rhs: i32, op: char) -> Result<i32, &'static str>
     match op {
         '+' => Ok(arithmetic::add(lhs, rhs)),
         '-' => Ok(arithmetic::subtract(lhs, rhs)),
-        '*' => Ok(arithmetic::multiply(lhs, rhs)),
+        '*' => Ok(arithmetic::multiply(lhs, rhs).try_into().unwrap()),
         '/' => arithmetic::divide(lhs, rhs).ok_or("Divide by zero error"),
-        '^' => Ok(arithmetic::power(lhs, u32::try_from(rhs).map_err(|_| "Power RHS must be positive")?)),
+        '^' => Ok(arithmetic::power(lhs.into(), u32::try_from(rhs).map_err(|_| "Power RHS must be positive")?)),
         '%' => arithmetic::modulo(lhs, rhs).ok_or("Modulus RHS must not be zero"),
         _ => return Err("Unexpected operator")
     }
