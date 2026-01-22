@@ -1,0 +1,34 @@
+[package]
+name = "program_a-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = {version = "0.15", package = "libafl_libfuzzer"}
+arbitrary = { version = "1.4.2", features = ["derive"] } 
+
+[dependencies.program_a]
+path = ".."
+
+[[bin]]
+name = "fuzz_target_parse_csv_ints"
+path = "fuzz_targets/fuzz_target_parse_csv_ints.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_evaluate_expression"
+path = "fuzz_targets/fuzz_target_evaluate_expression.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_subtract"
+path = "fuzz_targets/fuzz_target_subtract.rs"
+test = false
+doc = false
+bench = false

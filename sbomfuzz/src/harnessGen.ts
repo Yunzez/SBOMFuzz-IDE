@@ -141,6 +141,7 @@ async function generateHarnessFromPrompt(
   // }
   const cfg = vscode.workspace.getConfiguration("sbomfuzz");
   let apiKey = cfg.get<string>("apiKey");
+  const apiBaseUrl = cfg.get<string>("apiBaseUrl");
   channel_log("Generating harness with OpenAI...");
   channel_log("Using API key: " + (apiKey ? "set" : "not set"));
   if (!apiKey) {
@@ -154,7 +155,7 @@ async function generateHarnessFromPrompt(
   apiKey = apiKey.replace(/^['"]|['"]$/g, "");
   let openai;
   try {
-    openai = new OpenAI({ apiKey });
+    openai = new OpenAI({ apiKey, baseURL: apiBaseUrl });
     // … your request …
   } catch (e: any) {
     vscode.window.showErrorMessage(
@@ -218,6 +219,7 @@ export async function optimizeHarness(
   const targetName = `fuzz_target_${target.functionName}`;
   const cfg = vscode.workspace.getConfiguration("sbomfuzz");
   let apiKey = cfg.get<string>("apiKey");
+  const apiBaseUrl = cfg.get<string>("apiBaseUrl");
 
   if (!apiKey) {
     console.error("❌ Missing OpenAI API key");
@@ -226,7 +228,7 @@ export async function optimizeHarness(
     );
   }
   apiKey = apiKey!.replace(/^['"]|['"]$/g, "");
-  const openai = new OpenAI({ apiKey });
+  const openai = new OpenAI({ apiKey, baseURL: apiBaseUrl });
 
   console.log(`🔁 Running fuzz attempt #${iteration}`);
 

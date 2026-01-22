@@ -1,3 +1,4 @@
+import os
 import requests
 
 def attach_function_info(prompt, function_info):
@@ -52,7 +53,8 @@ def generate_output(apikey, info_list, prompt):
                 ]
             }
 
-            response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=data)
+            api_base_url = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
+            response = requests.post(f"{api_base_url}/chat/completions", headers=headers, json=data)
 
             if response.status_code == 200:
                 result = response.json()
