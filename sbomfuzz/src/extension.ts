@@ -11,7 +11,11 @@ import { getGlobalContext, useGlobalContext } from "./globalContextProvider";
 import { FunctionResult } from "./functionOutputProcesser";
 import { generateHarness, optimizeHarness, runGenerateAndOptimizeHarness } from "./harnessGen";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
-import { applyHarnessMetadata, initHarnessRegistry } from "./harnessRegistry";
+import {
+  applyHarnessMetadata,
+  applyHarnessMetadataToTargets,
+  initHarnessRegistry,
+} from "./harnessRegistry";
 const out = vscode.window.createOutputChannel("SBOMFuzz_debug");
 export function channel_log(m: any) {
   out.appendLine(typeof m === "string" ? m : JSON.stringify(m));
@@ -59,7 +63,7 @@ export async function activate(context: vscode.ExtensionContext) {
         );
         return;
       }
-      const targets = getFuzzTargets(fuzzRoot);
+      const targets = applyHarnessMetadataToTargets(getFuzzTargets(fuzzRoot));
       if (webview) {
         webview.postMessage({ command: "refreshHarnessList", targets });
       }
@@ -174,7 +178,9 @@ async function runAnalysisTask(
 
       const fuzzRoot = globalContext.fuzzRoot;
       if (fuzzRoot) {
-        globalContext.fuzzTargets = getFuzzTargets(fuzzRoot);
+        globalContext.fuzzTargets = applyHarnessMetadataToTargets(
+          getFuzzTargets(fuzzRoot)
+        );
       }
 
       const webview = SbomFuzzWebviewViewProvider.getWebview();

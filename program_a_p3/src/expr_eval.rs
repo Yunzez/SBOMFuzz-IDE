@@ -12,9 +12,7 @@ use crate::{arithmetic, parser};
 /// 
 /// Only integers are allowed in the expression
 /// 
-/// example: "1 + (3 * 3) / 2" = 5
-/// - TODO: 2(4) = 8 not 6 like is currently expresse (parsed as 2 + 4)
-/// - TODO: `((^-3 6`
+/// example: "1 + (3 * 3) / 2" = 5  
 pub fn evaluate_expression(
     expr: &str
 ) -> Result<i32, &'static str> {

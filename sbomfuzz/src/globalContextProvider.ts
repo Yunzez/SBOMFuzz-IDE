@@ -13,10 +13,19 @@ import fs from "fs";
 import type * as vscode from "vscode";
 import { loadFunctionResults } from "./functionOutputProcesser";
 import { findCargoProjectRoot, findFuzzRoot, getFuzzTargets } from "./util";
-import { applyHarnessMetadata } from "./harnessRegistry";
+import {
+  applyHarnessMetadata,
+  applyHarnessMetadataToTargets,
+} from "./harnessRegistry";
 
 export interface SharedContext {
-  fuzzTargets: { name: string; path: string }[];
+  fuzzTargets: {
+    name: string;
+    path: string;
+    target_function?: string;
+    functionKey?: string;
+    functionName?: string;
+  }[];
   fuzzRoot?: string;
   projectRoot?: string;
   extensionPath?: string;
@@ -43,7 +52,9 @@ export async function useGlobalContext(context: vscode.ExtensionContext) {
   globalContext.projectRoot = root;
   globalContext.fuzzRoot = fuzzRoot;
   globalContext.extensionPath = projectPath;
-  globalContext.fuzzTargets = fuzzRoot ? getFuzzTargets(fuzzRoot) : [];
+  globalContext.fuzzTargets = fuzzRoot
+    ? applyHarnessMetadataToTargets(getFuzzTargets(fuzzRoot))
+    : [];
 
   if (fs.existsSync(outputPath)) {
     fs.rmSync(outputPath, { recursive: true, force: true });

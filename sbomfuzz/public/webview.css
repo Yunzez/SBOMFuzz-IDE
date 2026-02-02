@@ -32,13 +32,16 @@ button {
 }
 
 .function-button {
-  border: 2px solid #f9f9f9;
-  border-radius: 0.5em;
-  color: white;
-  padding: 0.5em 1em;
+  border: 1px solid #2f3841;
+  border-radius: 10px;
+  color: #e6edf3;
+  background: #1f242b;
+  padding: 6px 4px;
   cursor: pointer;
-  margin: 0.5em;
+  margin: 5px;
   display: inline-block; /* Ensure it behaves like a button or link */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  min-width: 250px;
 }
 
 .menu-button {
@@ -79,9 +82,65 @@ button {
   align-items: center;
   gap: 10px;
   padding: 6px;
-  background: #f0f0f0;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #2a3138;
+  border-radius: 6px;
+  border: 1px solid #3a434d;
+  color: #e6edf3;
+}
+
+.root-link {
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.root-link:hover {
+  background: #343d46;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.root-path {
+  color: #9cd3ff;
+  word-break: break-all;
+}
+
+@media (max-width: 520px) {
+  .root-path {
+    display: none;
+  }
+}
+
+.root-action {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9cd3ff;
+  border: 1px solid #3d7fb8;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: #1f262e;
+}
+
+
+.root-label {
+  font-weight: bold;
+  color: #f0f6fc;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.roots-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  padding: 8px;
+  background: #1f2328;
+  border: 1px solid #343a40;
+  border-radius: 8px;
 }
 
 .score-breakdown {
@@ -103,20 +162,21 @@ button {
 }
 
 .affirmative-button {
-  border: 2px solid #28a745; /* Green border */
-  border-radius: 0.25em;
-  padding: 0.5em 1em;
+  border: 1px solid #2ea043;
+  border-radius: 8px;
+  padding: 6px 10px;
   cursor: pointer;
-  color: white; /* White text */
-  background-color: transparent; /* Transparent background */
+  color: #d1f7dc;
+  background-color: #1f2a23;
   transition: background-color 0.3s ease, color 0.3s ease;
   margin: 0;
-  font-weight: 400;
+  font-weight: 600;
+  font-size: 13px;
 }
 
 .affirmative-button:hover {
-  background-color: #28a745; /* Green background on hover */
-  color: white; /* White text on hover */
+  background-color: #2ea043;
+  color: #ffffff;
 }
 
 .affirmative-button:disabled {
@@ -128,19 +188,21 @@ button {
 }
 
 .negative-button {
-  border: 2px solid #dc3545; /* Red border */
-  border-radius: 0.25em;
-  padding: 0.5em 1em;
+  border: 1px solid #cf222e;
+  border-radius: 8px;
+  padding: 6px 10px;
   cursor: pointer;
-  color: white; /* White text */
-  background-color: transparent; /* Transparent background */
+  color: #ffd7d7;
+  background-color: #2b1f21;
   transition: background-color 0.3s ease, color 0.3s ease;
   margin: 0;
+  font-weight: 600;
+  font-size: 13px;
 }
 
 .negative-button:hover {
-  background-color: #dc3545; /* Red background on hover */
-  color: white; /* White text on hover */
+  background-color: #cf222e;
+  color: #ffffff;
 }
 
 .collapsible-section {
@@ -188,6 +250,20 @@ button {
   display: flex;
   flex-direction: row;
   margin-bottom: 1em;
+}
+
+.btns-div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-items: center;
+}
+
+.harness-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
 }
 
 .filter-button {

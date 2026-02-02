@@ -35,7 +35,7 @@ export function renderHarnessList(targets, container, options) {
       <div>
         ${relativePath}
       </div>
-      <div class="btns-div" style="margin-top:6px;"></div>
+      <div class="btns-div" style="margin-top:3px;"></div>
     `;
 
     targetDiv.onclick = () => {

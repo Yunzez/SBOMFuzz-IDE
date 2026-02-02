@@ -85,8 +85,15 @@ export function loadFunctionResults(
     }
   }
   const globalContext = getGlobalContext();
+  const fuzzTargetKeys = new Set(
+    (globalContext.fuzzTargets || [])
+      .map((t: any) => t.functionKey)
+      .filter(Boolean)
+  );
   const fuzzTargetNames = new Set(
-    (globalContext.fuzzTargets || []).map((t: any) => t.target_function)
+    (globalContext.fuzzTargets || [])
+      .map((t: any) => t.target_function)
+      .filter(Boolean)
   );
   console.log("Fuzz target names:", globalContext.fuzzTargets);
   // Return all parsed FunctionResults if available
@@ -111,9 +118,11 @@ export function loadFunctionResults(
         centralityScore: parseFloat(r["Centrality Score"]),
         unsafeScore: parseFloat(r["Unsafe Score"]),
         priorityScore: parseFloat(r["Priority Score"]),
-        status: fuzzTargetNames.has(functionName.split("::").pop() || functionName)
-          ? FunctionStatus.HarnessGenerated
-          : FunctionStatus.NoHarness,
+        status:
+          fuzzTargetKeys.has(key) ||
+          fuzzTargetNames.has(functionName.split("::").pop() || functionName)
+            ? FunctionStatus.HarnessGenerated
+            : FunctionStatus.NoHarness,
       };
     });
   }

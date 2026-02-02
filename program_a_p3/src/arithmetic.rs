@@ -1,13 +1,15 @@
-use std::num::Wrapping;
-
 /// Returns the sum of two integers.
 pub fn add(a: i32, b: i32) -> i32 {
-    a.wrapping_add(b)
+    if a > i32::MAX - b {
+        i32::MAX
+    } else {
+        a + b
+    }
 }
 
 /// Returns the difference of two integers.
 pub fn subtract(a: i32, b: i32) -> i32 {
-    a.wrapping_sub(b)
+    a.saturating_sub(b)
 }
 
 /// Multiplies two integers.
@@ -15,17 +17,18 @@ pub fn multiply(a: i32, b: i32) -> i32 {
     if a == 0 || b == 0 {
         return 0;
     }
+    // a * b
     a.wrapping_mul(b)
 }
 
 /// Divides `a` by `b`, returns `None` if `b` is zero to avoid panic.
 pub fn divide(a: i32, b: i32) -> Option<i32> {
-    if b == 0 { None } else { Some(a.wrapping_div(b)) }
+    if b == 0 { None } else { Some(a.saturating_div(b)) }
 }
 
 /// Computes the modulus (remainder). Panics if `b` is zero.
 pub fn modulo(a: i32, b: i32) -> Option<i32> {
-    if b == 0 { None } else { Some((Wrapping(a) % Wrapping(b)).0)  }
+    if b == 0 { None } else { Some(a % b) }
 }
 
 /// Computes exponentiation (a^b).

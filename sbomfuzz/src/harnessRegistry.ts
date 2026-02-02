@@ -14,6 +14,14 @@ type HarnessRecord = {
   createdAt: number;
 };
 
+export type FuzzTarget = {
+  name: string;
+  path: string;
+  target_function?: string;
+  functionKey?: string;
+  functionName?: string;
+};
+
 const STORAGE_KEY = "sbomfuzz.harnessRegistry";
 
 let registry = new Map<string, HarnessRecord>();
@@ -121,6 +129,28 @@ export function getHarnessRecordByTargetName(targetName: string) {
     }
   }
   return undefined;
+}
+
+/**
+ * Enriches fuzz targets with persisted harness metadata (functionKey/functionName).
+ */
+export function applyHarnessMetadataToTargets<T extends FuzzTarget>(
+  targets: T[]
+): T[] {
+  if (!Array.isArray(targets)) {
+    return targets;
+  }
+  return targets.map((target) => {
+    const record = getHarnessRecordByTargetName(target.name);
+    if (!record) {
+      return target;
+    }
+    return {
+      ...target,
+      functionKey: record.functionKey,
+      functionName: record.functionName,
+    };
+  });
 }
 
 /**

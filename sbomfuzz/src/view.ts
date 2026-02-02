@@ -9,7 +9,6 @@ import {
 } from "./util";
 import {
   FunctionLocation,
-  FunctionStatus,
   loadFunctionResults,
 } from "./functionOutputProcesser";
 import {
@@ -21,6 +20,7 @@ import {
   runSelectedHarnessGUI,
   stopHarness,
 } from "./harnessGen";
+import { applyHarnessMetadataToTargets } from "./harnessRegistry";
 import useGlobalContext, { getGlobalContext } from "./globalContextProvider";
 let currentWebview: vscode.Webview | undefined;
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
@@ -83,6 +83,15 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         jumpToFunctionLocation(message);
       }
 
+      if (message.command === "revealPath") {
+        if (message.path) {
+          vscode.commands.executeCommand(
+            "revealInExplorer",
+            vscode.Uri.file(message.path)
+          );
+        }
+      }
+
       if (message.command === "runFuzzTarget") {
         runSelectedHarnessGUI(message.target, globalContext.fuzzRoot!);
       }
@@ -90,7 +99,9 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
       if (message.command === "stopFuzzTarget") {
         stopHarness();
         // Refresh the list after stopping
-        const newTargets = getFuzzTargets(globalContext.fuzzRoot!);
+        const newTargets = applyHarnessMetadataToTargets(
+          getFuzzTargets(globalContext.fuzzRoot!)
+        );
         webviewView.webview.postMessage({
           command: "refreshHarnessList",
           targets: newTargets,
@@ -99,18 +110,10 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
 
       if (message.command === "deleteFuzzTarget") {
         deleteSelectedHarness(message.target, globalContext.fuzzRoot!);
-        globalContext.fuzzTargets = getFuzzTargets(globalContext.fuzzRoot!);
-        let targetName = message.target;
-        let replacement = globalContext.results;
-        replacement!.map((fn) => {
-          if (fn.functionName === targetName) {
-            fn.harnessStatus = FunctionStatus.NoHarness;
-          }
-        });
-        // Reset globalContext.results to the new targets
-        globalContext.results = replacement;
-
-        const newTargets = getFuzzTargets(globalContext.fuzzRoot!);
+        globalContext.fuzzTargets = applyHarnessMetadataToTargets(
+          getFuzzTargets(globalContext.fuzzRoot!)
+        );
+        const newTargets = globalContext.fuzzTargets;
         webviewView.webview.postMessage({
           command: "refreshHarnessList",
           targets: newTargets,
@@ -169,7 +172,9 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
 
       if (message.command === "getFuzzTargets") {
         console.log("Listing fuzz targets in:", message.fuzzRoot);
-        const targets = getFuzzTargets(message.fuzzRoot);
+        const targets = applyHarnessMetadataToTargets(
+          getFuzzTargets(message.fuzzRoot)
+        );
         const globalContext = getGlobalContext();
         globalContext.fuzzTargets = targets;
         webviewView.webview.postMessage({

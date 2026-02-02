@@ -23,5 +23,5 @@ fuzz_target!(|data: &[u8]| {
     if cleaned.is_empty() {
         return;
     }
-    let _ = parse_csv_ints(&cleaned);
+    let _ = parse_csv_ints(&input);
 });

@@ -1,6 +1,5 @@
 import { setupMessaging, sendMessage, log } from "./messaging.js";
 import { startRendering, loadFilters } from "./functionList.js";
-import { renderHarnessList } from "./harnessList.js";
 
 let pathSelected = null;
 let fuzzRootSelected = null;
@@ -20,6 +19,7 @@ function createRenderOptions(overrides = {}) {
     onStatusChange: handleStatusChange,
     selectedFilter,
     onHarnessDeleted: handleHarnessDeleted,
+    getFunctionTargets: () => functionTargets,
     ...overrides,
   };
 }
@@ -43,13 +43,20 @@ function handleFilterChange(filterId) {
   selectedFilter = filterId;
 }
 
-function handleHarnessDeleted(targetName) {
+function handleHarnessDeleted(payload) {
   if (!functionTargets || functionTargets.length === 0) {
     return;
   }
+  const targetName =
+    typeof payload === "string" ? payload : payload?.targetName;
+  const functionKey =
+    typeof payload === "object" && payload ? payload.functionKey : null;
   let changed = false;
   functionTargets = functionTargets.map((fn) => {
-    if (fn.harnessTargetName === targetName) {
+    if (
+      (functionKey && fn.functionKey === functionKey) ||
+      (targetName && fn.harnessTargetName === targetName)
+    ) {
       changed = true;
       const updated = { ...fn };
       updated.status = "No Harness";
@@ -136,35 +143,60 @@ function handleFunctionStatusUpdate(event) {
   );
 }
 
-export function toggleCollapse(headerEl) {
-  const contentEl = headerEl.nextElementSibling;
-  const isOpen = headerEl.classList.toggle("expanded");
-
-  if (isOpen) {
-    contentEl.style.display = "block";
-  } else {
-    contentEl.style.display = "none";
-  }
-}
-
-const collapsibleHeaders = document.querySelectorAll(".collapsible-header");
-
-collapsibleHeaders.forEach((header) => {
-  log("Setting up collapsible header:", header.textContent);
-  header.addEventListener("click", () => {
-    log("Collapsible header clicked:", header.textContent);
-    toggleCollapse(header);
-  });
-});
-
 setupMessaging({
   onFuzzTargetsListed: (targets) => {
     log("🧪 Fuzz targets listed:", targets);
-    const targetList = document.getElementById("harness-list");
-    renderHarnessList(
-      targets,
-      targetList,
-      createRenderOptions({ onHarnessDeleted: handleHarnessDeleted })
+    if (!functionTargets || functionTargets.length === 0) {
+      return;
+    }
+    const byFunctionKey = new Map(
+      targets.filter((t) => t.functionKey).map((t) => [t.functionKey, t])
+    );
+    const byTargetFunction = new Map(
+      targets
+        .filter((t) => t.target_function)
+        .map((t) => [t.target_function, t])
+    );
+    const byTargetName = new Map(
+      targets.filter((t) => t.name).map((t) => [t.name, t])
+    );
+    let changed = false;
+    functionTargets = functionTargets.map((fn) => {
+      const shortName = fn.functionName?.split("::").pop() || fn.functionName;
+      const match =
+        byFunctionKey.get(fn.functionKey) ||
+        (shortName ? byTargetFunction.get(shortName) : null) ||
+        (shortName ? byTargetName.get(`fuzz_target_${shortName}`) : null);
+      if (match) {
+        const updated = { ...fn };
+        updated.status = "HarnessGenerated";
+        updated.harnessTargetName = match.name;
+        updated.harnessPath = match.path;
+        delete updated.pendingGeneration;
+        changed = true;
+        return updated;
+      }
+      if (fn.harnessTargetName || fn.harnessPath) {
+        const updated = { ...fn };
+        updated.status = "No Harness";
+        delete updated.harnessTargetName;
+        delete updated.harnessPath;
+        delete updated.pendingGeneration;
+        changed = true;
+        return updated;
+      }
+      return fn;
+    });
+    if (!changed) {
+      return;
+    }
+    const activeFilter = selectedFilter || "priority-filter";
+    const listTarget = functionListContainer || targetContainer;
+    startRendering(
+      functionTargets,
+      listTarget,
+      activeFilter,
+      createRenderOptions()
     );
   },
 
@@ -200,14 +232,23 @@ setupMessaging({
       pathSelected = projectRootPath;
 
       pathDiv.innerHTML = `
-      <div class="root-container">
-        <span style="font-weight: bold; color: #333;">Project Root:</span>
-        <span style="color: #007acc;">${projectRootPath}</span>
+      <div class="root-container root-link" id="project-root-link">
+        <span class="root-label">Project Root</span>
+        <span class="root-path">${projectRootPath}</span>
+        <span class="root-action">Reveal</span>
       </div>
       `;
+      document
+        .getElementById("project-root-link")
+        ?.addEventListener("click", () => {
+          sendMessage({
+            command: "revealPath",
+            path: projectRootPath,
+          });
+        });
     } else {
       pathDiv.innerHTML = `
-      <div style="padding: 8px; background: #ffe6e6; border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+      <div style="padding: 8px;  border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
         <span style="font-weight: bold; color: #cc0000;">No Cargo project found.</span>
       </div>
       `;
@@ -219,10 +260,19 @@ setupMessaging({
       log("🧪 Got Fuzz root: " + fuzzRootPath);
       fuzzRootSelected = fuzzRootPath;
       fuzzPathDiv.innerHTML = `
-      <div class="root-container">
-        <span style="font-weight: bold; color: #333;">Fuzz Harness Root:</span>
-        <span style="color: #007acc;">${fuzzRootPath}</span>
+      <div class="root-container root-link" id="fuzz-root-link">
+        <span class="root-label">Fuzz Root</span>
+        <span class="root-path">${fuzzRootPath}</span>
+        <span class="root-action">Reveal</span>
       </div>`;
+      document
+        .getElementById("fuzz-root-link")
+        ?.addEventListener("click", () => {
+          sendMessage({
+            command: "revealPath",
+            path: fuzzRootPath,
+          });
+        });
       log("Getting Fuzz targets: ");
       sendMessage({ command: "getFuzzTargets", fuzzRoot: fuzzRootPath });
     } else {

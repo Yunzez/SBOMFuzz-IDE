@@ -21,20 +21,8 @@ test = false
 doc = false
 bench = false
 [[bin]]
-name = "fuzz_target_parse_next_token"
-path = "fuzz_targets/fuzz_target_parse_next_token.rs"
-test = false
-doc = false
-bench = false
-[[bin]]
-name = "fuzz_target_evaluate_expression"
-path = "fuzz_targets/fuzz_target_evaluate_expression.rs"
-test = false
-doc = false
-bench = false
-[[bin]]
-name = "fuzz_target_add"
-path = "fuzz_targets/fuzz_target_add.rs"
+name = "fuzz_target_main"
+path = "fuzz_targets/fuzz_target_main.rs"
 test = false
 doc = false
 bench = false
@@ -45,14 +33,26 @@ test = false
 doc = false
 bench = false
 [[bin]]
+name = "fuzz_target_subtract"
+path = "fuzz_targets/fuzz_target_subtract.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
 name = "fuzz_target_divide"
 path = "fuzz_targets/fuzz_target_divide.rs"
 test = false
 doc = false
 bench = false
 [[bin]]
-name = "fuzz_target_modulo"
-path = "fuzz_targets/fuzz_target_modulo.rs"
+name = "fuzz_target_square_ptr"
+path = "fuzz_targets/fuzz_target_square_ptr.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_allocate_buffer"
+path = "fuzz_targets/fuzz_target_allocate_buffer.rs"
 test = false
 doc = false
 bench = false

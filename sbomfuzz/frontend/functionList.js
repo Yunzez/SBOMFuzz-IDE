@@ -2,6 +2,7 @@ function renderSearchBar(results, targetContainer, priority, options) {
   const { log } = options;
   const searchContainer = document.createElement("div");
   searchContainer.style.marginBottom = "10px";
+  searchContainer.style.width = "100%";
   const searchInput = document.createElement("input");
   searchInput.type = "text";
   searchInput.placeholder = "Search functions...";
@@ -40,12 +41,28 @@ export function renderFunctionResults(
   priority,
   options
 ) {
-  const { fuzzRootSelected, pathSelected, sendMessage, log, onStatusChange } =
-    options;
+  const {
+    fuzzRootSelected,
+    pathSelected,
+    sendMessage,
+    log,
+    onStatusChange,
+    onHarnessDeleted,
+  } = options;
 
   targetContainer.innerHTML = "";
-  const nonIgnored = results.filter((r) => r.status !== "Ignore");
-  const ignored = results.filter((r) => r.status === "Ignore");
+  const filteredResults =
+    priority === "unsafe-block-filter"
+      ? results.filter((r) => r.unsafeScore > 0)
+      : priority === "harness-filter"
+        ? results.filter(
+            (r) =>
+              r.status === "HarnessGenerated" ||
+              Boolean(r.harnessPath || r.harnessTargetName)
+          )
+        : results;
+  const nonIgnored = filteredResults.filter((r) => r.status !== "Ignore");
+  const ignored = filteredResults.filter((r) => r.status === "Ignore");
   nonIgnored.sort((a, b) => b.priorityScore - a.priorityScore);
 
   switch (priority) {
@@ -66,6 +83,25 @@ export function renderFunctionResults(
   const orderedResults = [...nonIgnored, ...ignored];
 
   for (const result of orderedResults) {
+    const scoreLabel =
+      priority === "unsafe-block-filter"
+        ? "Unsafe Block"
+        : priority === "parameters-filter"
+          ? "Parameters Count"
+          : priority === "usage-filter"
+            ? "Usage Count"
+            : "Priority Score";
+    const scoreValue =
+      priority === "unsafe-block-filter"
+        ? result.unsafeScore > 0
+          ? "Yes"
+          : "No"
+        : priority === "parameters-filter"
+          ? result.paramCount
+          : priority === "usage-filter"
+            ? result.usageCount
+            : result.priorityScore.toFixed(3);
+
     const ignoreBtn = document.createElement("button");
     ignoreBtn.textContent = result.status !== "Ignore" ? "Ignore" : "Unignore";
     ignoreBtn.className = "negative-button";
@@ -134,14 +170,15 @@ export function renderFunctionResults(
       </div>
       <div>${relativePath}</div>
       <div class="priority-score" style="margin-top: 4px;">
-        Priority Score: ${result.priorityScore.toFixed(3)}
+        ${scoreLabel}: ${scoreValue}
         <span
           class="info-icon"
           style="margin-left: 4px; cursor: pointer;"
           title="Hover to see score breakdown"
         >ℹ️</span>
       </div>
-      <div class="btns-div" style="margin-top:6px;"></div>
+      <div class="btns-div" style="margin-top:3px;"></div>
+      <div class="harness-actions" style="margin-top:6px;"></div>
     `;
 
     const priorityScoreDiv =
@@ -170,8 +207,61 @@ export function renderFunctionResults(
     });
 
     const actionArea = resultDiv.getElementsByClassName("btns-div")[0];
+    const harnessActionArea =
+      resultDiv.getElementsByClassName("harness-actions")[0];
     actionArea.appendChild(ignoreBtn);
     actionArea.appendChild(generateBtn);
+
+    if (isGenerated && result.harnessTargetName) {
+      const runBtn = document.createElement("button");
+      runBtn.textContent = "Run";
+      runBtn.className = `affirmative-button ${result.harnessTargetName}-run-btn`;
+      runBtn.style.marginLeft = "4px";
+
+      const stopBtn = document.createElement("button");
+      stopBtn.textContent = "Stop";
+      stopBtn.className = `negative-button ${result.harnessTargetName}-stop-btn`;
+      stopBtn.style.marginLeft = "4px";
+      stopBtn.style.display = "none";
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "Delete";
+      deleteBtn.className = `negative-button ${result.harnessTargetName}-delete-btn`;
+      deleteBtn.style.marginLeft = "4px";
+
+      runBtn.onclick = (event) => {
+        event.stopPropagation();
+        log?.(`Running fuzz target: ${result.harnessTargetName}`);
+        sendMessage?.({ command: "runFuzzTarget", target: result.harnessTargetName });
+        stopBtn.style.display = "inline-block";
+        runBtn.style.display = "none";
+      };
+
+      stopBtn.onclick = (event) => {
+        event.stopPropagation();
+        log?.("Stopping fuzz target.");
+        sendMessage?.({ command: "stopFuzzTarget" });
+        stopBtn.style.display = "none";
+        runBtn.style.display = "inline-block";
+      };
+
+      deleteBtn.onclick = (event) => {
+        event.stopPropagation();
+        log?.(`Deleting fuzz target: ${result.harnessTargetName}`);
+        sendMessage?.({ command: "deleteFuzzTarget", target: result.harnessTargetName });
+        onHarnessDeleted?.({
+          functionKey: result.functionKey,
+          targetName: result.harnessTargetName,
+        });
+        if (fuzzRootSelected) {
+          sendMessage?.({ command: "getFuzzTargets", fuzzRoot: fuzzRootSelected });
+        }
+      };
+
+      harnessActionArea.appendChild(runBtn);
+      harnessActionArea.appendChild(stopBtn);
+      harnessActionArea.appendChild(deleteBtn);
+    }
 
     ignoreBtn.onclick = (event) => {
       event.stopPropagation();
@@ -200,12 +290,13 @@ export function loadFilters(
   functionListDiv,
   options
 ) {
-  const { onFilterChange, selectedFilter } = options;
+  const { onFilterChange, selectedFilter, getFunctionTargets } = options;
   targetContainer.innerHTML = "";
   const filterTitle = document.createElement("div");
   filterTitle.textContent = "Order By";
   filterTitle.style.fontWeight = "bold";
   filterTitle.style.marginBottom = "8px";
+  filterTitle.style.marginTop = "8px";
   targetContainer.appendChild(filterTitle);
 
   const filterButtonsContainer = document.createElement("div");
@@ -238,6 +329,12 @@ export function loadFilters(
       filterDescription:
         "Usage Counts measure how frequently a function is used directly.",
     },
+    {
+      id: "harness-filter",
+      label: "Has Harness",
+      default: false,
+      filterDescription: "Show only functions with generated harnesses.",
+    },
   ];
 
   filters.forEach((filter) => {
@@ -263,7 +360,8 @@ export function loadFilters(
       previous?.classList.remove("selected-filter");
       button.classList.add("selected-filter");
       onFilterChange?.(filter.id);
-      startRendering(functionTargets, functionListDiv, filter.id, options);
+      const latestResults = getFunctionTargets?.() || functionTargets;
+      startRendering(latestResults, functionListDiv, filter.id, options);
     });
   });
 
