@@ -266,6 +266,24 @@ button {
   align-items: center;
 }
 
+.run-state {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid #3a434d;
+  background: #242a31;
+  color: #b6c2cf;
+}
+
+.run-state--running {
+  border-color: #2ea043;
+  background: #1f2a23;
+  color: #7ee787;
+}
+
 .filter-button {
   margin-right: 0.5em;
   margin-bottom: 0.3em;

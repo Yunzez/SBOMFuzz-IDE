@@ -219,7 +219,7 @@ export function renderFunctionResults(
       runBtn.style.marginLeft = "4px";
 
       const stopBtn = document.createElement("button");
-      stopBtn.textContent = "Stop";
+      stopBtn.textContent = "Close";
       stopBtn.className = `negative-button ${result.harnessTargetName}-stop-btn`;
       stopBtn.style.marginLeft = "4px";
       stopBtn.style.display = "none";

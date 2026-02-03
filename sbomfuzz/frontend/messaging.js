@@ -28,10 +28,20 @@ export function setupMessaging(handlers = {}) {
       case "globalBroadcast":
         switch (msg.eventType) {
           case "HarnessStarted":
-            // handlers.onHarnessStarted(msg.data);
+            document
+              .querySelector(`.${msg.name}-run-btn`)
+              ?.style.setProperty("display", "none");
+            document
+              .querySelector(`.${msg.name}-stop-btn`)
+              ?.style.setProperty("display", "inline-block");
             break;
           case "HarnessStopped":
-            // handlers.onHarnessStopped(msg.data);
+            document
+              .querySelector(`.${msg.name}-stop-btn`)
+              ?.style.setProperty("display", "none");
+            document
+              .querySelector(`.${msg.name}-run-btn`)
+              ?.style.setProperty("display", "inline-block");
             break;
           case "HarnessFailed":
             console.log("HarnessFailed event received:", msg);

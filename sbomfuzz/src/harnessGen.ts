@@ -19,6 +19,7 @@ let harnessProcess: ChildProcess | null = null;
 let harnessTerminal: vscode.Terminal | null = null;
 let harnessTerminalCloseListener: vscode.Disposable | null = null;
 let harnessTerminalTarget: string | null = null;
+let harnessProcessTarget: string | null = null;
 // Track harness statuses
 interface HarnessStatus {
   name: string;
@@ -449,6 +450,7 @@ export function runSelectedHarness(targetName: string, root: string): void {
     return;
   }
   harnessProcess = proc;
+  harnessProcessTarget = targetName;
 
   outputChannel.appendLine(`▶️ Running harness: ${targetName}\n`);
 
@@ -474,6 +476,7 @@ export function runSelectedHarness(targetName: string, root: string): void {
     });
 
     harnessProcess = null;
+    harnessProcessTarget = null;
   });
 
   proc.on("close", (code, signal) => {
@@ -495,25 +498,25 @@ export function runSelectedHarness(targetName: string, root: string): void {
 
     updateHarnessStatus(targetName, "stopped");
     harnessProcess = null;
+    harnessProcessTarget = null;
   });
 }
 
-export function runSelectedHarnessGUI(
+export async function runSelectedHarnessGUI(
   targetName: string,
   root: string
-): void {
-  if (harnessProcess) {
-    vscode.window.showWarningMessage(
-      "A harness is already running in the background. Stop it before launching the GUI."
+): Promise<void> {
+  if (harnessProcess || harnessTerminal) {
+    const choice = await vscode.window.showWarningMessage(
+      "A harness run is already active. Stop it and run this one?",
+      { modal: true },
+      "Stop and Run",
+      "Cancel"
     );
-    return;
-  }
-
-  if (harnessTerminal) {
-    vscode.window.showWarningMessage(
-      "A harness terminal is already active. Close it before starting another GUI run."
-    );
-    return;
+    if (choice !== "Stop and Run") {
+      return;
+    }
+    await stopHarness();
   }
 
   const terminal = vscode.window.createTerminal({
@@ -527,39 +530,41 @@ export function runSelectedHarnessGUI(
 
   harnessTerminal = terminal;
   harnessTerminalTarget = targetName;
+  const terminalTarget = targetName;
   harnessTerminalCloseListener = vscode.window.onDidCloseTerminal(
     (closedTerminal) => {
       if (closedTerminal !== terminal) {
         return;
       }
 
-      const finishedTarget = harnessTerminalTarget;
       const exitCode = closedTerminal.exitStatus?.code;
       cleanupHarnessTerminal();
 
-      if (finishedTarget) {
-        updateHarnessStatus(finishedTarget, "stopped");
-        vscode.commands.executeCommand("sbomfuzz.broadcast", {
-          name: finishedTarget,
-          eventType: globalBroadcastEventType.HarnessFailed,
-        });
-      }
+      updateHarnessStatus(terminalTarget, "stopped");
+      vscode.commands.executeCommand("sbomfuzz.broadcast", {
+        name: terminalTarget,
+        eventType: globalBroadcastEventType.HarnessStopped,
+      });
 
       if (exitCode !== undefined && exitCode !== 0) {
         vscode.window.showWarningMessage(
           `⚠️ Fuzz harness ${
-            finishedTarget ?? ""
+            terminalTarget ?? ""
           } terminal closed with error code ${exitCode}.`
         );
       } else {
         vscode.window.showInformationMessage(
-          `🔚 Fuzz harness ${finishedTarget ?? ""} terminal closed.`
+          `🔚 Fuzz harness ${terminalTarget ?? ""} terminal closed.`
         );
       }
     }
   );
 
   updateHarnessStatus(targetName, "running");
+  vscode.commands.executeCommand("sbomfuzz.broadcast", {
+    name: targetName,
+    eventType: globalBroadcastEventType.HarnessStarted,
+  });
   vscode.window.showInformationMessage(
     `▶️ Opening LibAFL GUI for harness ${targetName} in the integrated terminal.`
   );
@@ -567,31 +572,49 @@ export function runSelectedHarnessGUI(
   terminal.sendText(`cargo fuzz run ${targetName}`);
 }
 
-export function stopHarness(): void {
+export async function stopHarness(): Promise<void> {
   if (harnessProcess) {
     const pid = harnessProcess.pid;
     console.log("Stopping harness process:", pid);
 
     // Use tree-kill to terminate the process and its children
-    kill(pid!, "SIGINT", (err) => {
-      if (err) {
-        console.error("Failed to kill harness process tree:", err);
-        vscode.window.showErrorMessage("Failed to stop harness process.");
-      } else {
-        console.log("Harness process tree killed successfully.");
-        vscode.window.showInformationMessage("Harness process stopped.");
-      }
-      harnessProcess = null;
+    const stoppingTarget = harnessProcessTarget;
+    await new Promise<void>((resolve) => {
+      kill(pid!, "SIGINT", (err) => {
+        if (err) {
+          console.error("Failed to kill harness process tree:", err);
+          vscode.window.showErrorMessage("Failed to stop harness process.");
+        } else {
+          console.log("Harness process tree killed successfully.");
+          vscode.window.showInformationMessage("Harness process stopped.");
+        }
+        harnessProcess = null;
+        harnessProcessTarget = null;
+        if (stoppingTarget) {
+          vscode.commands.executeCommand("sbomfuzz.broadcast", {
+            name: stoppingTarget,
+            eventType: globalBroadcastEventType.HarnessStopped,
+          });
+        }
+        resolve();
+      });
     });
     return;
   } else {
     if (harnessTerminal) {
       const terminalToStop = harnessTerminal;
       const runningTarget = harnessTerminalTarget;
+      cleanupHarnessTerminal();
       terminalToStop.dispose();
       vscode.window.showInformationMessage(
         `Harness ${runningTarget ?? ""} terminal stopped.`
       );
+      if (runningTarget) {
+        vscode.commands.executeCommand("sbomfuzz.broadcast", {
+          name: runningTarget,
+          eventType: globalBroadcastEventType.HarnessStopped,
+        });
+      }
       return;
     }
     vscode.window.showWarningMessage(
