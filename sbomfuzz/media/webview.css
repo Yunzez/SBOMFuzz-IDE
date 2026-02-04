@@ -60,7 +60,7 @@ button {
   border-color: #ccc; /* Subtle border color change on hover */
 }
 .search-bar {
-  width: 90%;
+  width: 100%;
   padding: 10px; /* Slightly more padding for better spacing */
   border: 1px solid #ccc;
   border-radius: 6px; /* Slightly more rounded corners */
@@ -69,6 +69,7 @@ button {
   transition: box-shadow 0.3s ease, border-color 0.3s ease; /* Smooth transitions */
   margin-top: 1em; /* Add margin on top for spacing */
   border-top: 2px solid #eee; /* Add a separation line at the top */
+  box-sizing: border-box;
 }
 
 .search-bar:focus {
@@ -264,24 +265,6 @@ button {
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
-}
-
-.run-state {
-  margin-left: 6px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  border: 1px solid #3a434d;
-  background: #242a31;
-  color: #b6c2cf;
-}
-
-.run-state--running {
-  border-color: #2ea043;
-  background: #1f2a23;
-  color: #7ee787;
 }
 
 .filter-button {
