@@ -21,8 +21,26 @@ test = false
 doc = false
 bench = false
 [[bin]]
-name = "fuzz_target_apply_operator"
-path = "fuzz_targets/fuzz_target_apply_operator.rs"
+name = "fuzz_target_add"
+path = "fuzz_targets/fuzz_target_add.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_divide"
+path = "fuzz_targets/fuzz_target_divide.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_fill_and_sum"
+path = "fuzz_targets/fuzz_target_fill_and_sum.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_multiply"
+path = "fuzz_targets/fuzz_target_multiply.rs"
 test = false
 doc = false
 bench = false

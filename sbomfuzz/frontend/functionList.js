@@ -225,7 +225,7 @@ export function renderFunctionResults(
       stopBtn.style.display = "none";
 
       const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "Delete";
+      deleteBtn.textContent = "Delete Harness";
       deleteBtn.className = `negative-button ${result.harnessTargetName}-delete-btn`;
       deleteBtn.style.marginLeft = "4px";
 
