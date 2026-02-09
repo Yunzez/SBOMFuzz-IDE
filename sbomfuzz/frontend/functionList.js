@@ -233,16 +233,12 @@ export function renderFunctionResults(
         event.stopPropagation();
         log?.(`Running fuzz target: ${result.harnessTargetName}`);
         sendMessage?.({ command: "runFuzzTarget", target: result.harnessTargetName });
-        stopBtn.style.display = "inline-block";
-        runBtn.style.display = "none";
       };
 
       stopBtn.onclick = (event) => {
         event.stopPropagation();
         log?.("Stopping fuzz target.");
         sendMessage?.({ command: "stopFuzzTarget" });
-        stopBtn.style.display = "none";
-        runBtn.style.display = "inline-block";
       };
 
       deleteBtn.onclick = (event) => {

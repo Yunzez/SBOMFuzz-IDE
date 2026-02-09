@@ -510,8 +510,7 @@ export async function runSelectedHarnessGUI(
     const choice = await vscode.window.showWarningMessage(
       "A harness run is already active. Stop it and run this one?",
       { modal: true },
-      "Stop and Run",
-      "Cancel"
+      "Stop and Run"
     );
     if (choice !== "Stop and Run") {
       return;
