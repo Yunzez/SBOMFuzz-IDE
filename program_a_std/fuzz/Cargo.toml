@@ -20,3 +20,15 @@ path = "fuzz_targets/fuzz_target_parse_csv_ints.rs"
 test = false
 doc = false
 bench = false
+[[bin]]
+name = "fuzz_target_apply_operator"
+path = "fuzz_targets/fuzz_target_apply_operator.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_multiply"
+path = "fuzz_targets/fuzz_target_multiply.rs"
+test = false
+doc = false
+bench = false

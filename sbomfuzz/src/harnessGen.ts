@@ -13,6 +13,7 @@ import {
   getHarnessRecordByTargetName,
   registerHarnessForFunction,
   removeHarnessRecordByTargetName,
+  setHarnessOptimized,
 } from "./harnessRegistry";
 import kill from "tree-kill";
 let harnessProcess: ChildProcess | null = null;
@@ -58,7 +59,8 @@ export function getAllHarnessStatuses(): HarnessStatus[] {
 export async function generateHarness(
   target: any,
   fuzzRoot: string,
-  extensionPath: string
+  extensionPath: string,
+  basePromptRef?: { prompt?: string }
 ): Promise<{ success: boolean; targetPath?: string; message?: string }> {
   channel_log("Generating harness...");
   const targetName = `fuzz_target_${target.functionName}`;
@@ -77,14 +79,76 @@ export async function generateHarness(
     return { success: false, message: "Missing prompt.txt" };
   }
 
+  const formatParameters = () => {
+    const params = (target as any).functionParameters;
+    if (typeof params === "string" && params.trim().length > 0) {
+      return params.trim();
+    }
+    if (params && typeof params === "object") {
+      try {
+        return JSON.stringify(params);
+      } catch {
+        return String(params);
+      }
+    }
+    if (typeof (target as any).paramCount === "number") {
+      return `<unknown> (count: ${(target as any).paramCount})`;
+    }
+    return "<unknown>";
+  };
+
+  const functionUsage =
+    (target as any).functionUsage ||
+    (target as any).functionUsageExamples ||
+    "";
+
+  const extractSignature = () => {
+    const filePath = target?.functionLocation?.filePath;
+    const functionName = target?.functionName;
+    if (!filePath || !functionName) {
+      return "";
+    }
+    try {
+      const content = fs.readFileSync(filePath, "utf8");
+      const lines = content.split("\n");
+      const signatureLines: string[] = [];
+      let capturing = false;
+      for (const line of lines) {
+        if (!capturing) {
+          if (new RegExp(`\\bfn\\s+${functionName}\\b`).test(line)) {
+            capturing = true;
+          } else {
+            continue;
+          }
+        }
+        signatureLines.push(line.trim());
+        if (line.includes("{") || line.includes(";")) {
+          break;
+        }
+        if (signatureLines.join(" ").length > 400) {
+          break;
+        }
+      }
+      return signatureLines.join(" ");
+    } catch {
+      return "";
+    }
+  };
+
+  const signature = extractSignature();
+
   const functionInfo =
     [
       `Function: ${target.functionName || ""}`,
       `Crate: ${target.functionCrate || ""}`,
-      `Module: ${target.functionModulePath || ""}`,
+      `Possible Module Path: ${target.functionModulePath || ""}`,
+      signature ? `Signature: ${signature}` : "",
       `Description: ${target.functionDescription || ""}`,
-      `Parameters: ${target.functionParameters || ""}`,
-    ].join("\n") + "\n";
+      `Parameters: ${formatParameters()}`,
+      functionUsage ? `function_usage: ${functionUsage}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n") + "\n";
 
   // Add your harness generation logic here
   let template = fs.readFileSync(promptPath, "utf8");
@@ -92,6 +156,9 @@ export async function generateHarness(
     .replace(/<fuzzer>/g, "cargo-fuzz")
     .replace(/<function-info>/g, functionInfo);
   console.log("Generated harness template:", template);
+  if (basePromptRef) {
+    basePromptRef.prompt = template;
+  }
   channel_log("trigger generation with OpenAI...");
 
   const result = await generateHarnessFromPrompt(template, extensionPath);
@@ -214,7 +281,8 @@ export async function optimizeHarness(
   root: string,
   filePath: string,
   extensionPath: string,
-  iteration: number = 0
+  iteration: number = 0,
+  basePrompt?: string
 ): Promise<{ success: boolean }> {
   iteration++;
   const targetName = `fuzz_target_${target.functionName}`;
@@ -233,7 +301,7 @@ export async function optimizeHarness(
 
   console.log(`🔁 Running fuzz attempt #${iteration}`);
 
-  const runHarnessBuild = (): Promise<string> =>
+  const runHarnessBuild = (): Promise<{ stderr: string; code: number | null }> =>
     new Promise((resolve) => {
       const proc = spawn("cargo", ["fuzz", "build", targetName], {
         cwd: root,
@@ -253,15 +321,15 @@ export async function optimizeHarness(
         }
       });
 
-      proc.on("close", () => {
-        resolve(stderr);
+      proc.on("close", (code) => {
+        resolve({ stderr, code });
       });
     });
 
-  const errorOutput = await runHarnessBuild();
+  const { stderr: errorOutput, code } = await runHarnessBuild();
   console.log("Harness run output:", errorOutput);
 
-  if (!errorOutput.includes("error") && !errorOutput.includes("panic")) {
+  if (code === 0) {
     console.log("Yay! Harness ran without errors!");
     return { success: true };
   }
@@ -281,9 +349,19 @@ export async function optimizeHarness(
   }
 
   let template = fs.readFileSync(promptPath, "utf8");
+  const combinedPrompt = basePrompt
+    ? `${basePrompt}\n\n# Fix Harness\n`
+    : "";
   template = template
     .replace(/<HARNESS-CODE>/g, originalCode)
-    .replace(/<ERROR-LOG>/g, errorOutput);
+    .replace(/<ERROR-LOG>/g, errorOutput)
+    .replace(/<BASE-PROMPT>/g, combinedPrompt);
+  if (!template.includes(combinedPrompt)) {
+    template = `${combinedPrompt}${template}`;
+  }
+  if (combinedPrompt) {
+    console.log("Fix harness base prompt:", combinedPrompt);
+  }
 
   try {
     const response = await openai.chat.completions.create({
@@ -304,11 +382,51 @@ export async function optimizeHarness(
     console.log(`✍️ Rewritten harness, retrying (iteration ${iteration})...`);
 
     // RECURSE
-    return optimizeHarness(target, root, filePath, extensionPath, iteration);
+    return optimizeHarness(
+      target,
+      root,
+      filePath,
+      extensionPath,
+      iteration,
+      basePrompt
+    );
   } catch (err) {
     console.error("❌ Error optimizing harness:", err);
     return { success: false };
   }
+}
+
+export async function assessHarness(
+  targetName: string,
+  root: string
+): Promise<{ success: boolean; errorOutput?: string }> {
+  const outputChannel = vscode.window.createOutputChannel("Fuzz Harness");
+  outputChannel.show(true);
+  return new Promise((resolve) => {
+    const proc = spawn("cargo", ["fuzz", "build", targetName], {
+      cwd: root,
+      env: {
+        ...process.env,
+        RUSTFLAGS: "-Awarnings",
+      },
+    });
+    let stderr = "";
+    proc.stdout.on("data", (data) => {
+      outputChannel.append(data.toString());
+    });
+    proc.stderr.on("data", (data) => {
+      const chunk = data.toString();
+      outputChannel.append(chunk);
+      stderr += chunk;
+    });
+    proc.on("close", (code) => {
+      if (code === 0) {
+        resolve({ success: true });
+      } else {
+        resolve({ success: false, errorOutput: stderr });
+      }
+    });
+  });
 }
 
 export function deleteSelectedHarness(targetName: string, root: string): void {
@@ -389,6 +507,7 @@ export function deleteSelectedHarness(targetName: string, root: string): void {
   // Update harness status to deleted
   updateHarnessStatus(targetName, "deleted");
   removeHarnessRecordByTargetName(targetName);
+  setHarnessOptimized(targetName, false);
 
   const globalContext = getGlobalContext();
   if (registryRecord && globalContext?.results) {
@@ -635,6 +754,7 @@ export function runGenerateAndOptimizeHarness(
   extensionPath: string
 ) {
   console.log("Generating harness for target:", target);
+  const basePromptRef: { prompt?: string } = {};
   vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -647,7 +767,8 @@ export function runGenerateAndOptimizeHarness(
       const { success, targetPath } = await generateHarness(
         target,
         fuzzRoot,
-        extensionPath
+        extensionPath,
+        basePromptRef
       );
       if (!success || !targetPath) {
         vscode.window.showErrorMessage(
@@ -665,13 +786,17 @@ export function runGenerateAndOptimizeHarness(
         target,
         fuzzRoot,
         targetPath,
-        extensionPath
+        extensionPath,
+        0,
+        basePromptRef.prompt
       );
 
       if (optimized.success) {
         const targetName = `fuzz_target_${target.functionName}`;
         const globalContext = getGlobalContext();
-        registerHarnessForFunction(target, targetName, targetPath);
+        registerHarnessForFunction(target, targetName, targetPath, {
+          optimized: true,
+        });
         if (globalContext?.results) {
           const match = globalContext.results.find(
             (fn) => fn.functionKey === target.functionKey
@@ -680,6 +805,7 @@ export function runGenerateAndOptimizeHarness(
             match.status = FunctionStatus.HarnessGenerated;
             match.harnessPath = targetPath;
             match.harnessTargetName = targetName;
+            (match as any).harnessOptimized = true;
             delete (match as any).pendingGeneration;
           }
         }
@@ -689,6 +815,7 @@ export function runGenerateAndOptimizeHarness(
           status: FunctionStatus.HarnessGenerated,
           harnessPath: targetPath,
           harnessTargetName: targetName,
+          harnessOptimized: true,
         });
         progress.report({
           increment: 70,
@@ -699,23 +826,29 @@ export function runGenerateAndOptimizeHarness(
         vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
       } else {
         const targetName = `fuzz_target_${target.functionName}`;
-        removeHarnessRecordByTargetName(targetName);
         const globalContext = getGlobalContext();
+        registerHarnessForFunction(target, targetName, targetPath, {
+          optimized: false,
+        });
         if (globalContext?.results) {
           const match = globalContext.results.find(
             (fn) => fn.functionKey === target.functionKey
           );
           if (match) {
-            match.status = FunctionStatus.NoHarness;
-            delete match.harnessPath;
-            delete match.harnessTargetName;
+            match.status = FunctionStatus.HarnessGenerated;
+            match.harnessPath = targetPath;
+            match.harnessTargetName = targetName;
+            (match as any).harnessOptimized = false;
             delete (match as any).pendingGeneration;
           }
         }
         vscode.commands.executeCommand("sbomfuzz.broadcast", {
           eventType: globalBroadcastEventType.UpdateFunctionStatus,
           functionKey: target.functionKey,
-          status: FunctionStatus.NoHarness,
+          status: FunctionStatus.HarnessGenerated,
+          harnessPath: targetPath,
+          harnessTargetName: targetName,
+          harnessOptimized: false,
         });
         progress.report({
           increment: 70,

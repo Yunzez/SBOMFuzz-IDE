@@ -1,6 +1,60 @@
 body {
   font-family: sans-serif;
   padding: 1em;
+  background: var(--sbom-bg);
+  color: var(--sbom-text);
+}
+
+:root {
+  --sbom-bg: #0f1419;
+  --sbom-text: #e6edf3;
+  --sbom-card-bg: #1f242b;
+  --sbom-card-border: #2f3841;
+  --sbom-card-hover: #46515d;
+  --sbom-root-bg: #2a3138;
+  --sbom-root-border: #3a434d;
+  --sbom-root-text: #e6edf3;
+  --sbom-link: #9cd3ff;
+  --sbom-pill-bg: #1b2128;
+  --sbom-pill-border: #2b333c;
+  --sbom-pill-text: #c9d4df;
+  --sbom-pill-hover: #252d36;
+  --sbom-pill-selected-bg: #0f3f73;
+  --sbom-pill-selected-border: #1f6fd1;
+  --sbom-pill-selected-text: #e6f1ff;
+  --sbom-harness-border: #3dff8c;
+  --sbom-harness-glow: rgba(61, 255, 140, 0.15);
+  --sbom-pending-border: #ffb347;
+  --sbom-pending-glow: rgba(255, 179, 71, 0.15);
+  --sbom-menu-bg: #ffffff;
+  --sbom-menu-text: #1f2328;
+  --sbom-action-text: #e6edf3;
+}
+
+body.vscode-light {
+  --sbom-bg: #f7f9fb;
+  --sbom-text: #1f2328;
+  --sbom-card-bg: #ffffff;
+  --sbom-card-border: #d7dde4;
+  --sbom-card-hover: #b9c2cc;
+  --sbom-root-bg: #ffffff;
+  --sbom-root-border: #d7dde4;
+  --sbom-root-text: #000000;
+  --sbom-link: #0b5cad;
+  --sbom-pill-bg: #f0f3f6;
+  --sbom-pill-border: #d7dde4;
+  --sbom-pill-text: #3a4148;
+  --sbom-pill-hover: #e6ebf1;
+  --sbom-pill-selected-bg: #0f3f73;
+  --sbom-pill-selected-border: #1f6fd1;
+  --sbom-pill-selected-text: #ffffff;
+  --sbom-harness-border: #2bbd6a;
+  --sbom-harness-glow: rgba(43, 189, 106, 0.18);
+  --sbom-pending-border: #e89a2e;
+  --sbom-pending-glow: rgba(232, 154, 46, 0.18);
+  --sbom-menu-bg: #ffffff;
+  --sbom-menu-text: #1f2328;
+  --sbom-action-text: #000000;
 }
 button {
   margin-left: 0.5em;
@@ -32,16 +86,42 @@ button {
 }
 
 .function-button {
-  border: 1px solid #2f3841;
+  border: 1px solid var(--sbom-card-border);
   border-radius: 10px;
-  color: #e6edf3;
-  background: #1f242b;
+  color: var(--sbom-text);
+  background: var(--sbom-card-bg);
   padding: 6px 4px;
   cursor: pointer;
   margin: 5px;
   display: inline-block; /* Ensure it behaves like a button or link */
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   min-width: 250px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.function-button:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  border-color: var(--sbom-card-hover);
+}
+
+.function-button--harness {
+  border-color: var(--sbom-harness-border);
+  background: linear-gradient(135deg, #112218 0%, var(--sbom-card-bg) 100%);
+  box-shadow: 0 0 0 1px rgba(61, 255, 140, 0.2), 0 10px 24px var(--sbom-harness-glow);
+}
+
+.function-button--harness-pending {
+  border-color: var(--sbom-pending-border);
+  background: linear-gradient(135deg, #2a1d11 0%, var(--sbom-card-bg) 100%);
+  box-shadow: 0 0 0 1px rgba(255, 179, 71, 0.2), 0 10px 24px var(--sbom-pending-glow);
+}
+
+body.vscode-light .function-button--harness {
+  background: var(--sbom-card-bg);
+}
+
+body.vscode-light .function-button--harness-pending {
+  background: var(--sbom-card-bg);
 }
 
 .menu-button {
@@ -49,7 +129,8 @@ button {
   border-radius: 0.25em;
   padding: 0.3em 0.6em;
   cursor: pointer;
-  background-color: white; /* Set a default background color */
+  background-color: var(--sbom-menu-bg);
+  color: var(--sbom-menu-text);
   transition: all 0.3s ease, border-color 0.3s ease;
   margin-top: 3px;
   box-sizing: border-box; /* Ensure padding doesn't affect size */
@@ -83,10 +164,10 @@ button {
   align-items: center;
   gap: 10px;
   padding: 6px;
-  background: #2a3138;
+  background: var(--sbom-root-bg);
   border-radius: 6px;
-  border: 1px solid #3a434d;
-  color: #e6edf3;
+  border: 1px solid var(--sbom-root-border);
+  color: var(--sbom-root-text);
 }
 
 .root-link {
@@ -100,7 +181,7 @@ button {
 }
 
 .root-path {
-  color: #9cd3ff;
+  color: var(--sbom-link);
   word-break: break-all;
 }
 
@@ -114,11 +195,11 @@ button {
   margin-left: auto;
   font-size: 12px;
   font-weight: 600;
-  color: #9cd3ff;
-  border: 1px solid #3d7fb8;
+  color: var(--sbom-link);
+  border: 1px solid var(--sbom-pill-selected-border);
   padding: 2px 6px;
   border-radius: 10px;
-  background: #1f262e;
+  background: var(--sbom-pill-bg);
 }
 
 
@@ -139,8 +220,8 @@ button {
   gap: 6px;
   flex: 1;
   padding: 8px;
-  background: #1f2328;
-  border: 1px solid #343a40;
+  background: var(--sbom-pill-bg);
+  border: 1px solid var(--sbom-pill-border);
   border-radius: 8px;
 }
 
@@ -167,7 +248,7 @@ button {
   border-radius: 8px;
   padding: 6px 10px;
   cursor: pointer;
-  color: #d1f7dc;
+  color: var(--sbom-action-text);
   background-color: #1f2a23;
   transition: background-color 0.3s ease, color 0.3s ease;
   margin: 0;
@@ -177,7 +258,7 @@ button {
 
 .affirmative-button:hover {
   background-color: #2ea043;
-  color: #ffffff;
+  color: var(--sbom-action-text);
 }
 
 .affirmative-button:disabled {
@@ -193,7 +274,7 @@ button {
   border-radius: 8px;
   padding: 6px 10px;
   cursor: pointer;
-  color: #ffd7d7;
+  color: var(--sbom-action-text);
   background-color: #2b1f21;
   transition: background-color 0.3s ease, color 0.3s ease;
   margin: 0;
@@ -203,7 +284,13 @@ button {
 
 .negative-button:hover {
   background-color: #cf222e;
-  color: #ffffff;
+  color: var(--sbom-action-text);
+}
+
+body.vscode-light .affirmative-button,
+body.vscode-light .negative-button {
+  background-color: #ffffff;
+  color: #000000;
 }
 
 .collapsible-section {
@@ -249,8 +336,68 @@ button {
 
 .filters-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-bottom: 1em;
+}
+
+.filter-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-title {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--sbom-pill-text);
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.harness-filter {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: var(--sbom-pill-bg);
+  border: 1px solid var(--sbom-pill-border);
+  padding: 4px;
+  border-radius: 999px;
+  align-items: center;
+}
+
+.harness-filter-pill {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--sbom-pill-text);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.harness-filter-pill:hover {
+  background: var(--sbom-pill-hover);
+}
+
+.harness-filter-pill.selected {
+  background: var(--sbom-pill-selected-bg);
+  border-color: var(--sbom-pill-selected-border);
+  color: var(--sbom-pill-selected-text);
 }
 
 .btns-div {

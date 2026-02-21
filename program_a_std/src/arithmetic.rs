@@ -23,7 +23,7 @@ pub fn multiply(a: i32, b: i32) -> i32 {
     if a == 0 || b == 0 {
         return 0;
     }
-    a * b
+    a.wrapping_mul(b)
 }
 
 

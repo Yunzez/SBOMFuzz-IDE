@@ -5,6 +5,7 @@ let pathSelected = null;
 let fuzzRootSelected = null;
 let functionTargets = null;
 let selectedFilter = null;
+let harnessFilter = "all";
 const targetContainer = document.getElementById("entry-list");
 const pathDiv = document.getElementById("path-display-container");
 let filtersContainer = null;
@@ -20,6 +21,8 @@ function createRenderOptions(overrides = {}) {
     selectedFilter,
     onHarnessDeleted: handleHarnessDeleted,
     getFunctionTargets: () => functionTargets,
+    getHarnessFilter: () => harnessFilter,
+    harnessFilter,
     ...overrides,
   };
 }
@@ -41,6 +44,10 @@ function handleStatusChange(updated) {
 
 function handleFilterChange(filterId) {
   selectedFilter = filterId;
+}
+
+function handleHarnessFilterChange(filterId) {
+  harnessFilter = filterId;
 }
 
 function handleHarnessDeleted(payload) {
@@ -111,9 +118,13 @@ function handleFunctionStatusUpdate(event) {
       if (event.harnessTargetName) {
         updated.harnessTargetName = event.harnessTargetName;
       }
+      if (typeof event.harnessOptimized === "boolean") {
+        updated.harnessOptimized = event.harnessOptimized;
+      }
     } else {
       delete updated.harnessPath;
       delete updated.harnessTargetName;
+      delete updated.harnessOptimized;
     }
 
     delete updated.pendingGeneration;
@@ -125,6 +136,10 @@ function handleFunctionStatusUpdate(event) {
     } else {
       delete updated.pendingGeneration;
     }
+  }
+
+  if (typeof event.harnessOptimized === "boolean") {
+    updated.harnessOptimized = event.harnessOptimized;
   }
 
   functionTargets[index] = updated;
@@ -152,36 +167,18 @@ setupMessaging({
     const byFunctionKey = new Map(
       targets.filter((t) => t.functionKey).map((t) => [t.functionKey, t])
     );
-    const byTargetFunction = new Map(
-      targets
-        .filter((t) => t.target_function)
-        .map((t) => [t.target_function, t])
-    );
-    const byTargetName = new Map(
-      targets.filter((t) => t.name).map((t) => [t.name, t])
-    );
     let changed = false;
     functionTargets = functionTargets.map((fn) => {
-      const shortName = fn.functionName?.split("::").pop() || fn.functionName;
-      const match =
-        byFunctionKey.get(fn.functionKey) ||
-        (shortName ? byTargetFunction.get(shortName) : null) ||
-        (shortName ? byTargetName.get(`fuzz_target_${shortName}`) : null);
+      const match = byFunctionKey.get(fn.functionKey);
       if (match) {
         const updated = { ...fn };
         updated.status = "HarnessGenerated";
         updated.harnessTargetName = match.name;
         updated.harnessPath = match.path;
         delete updated.pendingGeneration;
-        changed = true;
-        return updated;
-      }
-      if (fn.harnessTargetName || fn.harnessPath) {
-        const updated = { ...fn };
-        updated.status = "No Harness";
-        delete updated.harnessTargetName;
-        delete updated.harnessPath;
-        delete updated.pendingGeneration;
+        if (typeof updated.harnessOptimized !== "boolean") {
+          updated.harnessOptimized = true;
+        }
         changed = true;
         return updated;
       }
@@ -212,7 +209,9 @@ setupMessaging({
         functionListContainer,
         createRenderOptions({
           onFilterChange: handleFilterChange,
+          onHarnessFilterChange: handleHarnessFilterChange,
           selectedFilter,
+          harnessFilter,
         })
       );
     }
@@ -306,7 +305,9 @@ setupMessaging({
         functionListContainer,
         createRenderOptions({
           onFilterChange: handleFilterChange,
+          onHarnessFilterChange: handleHarnessFilterChange,
           selectedFilter,
+          harnessFilter,
         })
       );
       const activeFilter = selectedFilter || "priority-filter";

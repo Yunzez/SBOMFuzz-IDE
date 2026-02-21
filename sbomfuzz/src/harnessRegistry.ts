@@ -9,8 +9,10 @@ import { FunctionResult, FunctionStatus } from "./functionOutputProcesser";
 type HarnessRecord = {
   functionKey: string;
   functionName: string;
+  functionFilePath?: string;
   targetName: string;
   harnessPath: string;
+  optimized?: boolean;
   createdAt: number;
 };
 
@@ -132,6 +134,22 @@ export function getHarnessRecordByTargetName(targetName: string) {
 }
 
 /**
+ * Updates optimization status for a harness by target name.
+ */
+export function setHarnessOptimized(targetName: string, optimized: boolean) {
+  let updated = false;
+  for (const [key, record] of registry.entries()) {
+    if (record.targetName === targetName) {
+      registry.set(key, { ...record, optimized });
+      updated = true;
+    }
+  }
+  if (updated) {
+    persist();
+  }
+}
+
+/**
  * Enriches fuzz targets with persisted harness metadata (functionKey/functionName).
  */
 export function applyHarnessMetadataToTargets<T extends FuzzTarget>(
@@ -163,9 +181,14 @@ export function applyHarnessMetadataToTargets<T extends FuzzTarget>(
  * ```
  */
 export function registerHarnessForFunction(
-  target: { functionKey?: string; functionName?: string },
+  target: {
+    functionKey?: string;
+    functionName?: string;
+    functionLocation?: { filePath?: string };
+  },
   targetName: string,
-  harnessPath: string
+  harnessPath: string,
+  options: { optimized?: boolean } = {}
 ) {
   if (!target?.functionKey) {
     return;
@@ -173,8 +196,10 @@ export function registerHarnessForFunction(
   upsertHarnessRecord({
     functionKey: target.functionKey,
     functionName: target.functionName ?? target.functionKey,
+    functionFilePath: target.functionLocation?.filePath,
     targetName,
     harnessPath,
+    optimized: options.optimized ?? true,
     createdAt: Date.now(),
   });
 }
@@ -187,16 +212,38 @@ export function applyHarnessMetadata(results: FunctionResult[]): FunctionResult[
   if (!Array.isArray(results)) {
     return results;
   }
+  const byFileAndName = new Map<string, HarnessRecord>();
+  for (const record of registry.values()) {
+    if (record.functionFilePath && record.functionName) {
+      byFileAndName.set(
+        `${record.functionFilePath}::${record.functionName}`,
+        record
+      );
+    }
+  }
   let dirty = false;
   for (const result of results) {
     if (!result?.functionKey) {
       continue;
     }
-    const record = registry.get(result.functionKey);
+    let record = registry.get(result.functionKey);
+    if (!record && result.functionLocation?.filePath) {
+      record = byFileAndName.get(
+        `${result.functionLocation.filePath}::${result.functionName}`
+      );
+      if (record && record.functionKey !== result.functionKey) {
+        registry.delete(record.functionKey);
+        record = { ...record, functionKey: result.functionKey };
+        registry.set(result.functionKey, record);
+        dirty = true;
+      }
+    }
     if (record && fs.existsSync(record.harnessPath)) {
       result.status = FunctionStatus.HarnessGenerated;
       (result as any).harnessPath = record.harnessPath;
       (result as any).harnessTargetName = record.targetName;
+      (result as any).harnessOptimized =
+        typeof record.optimized === "boolean" ? record.optimized : true;
     } else if (record) {
       registry.delete(result.functionKey);
       dirty = true;

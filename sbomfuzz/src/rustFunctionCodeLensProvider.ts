@@ -4,6 +4,7 @@ import { getGlobalContext } from "./globalContextProvider";
 import { log } from "console";
 import { runGenerateAndOptimizeHarness } from "./harnessGen";
 import { ExtensionContext } from "vscode";
+import { FunctionStatus } from "./functionOutputProcesser";
 
 export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
   provideCodeLenses(
@@ -15,7 +16,8 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
     // async, generics, and lifetimes. We run against the whole document so we can also
     // capture signatures that span multiple lines.
     const text = document.getText();
-    const regex = /^(?:\s*#.*\n)*\s*(?:pub\s*(?:\([^)]*\)\s*)?)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)\s*(?:<[^>{}]*>)?\s*\(/gm;
+    const regex =
+      /^(?:(?:\s*#.*\n)|(?:\s*\/\/\/.*\n))*\s*(?:pub\s*(?:\([^)]*\)\s*)?)?(?:const\s+)?(?:unsafe\s+)?(?:extern\s+"[^"]+"\s+)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)\b/gm;
 
     let match: RegExpExecArray | null;
     while ((match = regex.exec(text)) !== null) {
@@ -31,10 +33,22 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
       const line = fnPosition.line;
       const lineText = document.lineAt(line).text;
       const range = new vscode.Range(line, 0, line, lineText.length);
+      const globalContext = getGlobalContext();
+      const matchResult = (globalContext.results ?? []).find(
+        (fn) =>
+          fn.functionName === functionName &&
+          fn.functionLocation?.filePath === document.uri.fsPath
+      );
+      const hasHarness =
+        matchResult?.status === FunctionStatus.HarnessGenerated &&
+        !!matchResult?.harnessPath &&
+        fs.existsSync(matchResult.harnessPath);
       const cmd: vscode.Command = {
-        title: "Generate Harness!",
-        command: "sbomfuzz.showFunctionInfo",
-        arguments: [functionName, document.uri.fsPath],
+        title: hasHarness ? "Jump to Harness" : "Generate Harness!",
+        command: hasHarness ? "sbomfuzz.openHarness" : "sbomfuzz.showFunctionInfo",
+        arguments: hasHarness
+          ? [matchResult!.harnessPath]
+          : [functionName, document.uri.fsPath],
       };
       lenses.push(new vscode.CodeLens(range, cmd));
     }

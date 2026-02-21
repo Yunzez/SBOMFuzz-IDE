@@ -18,6 +18,7 @@ export type FunctionResult = {
   status: FunctionStatus;
   harnessPath?: string;
   harnessTargetName?: string;
+  harnessOptimized?: boolean;
   pendingGeneration?: boolean;
 };
 
@@ -90,11 +91,6 @@ export function loadFunctionResults(
       .map((t: any) => t.functionKey)
       .filter(Boolean)
   );
-  const fuzzTargetNames = new Set(
-    (globalContext.fuzzTargets || [])
-      .map((t: any) => t.target_function)
-      .filter(Boolean)
-  );
   console.log("Fuzz target names:", globalContext.fuzzTargets);
   // Return all parsed FunctionResults if available
   const keys = Object.keys(result);
@@ -118,11 +114,9 @@ export function loadFunctionResults(
         centralityScore: parseFloat(r["Centrality Score"]),
         unsafeScore: parseFloat(r["Unsafe Score"]),
         priorityScore: parseFloat(r["Priority Score"]),
-        status:
-          fuzzTargetKeys.has(key) ||
-          fuzzTargetNames.has(functionName.split("::").pop() || functionName)
-            ? FunctionStatus.HarnessGenerated
-            : FunctionStatus.NoHarness,
+        status: fuzzTargetKeys.has(key)
+          ? FunctionStatus.HarnessGenerated
+          : FunctionStatus.NoHarness,
       };
     });
   }

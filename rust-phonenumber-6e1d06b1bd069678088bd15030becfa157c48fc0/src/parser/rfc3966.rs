@@ -138,7 +138,7 @@ mod test {
     use crate::parser::rfc3966;
 
     #[test]
-    fn phone_number() {
+    pub fn phone_number() {
         assert_eq!(
             rfc3966::phone_number("tel:2034567890;ext=456;phone-context=+44")
                 .unwrap()

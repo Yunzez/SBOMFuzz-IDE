@@ -6,6 +6,7 @@ import {
   findFuzzRoot,
   getFuzzTargets,
   waitForDir,
+  globalBroadcastEventType,
 } from "./util";
 import {
   FunctionLocation,
@@ -16,11 +17,17 @@ import {
   generateHarness,
   optimizeHarness,
   runGenerateAndOptimizeHarness,
+  assessHarness,
   runSelectedHarness,
   runSelectedHarnessGUI,
   stopHarness,
 } from "./harnessGen";
-import { applyHarnessMetadataToTargets } from "./harnessRegistry";
+import {
+  getHarnessRecordByTargetName,
+  setHarnessOptimized,
+  applyHarnessMetadataToTargets,
+} from "./harnessRegistry";
+import { make_function_public } from "./rustFunctionCodeLensProvider";
 import useGlobalContext, { getGlobalContext } from "./globalContextProvider";
 let currentWebview: vscode.Webview | undefined;
 export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
@@ -94,6 +101,34 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
 
       if (message.command === "runFuzzTarget") {
         runSelectedHarnessGUI(message.target, globalContext.fuzzRoot!);
+      }
+
+      if (message.command === "assessFuzzTarget") {
+        const targetName = message.target;
+        const root = globalContext.fuzzRoot!;
+        assessHarness(targetName, root).then((result) => {
+          if (result.success) {
+            setHarnessOptimized(targetName, true);
+            const record = getHarnessRecordByTargetName(targetName);
+            if (record) {
+              const match = globalContext.results?.find(
+                (fn) => fn.functionKey === record.functionKey
+              );
+              if (match) {
+                match.harnessOptimized = true;
+              }
+              vscode.commands.executeCommand("sbomfuzz.broadcast", {
+                eventType: globalBroadcastEventType.UpdateFunctionStatus,
+                functionKey: record.functionKey,
+                harnessOptimized: true,
+              });
+            }
+          } else {
+            vscode.window.showWarningMessage(
+              "⚠️ Harness assess failed. See output for details."
+            );
+          }
+        });
       }
 
       if (message.command === "stopFuzzTarget") {
@@ -188,6 +223,12 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
         const fuzzRoot = message.fuzzRoot;
         const extensionPath = this.context.extensionPath;
         console.log("Generating harness for target:", target);
+        if (target?.functionLocation?.filePath && target?.functionName) {
+          make_function_public(
+            target.functionLocation.filePath,
+            target.functionName
+          );
+        }
         runGenerateAndOptimizeHarness(target, fuzzRoot, extensionPath);
       }
     });

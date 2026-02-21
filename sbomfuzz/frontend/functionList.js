@@ -48,21 +48,31 @@ export function renderFunctionResults(
     log,
     onStatusChange,
     onHarnessDeleted,
+    harnessFilter = "all",
   } = options;
 
   targetContainer.innerHTML = "";
   const filteredResults =
     priority === "unsafe-block-filter"
       ? results.filter((r) => r.unsafeScore > 0)
-      : priority === "harness-filter"
-        ? results.filter(
+      : results;
+  const harnessFilteredResults =
+    harnessFilter === "with"
+      ? filteredResults.filter(
+          (r) =>
+            r.status === "HarnessGenerated" ||
+            Boolean(r.harnessPath || r.harnessTargetName)
+        )
+      : harnessFilter === "without"
+        ? filteredResults.filter(
             (r) =>
-              r.status === "HarnessGenerated" ||
-              Boolean(r.harnessPath || r.harnessTargetName)
+              r.status !== "HarnessGenerated" &&
+              !r.harnessPath &&
+              !r.harnessTargetName
           )
-        : results;
-  const nonIgnored = filteredResults.filter((r) => r.status !== "Ignore");
-  const ignored = filteredResults.filter((r) => r.status === "Ignore");
+        : filteredResults;
+  const nonIgnored = harnessFilteredResults.filter((r) => r.status !== "Ignore");
+  const ignored = harnessFilteredResults.filter((r) => r.status === "Ignore");
   nonIgnored.sort((a, b) => b.priorityScore - a.priorityScore);
 
   switch (priority) {
@@ -161,6 +171,13 @@ export function renderFunctionResults(
 
     const resultDiv = document.createElement("div");
     resultDiv.className = "function-button";
+    if (result.status === "HarnessGenerated" || result.harnessPath || result.harnessTargetName) {
+      if (result.harnessOptimized === false) {
+        resultDiv.classList.add("function-button--harness-pending");
+      } else {
+        resultDiv.classList.add("function-button--harness");
+      }
+    }
     const relativePath = pathSelected
       ? result.functionLocation?.filePath.replace(pathSelected, "")
       : result.functionLocation?.filePath || "";
@@ -214,7 +231,8 @@ export function renderFunctionResults(
 
     if (isGenerated && result.harnessTargetName) {
       const runBtn = document.createElement("button");
-      runBtn.textContent = "Run";
+      const needsAssess = result.harnessOptimized === false;
+      runBtn.textContent = needsAssess ? "Assess" : "Run";
       runBtn.className = `affirmative-button ${result.harnessTargetName}-run-btn`;
       runBtn.style.marginLeft = "4px";
 
@@ -231,8 +249,13 @@ export function renderFunctionResults(
 
       runBtn.onclick = (event) => {
         event.stopPropagation();
-        log?.(`Running fuzz target: ${result.harnessTargetName}`);
-        sendMessage?.({ command: "runFuzzTarget", target: result.harnessTargetName });
+        if (needsAssess) {
+          log?.(`Assessing fuzz target: ${result.harnessTargetName}`);
+          sendMessage?.({ command: "assessFuzzTarget", target: result.harnessTargetName });
+        } else {
+          log?.(`Running fuzz target: ${result.harnessTargetName}`);
+          sendMessage?.({ command: "runFuzzTarget", target: result.harnessTargetName });
+        }
       };
 
       stopBtn.onclick = (event) => {
@@ -286,16 +309,61 @@ export function loadFilters(
   functionListDiv,
   options
 ) {
-  const { onFilterChange, selectedFilter, getFunctionTargets } = options;
+  const {
+    onFilterChange,
+    onHarnessFilterChange,
+    selectedFilter,
+    harnessFilter = "all",
+    getFunctionTargets,
+    getHarnessFilter,
+  } = options;
   targetContainer.innerHTML = "";
+  const filterHeader = document.createElement("div");
+  filterHeader.className = "filter-header";
+
   const filterTitle = document.createElement("div");
   filterTitle.textContent = "Order By";
-  filterTitle.style.fontWeight = "bold";
-  filterTitle.style.marginBottom = "8px";
-  filterTitle.style.marginTop = "8px";
-  targetContainer.appendChild(filterTitle);
+  filterTitle.className = "filter-title";
+
+  const filterRow = document.createElement("div");
+  filterRow.className = "filter-row";
+  const harnessFilterContainer = document.createElement("div");
+  harnessFilterContainer.className = "harness-filter";
+  const harnessStates = [
+    { id: "all", label: "All" },
+    { id: "with", label: "Harness" },
+    { id: "without", label: "No Harness" },
+  ];
+  harnessStates.forEach((filter) => {
+    const button = document.createElement("button");
+    button.textContent = filter.label;
+    button.className = "harness-filter-pill";
+    if (harnessFilter === filter.id) {
+      button.classList.add("selected");
+    }
+    button.addEventListener("click", () => {
+      harnessFilterContainer
+        .querySelector(".selected")
+        ?.classList.remove("selected");
+      button.classList.add("selected");
+      onHarnessFilterChange?.(filter.id);
+      const latestResults = getFunctionTargets?.() || functionTargets;
+      const activeSort = selectedFilter || "priority-filter";
+      startRendering(latestResults, functionListDiv, activeSort, {
+        ...options,
+        harnessFilter: filter.id,
+      });
+    });
+    harnessFilterContainer.appendChild(button);
+  });
+
+  filterRow.appendChild(filterTitle);
+  filterRow.appendChild(harnessFilterContainer);
+  filterHeader.appendChild(filterRow);
+  targetContainer.appendChild(filterHeader);
 
   const filterButtonsContainer = document.createElement("div");
+  filterButtonsContainer.className = "filter-buttons";
   const filters = [
     {
       id: "priority-filter",
@@ -325,12 +393,6 @@ export function loadFilters(
       filterDescription:
         "Usage Counts measure how frequently a function is used directly.",
     },
-    {
-      id: "harness-filter",
-      label: "Has Harness",
-      default: false,
-      filterDescription: "Show only functions with generated harnesses.",
-    },
   ];
 
   filters.forEach((filter) => {
@@ -357,7 +419,13 @@ export function loadFilters(
       button.classList.add("selected-filter");
       onFilterChange?.(filter.id);
       const latestResults = getFunctionTargets?.() || functionTargets;
-      startRendering(latestResults, functionListDiv, filter.id, options);
+      const activeHarnessFilter = getHarnessFilter?.() || harnessFilter;
+      startRendering(
+        latestResults,
+        functionListDiv,
+        filter.id,
+        { ...options, harnessFilter: activeHarnessFilter }
+      );
     });
   });
 

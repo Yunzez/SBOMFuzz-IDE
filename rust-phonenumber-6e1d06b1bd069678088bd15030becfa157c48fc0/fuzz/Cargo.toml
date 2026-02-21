@@ -19,3 +19,16 @@ path = "fuzz_targets/fuzz_target_1.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "fuzz_target_replace"
+path = "fuzz_targets/fuzz_target_replace.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_phone_number"
+path = "fuzz_targets/fuzz_target_phone_number.rs"
+test = false
+doc = false
+bench = false

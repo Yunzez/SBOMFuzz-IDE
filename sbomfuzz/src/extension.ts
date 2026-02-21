@@ -119,6 +119,18 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "sbomfuzz.openHarness",
+      (harnessPath: string) => {
+        const uri = vscode.Uri.file(harnessPath);
+        vscode.workspace.openTextDocument(uri).then((doc) => {
+          vscode.window.showTextDocument(doc, { preview: false });
+        });
+      }
+    )
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand("sbomfuzz.broadcast", (args) => {
       const webview = SbomFuzzWebviewViewProvider.getWebview();
       if (webview) {
