@@ -30,6 +30,7 @@ interface HarnessStatus {
 
 const harnessStatuses: Map<string, HarnessStatus> = new Map();
 
+
 // Function to update harness status
 export function updateHarnessStatus(
   targetName: string,
@@ -239,7 +240,8 @@ async function generateHarnessFromPrompt(
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      // model: "gpt-5-nano-2025-08-07",
+      model: "gpt-5-2025-08-07",
       messages: [
         {
           role: "system",
@@ -251,7 +253,7 @@ async function generateHarnessFromPrompt(
           content: prompt,
         },
       ],
-      temperature: 0.4,
+      temperature: 1,
     });
 
     // Extract code block content from response, ignoring ``` and language
@@ -365,9 +367,10 @@ export async function optimizeHarness(
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      // model: "gpt-5-nano-2025-08-07",
+      model: "gpt-5-2025-08-07",
       messages: [{ role: "user", content: template }],
-      temperature: 0.3,
+      temperature: 1,
     });
 
     const fixedCode = response.choices?.[0]?.message?.content;

@@ -16,6 +16,7 @@ import {
   applyHarnessMetadataToTargets,
   initHarnessRegistry,
 } from "./harnessRegistry";
+import { isFileExcluded, loadExcludedFilePaths } from "./excludeList";
 const out = vscode.window.createOutputChannel("SBOMFuzz_debug");
 export function channel_log(m: any) {
   out.appendLine(typeof m === "string" ? m : JSON.stringify(m));
@@ -74,6 +75,13 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "sbomfuzz.showFunctionInfo", // same as used in CodeLens
       (functionName: string, filePath: string) => {
+        const excludedPaths = loadExcludedFilePaths(globalContext.projectRoot);
+        if (isFileExcluded(filePath, excludedPaths)) {
+          vscode.window.showWarningMessage(
+            "This file is excluded from SBOMFuzz actions."
+          );
+          return;
+        }
         // Make sure function is public
         make_function_public(filePath, functionName);
         let focusTarget = findFuzzTargets(

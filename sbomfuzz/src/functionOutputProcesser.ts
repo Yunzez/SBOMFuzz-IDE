@@ -2,6 +2,7 @@ import * as fs from "fs";
 import path from "path";
 import * as vscode from "vscode";
 import { getGlobalContext } from "./globalContextProvider";
+import { isFileExcluded, loadExcludedFilePaths } from "./excludeList";
 export type FunctionResult = {
   functionKey: string;
   functionName: string;
@@ -86,6 +87,7 @@ export function loadFunctionResults(
     }
   }
   const globalContext = getGlobalContext();
+  const excludedPaths = loadExcludedFilePaths(globalContext.projectRoot);
   const fuzzTargetKeys = new Set(
     (globalContext.fuzzTargets || [])
       .map((t: any) => t.functionKey)
@@ -96,10 +98,12 @@ export function loadFunctionResults(
   const keys = Object.keys(result);
   if (keys.length > 0) {
    
-    return keys.map((key) => {
+    return keys
+      .map((key) => {
       const r = result[key];
       const functionName = r["Function Name"] || "";
-       console.log(r.functionName, );
+      console.log(r.functionName);
+      const functionLocation = parseFunctionLocation(r["Location"]);
       return {
         functionKey: key,
         functionName,
@@ -108,7 +112,7 @@ export function loadFunctionResults(
           (r["Module Path"] || "").split("::").slice(1).join("::") || "",
         functionDescription: r["Function Description"] || "",
         functionParameters: r["Parameters"],
-        functionLocation: parseFunctionLocation(r["Location"]),
+        functionLocation,
         paramCount: parseInt(r["Number of Parameters"]),
         usageCount: parseInt(r["Count"], 10) || 0,
         centralityScore: parseFloat(r["Centrality Score"]),
@@ -118,7 +122,10 @@ export function loadFunctionResults(
           ? FunctionStatus.HarnessGenerated
           : FunctionStatus.NoHarness,
       };
-    });
+    })
+      .filter(
+        (fn) => !isFileExcluded(fn.functionLocation?.filePath, excludedPaths)
+      );
   }
 
   vscode.window.showInformationMessage(

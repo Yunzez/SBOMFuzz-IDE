@@ -15,11 +15,16 @@ function renderSearchBar(results, targetContainer, priority, options) {
     if (query === "") {
       renderFunctionResults(results, resultsDiv, priority, options);
     } else {
-      const filteredResults = results.filter(
-        (fn) =>
-          fn.functionName.toLowerCase().includes(query) ||
-          fn.functionModulePath.toLowerCase().includes(query)
+    const filteredResults = results.filter((fn) => {
+      const name = fn.functionName.toLowerCase();
+      const modulePath = fn.functionModulePath.toLowerCase();
+      const combined = `${fn.functionModulePath}::${fn.functionName}`.toLowerCase();
+      return (
+        name.includes(query) ||
+        modulePath.includes(query) ||
+        combined.includes(query)
       );
+    });
       log?.(`Filtered results: ${filteredResults.length}`);
       renderFunctionResults(filteredResults, resultsDiv, priority, options);
     }
@@ -277,9 +282,9 @@ export function renderFunctionResults(
         }
       };
 
+      harnessActionArea.appendChild(deleteBtn);
       harnessActionArea.appendChild(runBtn);
       harnessActionArea.appendChild(stopBtn);
-      harnessActionArea.appendChild(deleteBtn);
     }
 
     ignoreBtn.onclick = (event) => {

@@ -47,9 +47,9 @@ export function renderHarnessList(targets, container, options) {
     };
 
     const actionArea = targetDiv.getElementsByClassName("btns-div")[0];
+    actionArea.appendChild(deleteBtn);
     actionArea.appendChild(runBtn);
     actionArea.appendChild(stopBtn);
-    actionArea.appendChild(deleteBtn);
 
     deleteBtn.onclick = (event) => {
       event.stopPropagation();

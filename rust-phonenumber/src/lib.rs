@@ -71,7 +71,7 @@ pub use crate::phone_number::{PhoneNumber, Type};
 pub mod parser;
 pub use crate::parser::{parse, parse_with};
 
-mod formatter;
+pub mod formatter;
 pub use crate::formatter::{format, format_with, Formatter, Mode};
 
 mod validator;

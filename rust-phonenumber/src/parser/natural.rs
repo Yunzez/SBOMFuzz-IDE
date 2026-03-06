@@ -53,7 +53,7 @@ mod test {
     use crate::parser::natural;
 
     #[test]
-    pub fn phone_number() {
+    fn phone_number() {
         assert_eq!(
             natural::phone_number("650 253 0000 extn. 4567").unwrap().1,
             Number {

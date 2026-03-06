@@ -21,9 +21,29 @@ This crate is small and organized around parsing and data representation:
   - Country metadata and utilities.
 - `src/error.rs`
   - Error types used across the crate.
+- `src/formatter.rs`
+  - Formatting and normalization helpers for converting parsed data into canonical forms.
+- `src/validator.rs`
+  - Validation logic used to check whether parsed values are plausible or valid.
+- `src/metadata/`
+  - Metadata tables and loaders used by the parser/validator (e.g., region rules, patterns).
+- `src/metadata/loader.rs`
+  - Entry points for loading and looking up metadata records.
 
 The parser layer:
 - `src/parser/mod.rs`: main parser entry points and routing logic that wires format-specific parsers into higher-level parse functions. Example inputs can include both structured and unstructured phone strings routed to the appropriate parser.
 - `src/parser/rfc3966.rs`: parser for RFC3966-style inputs with parameters. Example inputs: `tel:+1-201-555-0123`, `tel:201-555-0123;phone-context=+1`, `tel:+44-20-7946-0018;ext=123`.
 - `src/parser/natural.rs`: parser for more permissive, user-entered inputs. Example inputs: `+1 (201) 555-0123`, `201-555-0123`, `020 7946 0018`.
 - `src/parser/helper.rs`: shared parsing utilities, helper types, and predicate functions used across multiple parsers to keep logic consistent.
+
+## Recommended Functions
+To help you get started, we have selected a few functions that cover the main parsing paths and validation checks.
+They include higher-level entry points as well as format-specific parsers.
+
+- `phonenumber::parser::parse_with`
+- `phonenumber::parser::parse`
+- `phonenumber::parser::valid::phone_number`
+- `phonenumber::parser::natural::phone_number`
+- `phonenumber::parser::rfc3966::phone_number`
+- `phonenumber::is_viable`
+- `phonenumber::is_valid`

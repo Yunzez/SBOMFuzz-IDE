@@ -229,7 +229,7 @@ fn formatter<'a>(number: &str, formats: &'a [Format]) -> Option<&'a Format> {
     None
 }
 
-fn replace(
+pub fn replace(
     national: &str,
     meta: &Metadata,
     formatter: &Format,

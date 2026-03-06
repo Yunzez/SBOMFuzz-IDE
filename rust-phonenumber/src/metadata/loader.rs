@@ -307,7 +307,7 @@ fn territory<R: BufRead>(
     }
 }
 
-pub fn descriptor<R: BufRead>(
+fn descriptor<R: BufRead>(
     reader: &mut Reader<R>,
     meta: &Metadata,
     name: &[u8],
@@ -470,7 +470,7 @@ fn formats<R: BufRead>(
     }
 }
 
-pub fn format<R: BufRead>(
+fn format<R: BufRead>(
     reader: &mut Reader<R>,
     meta: &Metadata,
     name: &[u8],

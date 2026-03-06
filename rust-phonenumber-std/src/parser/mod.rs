@@ -102,7 +102,7 @@ mod test {
     use crate::phone_number::PhoneNumber;
 
     #[test]
-    fn parse() {
+    pub fn parse() {
         let mut number = PhoneNumber {
             code: country::Code {
                 value: 64,

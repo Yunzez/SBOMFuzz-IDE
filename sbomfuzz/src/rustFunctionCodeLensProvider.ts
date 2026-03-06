@@ -5,12 +5,18 @@ import { log } from "console";
 import { runGenerateAndOptimizeHarness } from "./harnessGen";
 import { ExtensionContext } from "vscode";
 import { FunctionStatus } from "./functionOutputProcesser";
+import { isFileExcluded, loadExcludedFilePaths } from "./excludeList";
 
 export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
   provideCodeLenses(
     document: vscode.TextDocument
   ): vscode.ProviderResult<vscode.CodeLens[]> {
     const lenses: vscode.CodeLens[] = [];
+    const globalContext = getGlobalContext();
+    const excludedPaths = loadExcludedFilePaths(globalContext.projectRoot);
+    if (isFileExcluded(document.uri.fsPath, excludedPaths)) {
+      return lenses;
+    }
 
     // Matches Rust function signatures including optional pub qualifiers (e.g. pub(crate)),
     // async, generics, and lifetimes. We run against the whole document so we can also
@@ -33,7 +39,6 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
       const line = fnPosition.line;
       const lineText = document.lineAt(line).text;
       const range = new vscode.Range(line, 0, line, lineText.length);
-      const globalContext = getGlobalContext();
       const matchResult = (globalContext.results ?? []).find(
         (fn) =>
           fn.functionName === functionName &&

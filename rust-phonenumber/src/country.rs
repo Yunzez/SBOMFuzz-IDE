@@ -14,6 +14,7 @@
 
 //! Country related types.
 
+use arbitrary::Arbitrary;
 use strum::{AsRefStr, EnumString};
 
 use std::str;
@@ -79,7 +80,7 @@ impl From<Code> for u16 {
 }
 
 /// CLDR country IDs.
-#[derive(Eq, PartialEq, Copy, Clone, Serialize, Deserialize, Hash, Debug, EnumString, AsRefStr)]
+#[derive(Eq, PartialEq, Copy, Clone, Serialize, Deserialize, Hash, Debug, EnumString, AsRefStr, Arbitrary)]
 pub enum Id {
     AC,
     AD,

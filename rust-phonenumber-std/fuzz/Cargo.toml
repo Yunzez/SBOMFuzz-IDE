@@ -29,3 +29,9 @@ name = "fuzz_target_rfc_phonenum"
 path = "fuzz_targets/fuzz_target_rfc_phonenum.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "test_country"
+path = "fuzz_targets/test_country.rs"
+test = false
+doc = false
