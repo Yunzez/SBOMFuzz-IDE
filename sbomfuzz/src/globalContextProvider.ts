@@ -11,7 +11,7 @@
 import path from "path";
 import fs from "fs";
 import type * as vscode from "vscode";
-import { loadFunctionResults } from "./functionOutputProcesser";
+import { FunctionResult, loadFunctionResults } from "./functionOutputProcesser";
 import { findCargoProjectRoot, findFuzzRoot, getFuzzTargets } from "./util";
 import {
   applyHarnessMetadata,
@@ -29,7 +29,7 @@ export interface SharedContext {
   fuzzRoot?: string;
   projectRoot?: string;
   extensionPath?: string;
-  results?: any[];
+  results?: FunctionResult[];
 }
 
 const globalContext: SharedContext = {

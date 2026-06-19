@@ -1,53 +1,50 @@
-# phonenumber
+# Study Readme: rust-phonenumber-std
 
-![CI Build](https://github.com/whisperfish/rust-phonenumber/workflows/Build/badge.svg)
-[![Crates.io](https://img.shields.io/crates/v/phonenumber.svg)](https://crates.io/crates/phonenumber)
-[![phonenumber](https://docs.rs/phonenumber/badge.svg)](https://docs.rs/phonenumber)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+## Purpose of This Crate
+`rust-phonenumber` is a Rust library for parsing and working with phone numbers. It turns user-provided strings into structured data (e.g., national number, country code, and extension), using multiple parsing strategies.
 
-Rust version of [libphonenumber](https://github.com/googlei18n/libphonenumber).
+## What It Does (High Level)
+The crate exposes parsers that:
+- Accept phone number strings in different formats.
+- Extract components like national number, country prefix, and extension.
+- Validate basic formatting rules and separators.
 
-## Usage
+## Module Explanation
+This crate is small and organized around parsing and data representation:
+- `src/parser/`
+  - Parsing implementations and helpers.
+- `src/phone_number.rs`
+  - Core data structures and formatting helpers for phone numbers.
+- `src/country.rs`
+  - Country metadata and utilities.
+- `src/error.rs`
+  - Error types used across the crate.
+- `src/formatter.rs`
+  - Formatting and normalization helpers for converting parsed data into canonical forms.
+- `src/validator.rs`
+  - Validation logic used to check whether parsed values are plausible or valid.
+- `src/metadata/`
+  - Metadata tables and loaders used by the parser/validator (e.g., region rules, patterns).
+- `src/metadata/loader.rs`
+  - Entry points for loading and looking up metadata records.
 
-Add this to your `Cargo.toml`:
+The parser layer:
+- `src/parser/mod.rs`: main parser entry points and routing logic that wires format-specific parsers into higher-level parse functions. Example inputs can include both structured and unstructured phone strings routed to the appropriate parser.
+- `src/parser/rfc3966.rs`: parser for RFC3966-style inputs with parameters. Example inputs: `tel:+1-201-555-0123`, `tel:201-555-0123;phone-context=+1`, `tel:+44-20-7946-0018;ext=123`.
+- `src/parser/natural.rs`: parser for more permissive, user-entered inputs. Example inputs: `+1 (201) 555-0123`, `201-555-0123`, `020 7946 0018`.
+- `src/parser/helper.rs`: shared parsing utilities, helper types, and predicate functions used across multiple parsers to keep logic consistent.
 
-```toml
-[dependencies]
-phonenumber = "0.3"
-```
-## Example
+## Macro
+- `macro_rules! parse` in `src/parser/helper.rs` defines a local Rust macro named `parse!`. It is a shortcut that makes repeated parsing steps easier to write. In this crate, it helps parser functions consume parts of the user input, such as stripping `tel:` before reading the phone number.
 
-The following example parses, validates and formats the given phone number.
+## Functions List
+To help you get started, we have selected a few functions that cover the main parsing paths and validation checks.
+They include higher-level entry points as well as format-specific parsers. You can choose from the follow functions to begin with. 
 
-```rust,no_run
-extern crate phonenumber;
-
-use phonenumber::Mode;
-use std::env;
-
-fn main() {
-	let mut args = env::args().skip(1).collect::<Vec<_>>();
-
-	if args.len() < 1 {
-		panic!("not enough arguments");
-	}
-
-	let number  = args.pop().unwrap();
-	let country = args.pop().map(|c| c.parse().unwrap());
-
-	let number = phonenumber::parse(country, number).unwrap();
-	let valid  = phonenumber::is_valid(&number);
-
-	if valid {
-		println!("\x1b[32m{:#?}\x1b[0m", number);
-		println!();
-		println!("International: {}", number.format().mode(Mode::International));
-		println!("     National: {}", number.format().mode(Mode::National));
-		println!("      RFC3966: {}", number.format().mode(Mode::Rfc3966));
-		println!("        E.164: {}", number.format().mode(Mode::E164));
-	}
-	else {
-		println!("\x1b[31m{:#?}\x1b[0m", number);
-	}
-}
-```
+- `phonenumber::parser::parse_with (parser/mod.rs)`
+- `phonenumber::parser::parse (parser/mod.rs)`
+- `phonenumber::parser::valid::phone_number (parser/valid.rs)`
+- `phonenumber::parser::natural::phone_number (parser/natural.rs)`
+- `phonenumber::parser::rfc3966::phone_number (parser/rfc3966.rs)`
+- `phonenumber::is_viable (parser/validator.rs)`
+- `phonenumber::is_valid (parser/validator.rs)`

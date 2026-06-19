@@ -1,13 +1,21 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
+import * as path from "path";
 import { getGlobalContext } from "./globalContextProvider";
-import { log } from "console";
-import { runGenerateAndOptimizeHarness } from "./harnessGen";
-import { ExtensionContext } from "vscode";
 import { FunctionStatus } from "./functionOutputProcesser";
 import { isFileExcluded, loadExcludedFilePaths } from "./excludeList";
+import { getRunningTargetName } from "./harnessGen";
+import { getHarnessRecordByTargetName } from "./harnessRegistry";
+
+const _onDidChangeCodeLenses = new vscode.EventEmitter<void>();
+
+export function refreshCodeLenses(): void {
+  _onDidChangeCodeLenses.fire();
+}
 
 export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
+  readonly onDidChangeCodeLenses = _onDidChangeCodeLenses.event;
+
   provideCodeLenses(
     document: vscode.TextDocument
   ): vscode.ProviderResult<vscode.CodeLens[]> {
@@ -48,43 +56,67 @@ export class RustFunctionCodeLensProvider implements vscode.CodeLensProvider {
         matchResult?.status === FunctionStatus.HarnessGenerated &&
         !!matchResult?.harnessPath &&
         fs.existsSync(matchResult.harnessPath);
-      const cmd: vscode.Command = {
-        title: hasHarness ? "Jump to Harness" : "Generate Harness!",
-        command: hasHarness ? "sbomfuzz.openHarness" : "sbomfuzz.showFunctionInfo",
-        arguments: hasHarness
-          ? [matchResult!.harnessPath]
-          : [functionName, document.uri.fsPath],
-      };
-      lenses.push(new vscode.CodeLens(range, cmd));
+
+      if (hasHarness) {
+        // Lens 1: jump to the harness file
+        lenses.push(new vscode.CodeLens(range, {
+          title: "Jump to Harness",
+          command: "sbomfuzz.openHarness",
+          arguments: [matchResult!.harnessPath],
+        }));
+
+        // Lens 2: run or stop depending on whether this target is currently running
+        const targetName = matchResult!.harnessTargetName!;
+        const isRunning = getRunningTargetName() === targetName;
+        lenses.push(new vscode.CodeLens(range, {
+          title: isRunning ? "⬛ Stop Fuzzing" : "▶ Run Harness",
+          command: isRunning ? "sbomfuzz.stopHarnessFromCodeLens" : "sbomfuzz.runHarnessFromCodeLens",
+          arguments: isRunning ? [] : [targetName],
+        }));
+      } else {
+        lenses.push(new vscode.CodeLens(range, {
+          title: "Generate Harness!",
+          command: "sbomfuzz.showFunctionInfo",
+          arguments: [functionName, document.uri.fsPath],
+        }));
+      }
+    }
+
+    // ── Harness-file lenses ───────────────────────────────────────────────────
+    // When the open file is a generated harness, show what function it covers
+    // and a run/stop button, anchored to line 0.
+    const basename = path.basename(document.uri.fsPath, ".rs");
+    if (basename.startsWith("fuzz_target_")) {
+      const record = getHarnessRecordByTargetName(basename);
+      if (record) {
+        const firstLine = document.lineAt(0);
+        const topRange = new vscode.Range(0, 0, 0, firstLine.text.length);
+
+        // Look up the full module path from analysis results for a richer label
+        const fnResult = (globalContext.results ?? []).find(
+          (r) => r.functionKey === record.functionKey
+        );
+        const label = fnResult
+          ? `${fnResult.functionModulePath}::${fnResult.functionName}`
+          : record.functionName;
+
+        lenses.push(new vscode.CodeLens(topRange, {
+          title: `← ${label}`,
+          command: "sbomfuzz.jumpToFunctionFromHarness",
+          arguments: [record.functionKey],
+        }));
+
+        const isRunning = getRunningTargetName() === basename;
+        lenses.push(new vscode.CodeLens(topRange, {
+          title: isRunning ? "⬛ Stop Fuzzing" : "▶ Run Harness",
+          command: isRunning ? "sbomfuzz.stopHarnessFromCodeLens" : "sbomfuzz.runHarnessFromCodeLens",
+          arguments: isRunning ? [] : [basename],
+        }));
+      }
     }
 
     return lenses;
   }
-}
-
-
-export function onCodeLensClicked(
-  functionName: string,
-  filePath: string,
-  extensionPath: string,
-) {
-  // Make sure function is public
-  make_function_public(filePath, functionName);
-
-  let globalContext = getGlobalContext();
-  let fuzzTargets = globalContext.results ?? [];
-
-  // Find the function's info in the analyzer results
-  const targetInfo = fuzzTargets.find(
-    (fn) => fn.functionName === functionName && fn.functionLocation.filePath === filePath
-  );
-  if (!targetInfo) {
-    log(`Function ${functionName} not found in ${filePath}`);
-    return;
-  }
-
-  // Generate the fuzzing harness for the function
-  runGenerateAndOptimizeHarness(targetInfo, globalContext.fuzzRoot ?? "", extensionPath);
 }
 
 /// Given a file path and function name, make that function public /

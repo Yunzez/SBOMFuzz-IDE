@@ -8,10 +8,7 @@ import {
   waitForDir,
   globalBroadcastEventType,
 } from "./util";
-import {
-  FunctionLocation,
-  loadFunctionResults,
-} from "./functionOutputProcesser";
+import { FunctionLocation } from "./functionOutputProcesser";
 import {
   deleteSelectedHarness,
   generateHarness,
@@ -42,69 +39,46 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
   ) {
     webviewView.webview.options = {
       enableScripts: true,
+      localResourceRoots: [
+        vscode.Uri.joinPath(this.context.extensionUri, "media"),
+      ],
     };
     currentWebview = webviewView.webview;
     const globalContext = getGlobalContext();
     webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
 
-    webviewView.webview.onDidReceiveMessage((message) => {
-      if (message.command === "log") {
-        console.log("[webview log]", message.message);
-      }
+    const handlers: Record<string, (message: any) => void> = {
+      log: (msg) => console.log("[webview log]", msg.message),
 
-      console.log("[webview] Received message:", message);
-      if (message.command === "runFuzz") {
-        vscode.window.showInformationMessage(
-          `Running fuzz target: ${message.target}`
-        );
-      }
+      runFuzz: (msg) =>
+        vscode.window.showInformationMessage(`Running fuzz target: ${msg.target}`),
 
-      if (message.command === "getGlobaclContext") {
-        console.log("Requesting global context", globalContext);
-        webviewView.webview.postMessage({
-          command: "globalContext",
-          context: globalContext,
-        });
-      }
+      getGlobalContext: (_msg) => {
+        webviewView.webview.postMessage({ command: "globalContext", context: globalContext });
+      },
 
-      if (message.command === "executeCommand") {
-        vscode.commands.executeCommand(
-          message.commandId,
-          ...(message.args ?? [])
-        );
-      }
+      executeCommand: (msg) =>
+        vscode.commands.executeCommand(msg.commandId, ...(msg.args ?? [])),
 
-      if (message.command === "runAnalyzer") {
-        const projectRoot = message.projectPath;
-        if (projectRoot) {
-          const globalContext = getGlobalContext();
-          globalContext.projectRoot = projectRoot;
+      runAnalyzer: (msg) => {
+        if (msg.projectPath) {
+          globalContext.projectRoot = msg.projectPath;
         }
-        vscode.commands.executeCommand(
-          "sbomfuzz.runAnalysisTool",
-          projectRoot
-        );
-      }
+        vscode.commands.executeCommand("sbomfuzz.runAnalysisTool", msg.projectPath);
+      },
 
-      if (message.command === "openLocation") {
-        jumpToFunctionLocation(message);
-      }
+      openLocation: (msg) => jumpToFunctionLocation(msg),
 
-      if (message.command === "revealPath") {
-        if (message.path) {
-          vscode.commands.executeCommand(
-            "revealInExplorer",
-            vscode.Uri.file(message.path)
-          );
+      revealPath: (msg) => {
+        if (msg.path) {
+          vscode.commands.executeCommand("revealInExplorer", vscode.Uri.file(msg.path));
         }
-      }
+      },
 
-      if (message.command === "runFuzzTarget") {
-        runSelectedHarnessGUI(message.target, globalContext.fuzzRoot!);
-      }
+      runFuzzTarget: (msg) => runSelectedHarnessGUI(msg.target, globalContext.fuzzRoot!),
 
-      if (message.command === "assessFuzzTarget") {
-        const targetName = message.target;
+      assessFuzzTarget: (msg) => {
+        const targetName = msg.target;
         const root = globalContext.fuzzRoot!;
         assessHarness(targetName, root).then((result) => {
           if (result.success) {
@@ -124,121 +98,83 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
               });
             }
           } else {
-            vscode.window.showWarningMessage(
-              "⚠️ Harness assess failed. See output for details."
-            );
+            vscode.window.showWarningMessage("⚠️ Harness assess failed. See output for details.");
           }
         });
-      }
+      },
 
-      if (message.command === "stopFuzzTarget") {
+      stopFuzzTarget: (_msg) => {
         stopHarness();
-        // Refresh the list after stopping
-        const newTargets = applyHarnessMetadataToTargets(
-          getFuzzTargets(globalContext.fuzzRoot!)
-        );
-        webviewView.webview.postMessage({
-          command: "refreshHarnessList",
-          targets: newTargets,
-        });
-      }
+        const newTargets = applyHarnessMetadataToTargets(getFuzzTargets(globalContext.fuzzRoot!));
+        webviewView.webview.postMessage({ command: "refreshHarnessList", targets: newTargets });
+      },
 
-      if (message.command === "deleteFuzzTarget") {
-        deleteSelectedHarness(message.target, globalContext.fuzzRoot!);
+      deleteFuzzTarget: (msg) => {
+        deleteSelectedHarness(msg.target, globalContext.fuzzRoot!);
         globalContext.fuzzTargets = applyHarnessMetadataToTargets(
           getFuzzTargets(globalContext.fuzzRoot!)
         );
-        const newTargets = globalContext.fuzzTargets;
         webviewView.webview.postMessage({
           command: "refreshHarnessList",
-          targets: newTargets,
+          targets: globalContext.fuzzTargets,
         });
-      }
+      },
 
-      if (message.command === "createFuzzRoot") {
-        const targetDir = message.target; // <-- assume pathSelected is the user's cargo project
-
+      createFuzzRoot: (msg) => {
+        const targetDir = msg.target;
         if (!targetDir) {
           vscode.window.showErrorMessage("No project path selected.");
           return;
         }
-
         const fuzzDir = path.join(targetDir, "fuzz");
-
         if (fs.existsSync(fuzzDir)) {
           vscode.window.showWarningMessage("Fuzz directory already exists.");
           return;
         }
-
-        const terminal = vscode.window.createTerminal({
-          name: "cargo-fuzz-init",
-          cwd: targetDir,
-        });
-
+        const terminal = vscode.window.createTerminal({ name: "cargo-fuzz-init", cwd: targetDir });
         terminal.show();
         terminal.sendText("cargo fuzz init");
-
         waitForDir(fuzzDir).then((ok) => {
           if (ok) {
             vscode.window.showInformationMessage("✅ Fuzz root created!");
-            webviewView.webview.postMessage({
-              command: "fuzzRoot",
-              path: fuzzDir,
-            });
+            webviewView.webview.postMessage({ command: "fuzzRoot", path: fuzzDir });
           } else {
-            vscode.window.showWarningMessage(
-              "⚠️ Fuzz root may failed, please check."
-            );
+            vscode.window.showWarningMessage("⚠️ Fuzz root may failed, please check.");
           }
         });
-      }
+      },
 
-      // if (message.command === "showVisualization") {
-      //   const outputPath = "/Users/yunzezhao/Code/SBOMFuzz-IDE/sbomfuzz/output";
-      //   console.log("Loading function results from:", outputPath);
-      //   const results = loadFunctionResults(outputPath) ?? [];
-      //   console.log("Loaded function results:", results);
-
-      //   webviewView.webview.postMessage({
-      //     command: "rustAnalysisDone",
-      //     results,
-      //   });
-      // }
-
-      if (message.command === "getFuzzTargets") {
-        console.log("Listing fuzz targets in:", message.fuzzRoot);
-        const targets = applyHarnessMetadataToTargets(
-          getFuzzTargets(message.fuzzRoot)
-        );
-        const globalContext = getGlobalContext();
+      getFuzzTargets: (msg) => {
+        const targets = applyHarnessMetadataToTargets(getFuzzTargets(msg.fuzzRoot));
         globalContext.fuzzTargets = targets;
-        webviewView.webview.postMessage({
-          command: "fuzzTargetsListed",
-          targets,
-        });
-      }
+        webviewView.webview.postMessage({ command: "fuzzTargetsListed", targets });
+      },
 
-      if (message.command === "generateHarness") {
-        const target = message.target;
-        const fuzzRoot = message.fuzzRoot;
+      generateHarness: (msg) => {
+        const { target, fuzzRoot } = msg;
         const extensionPath = this.context.extensionPath;
-        console.log("Generating harness for target:", target);
         if (target?.functionLocation?.filePath && target?.functionName) {
-          make_function_public(
-            target.functionLocation.filePath,
-            target.functionName
-          );
+          make_function_public(target.functionLocation.filePath, target.functionName);
         }
         runGenerateAndOptimizeHarness(target, fuzzRoot, extensionPath);
+      },
+    };
+
+    webviewView.webview.onDidReceiveMessage((message) => {
+      console.log("[webview] Received message:", message);
+      const handler = handlers[message.command];
+      if (handler) {
+        handler(message);
+      } else {
+        console.warn("[webview] Unhandled command:", message.command);
       }
     });
   }
 
   private getHtmlForWebview(webview: vscode.Webview): string {
-    const mediaPath = vscode.Uri.file(
-      path.join(this.context.extensionPath, "media")
+    const webviewUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this.context.extensionUri, "media")
     );
-    const webviewUri = webview.asWebviewUri(mediaPath);
 
     const templatePath = path.join(
       this.context.extensionPath,
@@ -247,7 +183,9 @@ export class SbomFuzzWebviewViewProvider implements vscode.WebviewViewProvider {
     );
     let html = fs.readFileSync(templatePath, "utf-8");
 
-    html = html.replace(/\$\{webviewUri\}/g, webviewUri.toString());
+    html = html
+      .replace(/\$\{webviewUri\}/g, webviewUri.toString())
+      .replace(/\$\{cspSource\}/g, webview.cspSource);
 
     return html;
   }

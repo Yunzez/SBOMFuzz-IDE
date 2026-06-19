@@ -90,7 +90,7 @@ export function setupMessaging(handlers = {}) {
     }
   });
 
-  sendMessage({ command: "getGlobaclContext" });
+  sendMessage({ command: "getGlobalContext" });
 }
 
 // 🔼 Used to send messages to the extension

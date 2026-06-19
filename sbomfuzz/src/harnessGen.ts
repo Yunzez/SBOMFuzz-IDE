@@ -1,14 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as toml from "toml";
 import { OpenAI } from "openai";
-import * as dotenv from "dotenv";
 import { spawn, ChildProcess } from "child_process";
 import * as vscode from "vscode";
 import { channel_log } from "./extension";
 import { globalBroadcastEventType } from "./util";
 import { getGlobalContext } from "./globalContextProvider";
-import { FunctionStatus } from "./functionOutputProcesser";
+import { FunctionResult, FunctionStatus } from "./functionOutputProcesser";
 import {
   getHarnessRecordByTargetName,
   registerHarnessForFunction,
@@ -16,49 +14,35 @@ import {
   setHarnessOptimized,
 } from "./harnessRegistry";
 import kill from "tree-kill";
+import { refreshCodeLenses } from "./rustFunctionCodeLensProvider";
+
+function createOpenAIClient(): OpenAI | null {
+  const cfg = vscode.workspace.getConfiguration("sbomfuzz");
+  let apiKey = cfg.get<string>("apiKey");
+  const apiBaseUrl = cfg.get<string>("apiBaseUrl");
+  channel_log("Using API key: " + (apiKey ? "set" : "not set"));
+  if (!apiKey) {
+    vscode.window.showWarningMessage(
+      'Set "sbomfuzz.apiKey" in Settings or export API_KEY.'
+    );
+    return null;
+  }
+  apiKey = apiKey.replace(/^['"]|['"]$/g, "");
+  return new OpenAI({ apiKey, baseURL: apiBaseUrl });
+}
+
 let harnessProcess: ChildProcess | null = null;
 let harnessTerminal: vscode.Terminal | null = null;
 let harnessTerminalCloseListener: vscode.Disposable | null = null;
 let harnessTerminalTarget: string | null = null;
 let harnessProcessTarget: string | null = null;
-// Track harness statuses
-interface HarnessStatus {
-  name: string;
-  status: "created" | "running" | "stopped" | "deleted";
-  timestamp: number;
-}
 
-const harnessStatuses: Map<string, HarnessStatus> = new Map();
-
-
-// Function to update harness status
-export function updateHarnessStatus(
-  targetName: string,
-  status: "created" | "running" | "stopped" | "deleted"
-): void {
-  harnessStatuses.set(targetName, {
-    name: targetName,
-    status,
-    timestamp: Date.now(),
-  });
-  // Optionally notify the UI about the status change
-  channel_log(`Harness ${targetName} status updated to: ${status}`);
-}
-
-// Function to get harness status
-export function getHarnessStatus(
-  targetName: string
-): HarnessStatus | undefined {
-  return harnessStatuses.get(targetName);
-}
-
-// Function to get all harness statuses
-export function getAllHarnessStatuses(): HarnessStatus[] {
-  return Array.from(harnessStatuses.values());
+export function getRunningTargetName(): string | null {
+  return harnessProcessTarget ?? harnessTerminalTarget;
 }
 
 export async function generateHarness(
-  target: any,
+  target: FunctionResult,
   fuzzRoot: string,
   extensionPath: string,
   basePromptRef?: { prompt?: string }
@@ -81,10 +65,7 @@ export async function generateHarness(
   }
 
   const formatParameters = () => {
-    const params = (target as any).functionParameters;
-    if (typeof params === "string" && params.trim().length > 0) {
-      return params.trim();
-    }
+    const params = target.functionParameters;
     if (params && typeof params === "object") {
       try {
         return JSON.stringify(params);
@@ -92,16 +73,13 @@ export async function generateHarness(
         return String(params);
       }
     }
-    if (typeof (target as any).paramCount === "number") {
-      return `<unknown> (count: ${(target as any).paramCount})`;
+    if (typeof target.paramCount === "number") {
+      return `<unknown> (count: ${target.paramCount})`;
     }
     return "<unknown>";
   };
 
-  const functionUsage =
-    (target as any).functionUsage ||
-    (target as any).functionUsageExamples ||
-    "";
+  const functionUsage = "";
 
   const extractSignature = () => {
     const filePath = target?.functionLocation?.filePath;
@@ -199,42 +177,11 @@ export async function generateHarness(
 
 async function generateHarnessFromPrompt(
   prompt: string,
-  extensionPath: string
+  _extensionPath: string
 ): Promise<string | null> {
-  // const envPath = path.join(extensionPath, ".env");
-  // dotenv.config({ path: envPath });
-  // const apiKey = process.env.API_KEY;
-  // if (!apiKey) {
-  //   console.error("❌ Missing OpenAI API key");
-  //   return null;
-  // }
-  const cfg = vscode.workspace.getConfiguration("sbomfuzz");
-  let apiKey = cfg.get<string>("apiKey");
-  const apiBaseUrl = cfg.get<string>("apiBaseUrl");
   channel_log("Generating harness with OpenAI...");
-  channel_log("Using API key: " + (apiKey ? "set" : "not set"));
-  if (!apiKey) {
-    console.error("❌ Missing OpenAI API key");
-    vscode.window.showWarningMessage(
-      'Set "sbomfuzz.apiKey" in Settings or export API_KEY.'
-    );
-    return null;
-  }
-
-  apiKey = apiKey.replace(/^['"]|['"]$/g, "");
-  let openai;
-  try {
-    openai = new OpenAI({ apiKey, baseURL: apiBaseUrl });
-    // … your request …
-  } catch (e: any) {
-    vscode.window.showErrorMessage(
-      `Failed to generate harness: OpenAI call failed - ${e?.message || e}`
-    );
-    console.error("OpenAI call failed:", e?.message || e);
-    throw e;
-  }
+  const openai = createOpenAIClient();
   if (!openai) {
-    channel_log("❌ OpenAI initialization failed");
     return null;
   }
 
@@ -279,27 +226,21 @@ async function generateHarnessFromPrompt(
  * @param extensionPath - The path to this extension directory.
  */
 export async function optimizeHarness(
-  target: any,
+  target: FunctionResult,
   root: string,
   filePath: string,
   extensionPath: string,
   iteration: number = 0,
-  basePrompt?: string
+  basePrompt?: string,
+  onAttempt?: (attempt: number, total: number) => void
 ): Promise<{ success: boolean }> {
   iteration++;
+  onAttempt?.(iteration, 3);
   const targetName = `fuzz_target_${target.functionName}`;
-  const cfg = vscode.workspace.getConfiguration("sbomfuzz");
-  let apiKey = cfg.get<string>("apiKey");
-  const apiBaseUrl = cfg.get<string>("apiBaseUrl");
-
-  if (!apiKey) {
-    console.error("❌ Missing OpenAI API key");
-    vscode.window.showWarningMessage(
-      'Set "sbomfuzz.apiKey" in Settings or export API_KEY.'
-    );
+  const openai = createOpenAIClient();
+  if (!openai) {
+    return { success: false };
   }
-  apiKey = apiKey!.replace(/^['"]|['"]$/g, "");
-  const openai = new OpenAI({ apiKey, baseURL: apiBaseUrl });
 
   console.log(`🔁 Running fuzz attempt #${iteration}`);
 
@@ -391,7 +332,8 @@ export async function optimizeHarness(
       filePath,
       extensionPath,
       iteration,
-      basePrompt
+      basePrompt,
+      onAttempt
     );
   } catch (err) {
     console.error("❌ Error optimizing harness:", err);
@@ -432,6 +374,58 @@ export async function assessHarness(
   });
 }
 
+export function removeBinEntryFromToml(
+  tomlContent: string,
+  targetName: string
+): { result: string; found: boolean } {
+  const lines = tomlContent.split("\n");
+  const newLines: string[] = [];
+  let insideBin = false;
+  let binBuffer: string[] = [];
+  let found = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trim() === "[[bin]]") {
+      if (insideBin && binBuffer.length > 0) {
+        const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
+        if (nameLine && nameLine.includes(`"${targetName}"`)) {
+          found = true;
+        } else {
+          newLines.push(...binBuffer);
+        }
+        binBuffer = [];
+      }
+      insideBin = true;
+      binBuffer = [line];
+    } else if (insideBin) {
+      binBuffer.push(line);
+      if (i === lines.length - 1 || lines[i + 1].trim() === "[[bin]]") {
+        const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
+        if (nameLine && nameLine.includes(`"${targetName}"`)) {
+          found = true;
+        } else {
+          newLines.push(...binBuffer);
+        }
+        binBuffer = [];
+        insideBin = false;
+      }
+    } else {
+      newLines.push(line);
+    }
+  }
+  if (binBuffer.length > 0) {
+    const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
+    if (nameLine && nameLine.includes(`"${targetName}"`)) {
+      found = true;
+    } else {
+      newLines.push(...binBuffer);
+    }
+  }
+
+  return { result: newLines.join("\n"), found };
+}
+
 export function deleteSelectedHarness(targetName: string, root: string): void {
   const harnessFilePath = path.join(root, "fuzz_targets", `${targetName}.rs`);
   const cargoTomlPath = path.join(root, "Cargo.toml");
@@ -445,60 +439,9 @@ export function deleteSelectedHarness(targetName: string, root: string): void {
 
   if (fs.existsSync(cargoTomlPath)) {
     const tomlContent = fs.readFileSync(cargoTomlPath, "utf8");
-    // Split into lines for easier processing
-    const lines = tomlContent.split("\n");
-    const newLines: string[] = [];
-    let insideBin = false;
-    let binBuffer: string[] = [];
-    let found = false;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.trim() === "[[bin]]") {
-        if (insideBin && binBuffer.length > 0) {
-          // Check if this binBuffer matches the targetName
-          const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
-          if (nameLine && nameLine.includes(`"${targetName}"`)) {
-            found = true;
-            // skip adding this binBuffer
-          } else {
-            newLines.push(...binBuffer);
-          }
-          binBuffer = [];
-        }
-        insideBin = true;
-        binBuffer = [line];
-      } else if (insideBin) {
-        binBuffer.push(line);
-        // If next line is not part of bin or end of file, flush buffer
-        if (i === lines.length - 1 || lines[i + 1].trim() === "[[bin]]") {
-          // Check if this binBuffer matches the targetName
-          const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
-          if (nameLine && nameLine.includes(`"${targetName}"`)) {
-            found = true;
-            // skip adding this binBuffer
-          } else {
-            newLines.push(...binBuffer);
-          }
-          binBuffer = [];
-          insideBin = false;
-        }
-      } else {
-        newLines.push(line);
-      }
-    }
-    // If file ends with a bin section
-    if (binBuffer.length > 0) {
-      const nameLine = binBuffer.find((l) => l.trim().startsWith("name ="));
-      if (!(nameLine && nameLine.includes(`"${targetName}"`))) {
-        newLines.push(...binBuffer);
-      } else {
-        found = true;
-      }
-    }
-
+    const { result, found } = removeBinEntryFromToml(tomlContent, targetName);
     if (found) {
-      fs.writeFileSync(cargoTomlPath, newLines.join("\n"));
+      fs.writeFileSync(cargoTomlPath, result);
       console.log(`🗑️ Removed [[bin]] entry for ${targetName} from Cargo.toml`);
     } else {
       console.log(`ℹ️ No [[bin]] entry found for ${targetName} in Cargo.toml`);
@@ -507,8 +450,6 @@ export function deleteSelectedHarness(targetName: string, root: string): void {
     console.log(`ℹ️ Cargo.toml not found at: ${cargoTomlPath}`);
   }
 
-  // Update harness status to deleted
-  updateHarnessStatus(targetName, "deleted");
   removeHarnessRecordByTargetName(targetName);
   setHarnessOptimized(targetName, false);
 
@@ -534,14 +475,12 @@ function cleanupHarnessTerminal(): void {
   harnessTerminalTarget = null;
 }
 
-let buffer = "";
-let flushTimer: NodeJS.Timeout | null = null;
-
 export function runSelectedHarness(targetName: string, root: string): void {
   const outputChannel = vscode.window.createOutputChannel("Fuzz Harness");
-  outputChannel.show(true); // bring it to front
-  // This function is a placeholder for running the selected harness.
-  // You can implement the logic to execute the fuzz target here.
+  outputChannel.show(true);
+
+  let buffer = "";
+  let flushTimer: NodeJS.Timeout | null = null;
 
   function enqueue(data: Buffer) {
     buffer += data.toString();
@@ -573,6 +512,7 @@ export function runSelectedHarness(targetName: string, root: string): void {
   }
   harnessProcess = proc;
   harnessProcessTarget = targetName;
+  refreshCodeLenses();
 
   outputChannel.appendLine(`▶️ Running harness: ${targetName}\n`);
 
@@ -589,9 +529,6 @@ export function runSelectedHarness(targetName: string, root: string): void {
   proc.on("error", (err) => {
     outputChannel.appendLine(`❌ Error running harness: ${err.message}`);
     vscode.window.showErrorMessage(`Harness process failed: ${err.message}`);
-    updateHarnessStatus(targetName, "stopped");
-
-    // Notify the extension/webview about this status change instead of touching DOM
     vscode.commands.executeCommand("sbomfuzz.broadcast", {
       name: targetName,
       eventType: globalBroadcastEventType.HarnessFailed,
@@ -599,6 +536,7 @@ export function runSelectedHarness(targetName: string, root: string): void {
 
     harnessProcess = null;
     harnessProcessTarget = null;
+    refreshCodeLenses();
   });
 
   proc.on("close", (code, signal) => {
@@ -618,9 +556,9 @@ export function runSelectedHarness(targetName: string, root: string): void {
       eventType: globalBroadcastEventType.HarnessFailed,
     });
 
-    updateHarnessStatus(targetName, "stopped");
     harnessProcess = null;
     harnessProcessTarget = null;
+    refreshCodeLenses();
   });
 }
 
@@ -651,6 +589,7 @@ export async function runSelectedHarnessGUI(
 
   harnessTerminal = terminal;
   harnessTerminalTarget = targetName;
+  refreshCodeLenses();
   const terminalTarget = targetName;
   harnessTerminalCloseListener = vscode.window.onDidCloseTerminal(
     (closedTerminal) => {
@@ -660,8 +599,8 @@ export async function runSelectedHarnessGUI(
 
       const exitCode = closedTerminal.exitStatus?.code;
       cleanupHarnessTerminal();
+      refreshCodeLenses();
 
-      updateHarnessStatus(terminalTarget, "stopped");
       vscode.commands.executeCommand("sbomfuzz.broadcast", {
         name: terminalTarget,
         eventType: globalBroadcastEventType.HarnessStopped,
@@ -681,7 +620,6 @@ export async function runSelectedHarnessGUI(
     }
   );
 
-  updateHarnessStatus(targetName, "running");
   vscode.commands.executeCommand("sbomfuzz.broadcast", {
     name: targetName,
     eventType: globalBroadcastEventType.HarnessStarted,
@@ -711,6 +649,7 @@ export async function stopHarness(): Promise<void> {
         }
         harnessProcess = null;
         harnessProcessTarget = null;
+        refreshCodeLenses();
         if (stoppingTarget) {
           vscode.commands.executeCommand("sbomfuzz.broadcast", {
             name: stoppingTarget,
@@ -727,6 +666,7 @@ export async function stopHarness(): Promise<void> {
       const runningTarget = harnessTerminalTarget;
       cleanupHarnessTerminal();
       terminalToStop.dispose();
+      refreshCodeLenses();
       vscode.window.showInformationMessage(
         `Harness ${runningTarget ?? ""} terminal stopped.`
       );
@@ -751,21 +691,51 @@ function stripMarkdownCodeBlock(text: string): string {
     .trim();
 }
 
+function finalizeHarness(
+  target: FunctionResult,
+  targetName: string,
+  targetPath: string,
+  optimized: boolean
+): void {
+  const globalContext = getGlobalContext();
+  registerHarnessForFunction(target, targetName, targetPath, { optimized });
+  if (globalContext?.results) {
+    const match = globalContext.results.find(
+      (fn) => fn.functionKey === target.functionKey
+    );
+    if (match) {
+      match.status = FunctionStatus.HarnessGenerated;
+      match.harnessPath = targetPath;
+      match.harnessTargetName = targetName;
+      match.harnessOptimized = optimized;
+      delete match.pendingGeneration;
+    }
+  }
+  vscode.commands.executeCommand("sbomfuzz.broadcast", {
+    eventType: globalBroadcastEventType.UpdateFunctionStatus,
+    functionKey: target.functionKey,
+    status: FunctionStatus.HarnessGenerated,
+    harnessPath: targetPath,
+    harnessTargetName: targetName,
+    harnessOptimized: optimized,
+  });
+  vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
+}
+
 export function runGenerateAndOptimizeHarness(
-  target: any,
+  target: FunctionResult,
   fuzzRoot: string,
   extensionPath: string
 ) {
-  console.log("Generating harness for target:", target);
   const basePromptRef: { prompt?: string } = {};
   vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: "Optimizing fuzz harness...",
+      title: `SBOMFuzz: ${target.functionName}`,
       cancellable: false,
     },
     async (progress) => {
-      progress.report({ increment: 0 });
+      progress.report({ message: "Generating harness…" });
 
       const { success, targetPath } = await generateHarness(
         target,
@@ -774,91 +744,47 @@ export function runGenerateAndOptimizeHarness(
         basePromptRef
       );
       if (!success || !targetPath) {
-        vscode.window.showErrorMessage(
-          "runGenerateAndOptimizeHarness: Failed to generate harness."
-        );
+        vscode.window.showErrorMessage("Failed to generate harness.");
         return;
       }
 
-      progress.report({ increment: 30, message: "Harness generated." });
-      vscode.window.showInformationMessage(
-        "✅ Harness generated successfully!"
-      );
+      progress.report({ message: "Harness generated. Compiling…" });
+      vscode.window.showInformationMessage("✅ Harness generated successfully!");
 
+      const targetName = `fuzz_target_${target.functionName}`;
       const optimized = await optimizeHarness(
         target,
         fuzzRoot,
         targetPath,
         extensionPath,
         0,
-        basePromptRef.prompt
+        basePromptRef.prompt,
+        (attempt, total) =>
+          progress.report({ message: `Compiling (attempt ${attempt} / ${total})…` })
       );
 
-      if (optimized.success) {
-        const targetName = `fuzz_target_${target.functionName}`;
-        const globalContext = getGlobalContext();
-        registerHarnessForFunction(target, targetName, targetPath, {
-          optimized: true,
-        });
-        if (globalContext?.results) {
-          const match = globalContext.results.find(
-            (fn) => fn.functionKey === target.functionKey
-          );
-          if (match) {
-            match.status = FunctionStatus.HarnessGenerated;
-            match.harnessPath = targetPath;
-            match.harnessTargetName = targetName;
-            (match as any).harnessOptimized = true;
-            delete (match as any).pendingGeneration;
-          }
-        }
-        vscode.commands.executeCommand("sbomfuzz.broadcast", {
-          eventType: globalBroadcastEventType.UpdateFunctionStatus,
-          functionKey: target.functionKey,
-          status: FunctionStatus.HarnessGenerated,
-          harnessPath: targetPath,
-          harnessTargetName: targetName,
-          harnessOptimized: true,
-        });
-        progress.report({
-          increment: 70,
-          message: "Harness optimized and ready.",
-        });
-        vscode.window.showInformationMessage("🚀 Harness is ready to run!");
+      finalizeHarness(target, targetName, targetPath, optimized.success);
 
-        vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
-      } else {
-        const targetName = `fuzz_target_${target.functionName}`;
-        const globalContext = getGlobalContext();
-        registerHarnessForFunction(target, targetName, targetPath, {
-          optimized: false,
-        });
-        if (globalContext?.results) {
-          const match = globalContext.results.find(
-            (fn) => fn.functionKey === target.functionKey
-          );
-          if (match) {
-            match.status = FunctionStatus.HarnessGenerated;
-            match.harnessPath = targetPath;
-            match.harnessTargetName = targetName;
-            (match as any).harnessOptimized = false;
-            delete (match as any).pendingGeneration;
+      if (optimized.success) {
+        progress.report({ message: "Harness ready." });
+        vscode.window.showInformationMessage(
+          "🚀 Harness is ready to run!",
+          "Open Harness"
+        ).then((selection) => {
+          if (selection === "Open Harness") {
+            vscode.commands.executeCommand("sbomfuzz.openHarness", targetPath);
           }
-        }
-        vscode.commands.executeCommand("sbomfuzz.broadcast", {
-          eventType: globalBroadcastEventType.UpdateFunctionStatus,
-          functionKey: target.functionKey,
-          status: FunctionStatus.HarnessGenerated,
-          harnessPath: targetPath,
-          harnessTargetName: targetName,
-          harnessOptimized: false,
         });
-        progress.report({
-          increment: 70,
-          message: "Optimization failed.",
+      } else {
+        progress.report({ message: "Compilation failed after 3 attempts." });
+        vscode.window.showWarningMessage(
+          "⚠️ Harness failed to compile after 3 attempts.",
+          "Open Harness"
+        ).then((selection) => {
+          if (selection === "Open Harness") {
+            vscode.commands.executeCommand("sbomfuzz.openHarness", targetPath);
+          }
         });
-        vscode.window.showWarningMessage("⚠️ Harness optimization failed.");
-        vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
       }
     }
   );

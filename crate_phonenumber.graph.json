@@ -1,626 +1,626 @@
 {
   "functions": {
-    "phonenumber::parser::helper::is_valid": {
-      "id": 3769826860965572786,
+    "phonenumber::metadata::descriptor::is_match": {
+      "id": 16206031034005234299,
       "calls": [
-        "phonenumber::parser::helper::is_start",
-        "phonenumber::parser::helper::is_punctuation",
-        "nom::traits::as_char",
-        "nom::traits::is_alpha"
+        "core::option::unwrap_or",
+        "core::slice::contains",
+        "alloc::vec::is_empty",
+        "core::str::len",
+        "regex_cache::cache::find"
       ]
     },
-    "phonenumber::parser::helper::is_plus": {
-      "id": 3017493715303798377,
+    "phonenumber::metadata::database::load": {
+      "id": 11911580797515191786,
       "calls": [
+        "std::fs::open",
+        "phonenumber::metadata::loader::load",
+        "phonenumber::metadata::database::from",
+        "std::io::buffered::bufreader::new"
+      ]
+    },
+    "phonenumber::metadata::database::region": {
+      "id": 10167865684929589132,
+      "calls": [
+        "core::iter::traits::iterator::collect",
+        "std::collections::hash::map::get"
+      ]
+    },
+    "phonenumber::parser::rfc3966::pname": {
+      "id": 8666764346685776159,
+      "calls": [
+        "nom::traits::is_alphanum"
+      ]
+    },
+    "phonenumber::phone_number::id": {
+      "id": 12850641190549027689,
+      "calls": [
+        "phonenumber::phone_number::metadata"
+      ]
+    },
+    "phonenumber::parser::helper::is_valid": {
+      "id": 2300116209715194906,
+      "calls": [
+        "nom::traits::is_alpha",
+        "phonenumber::parser::helper::is_punctuation",
+        "phonenumber::parser::helper::is_start",
         "nom::traits::as_char"
       ]
     },
-    "phonenumber::metadata::loader::format": {
-      "id": 1922610540141683453,
+    "phonenumber::metadata::loader::text": {
+      "id": 17930380096445496499,
       "calls": [
-        "alloc::vec::new",
-        "quick_xml::events::attributes",
-        "core::str::converts::from_utf8",
-        "quick_xml::events::name",
-        "alloc::vec::push",
         "quick_xml::reader::buffered_reader::read_event_into",
-        "phonenumber::metadata::loader::text",
+        "alloc::string::push_str",
+        "core::str::converts::from_utf8",
+        "core::convert::into",
+        "alloc::vec::new",
         "quick_xml::name::into_inner",
-        "core::result::map_err",
-        "core::convert::into"
+        "quick_xml::events::name",
+        "alloc::string::new"
+      ]
+    },
+    "phonenumber::metadata::loader::load": {
+      "id": 3914481322322433897,
+      "calls": [
+        "quick_xml::reader::from_reader",
+        "phonenumber::metadata::loader::metadata"
+      ]
+    },
+    "phonenumber::metadata::loader::territories": {
+      "id": 17351760416544210356,
+      "calls": [
+        "quick_xml::reader::buffered_reader::read_event_into",
+        "quick_xml::events::name",
+        "core::convert::into",
+        "phonenumber::metadata::loader::territory",
+        "alloc::vec::new",
+        "phonenumber::metadata::loader::ignore",
+        "quick_xml::name::into_inner",
+        "core::str::converts::from_utf8",
+        "alloc::vec::push"
+      ]
+    },
+    "phonenumber::parser::parse_with": {
+      "id": 12793699736277536268,
+      "calls": [
+        "core::iter::traits::iterator::count",
+        "core::str::parse",
+        "core::str::len",
+        "phonenumber::metadata::database::by_id",
+        "core::iter::traits::iterator::take_while",
+        "phonenumber::parser::phone_number",
+        "phonenumber::parser::helper::trim",
+        "core::option::unwrap_or",
+        "phonenumber::parser::helper::country_code",
+        "alloc::string::len",
+        "core::result::or",
+        "core::str::chars",
+        "phonenumber::parser::helper::national_number",
+        "core::str::starts_with",
+        "phonenumber::validator::length"
+      ]
+    },
+    "phonenumber::parser::helper::trim": {
+      "id": 16998538938213026221,
+      "calls": [
+        "alloc::string::drain"
+      ]
+    },
+    "phonenumber::metadata::loader::formats": {
+      "id": 2023234720395885470,
+      "calls": [
+        "quick_xml::events::name",
+        "quick_xml::reader::buffered_reader::read_event_into",
+        "alloc::vec::push",
+        "core::str::converts::from_utf8",
+        "core::convert::into",
+        "phonenumber::metadata::loader::format",
+        "quick_xml::name::into_inner",
+        "alloc::vec::new"
+      ]
+    },
+    "phonenumber::parser::rfc3966::check": {
+      "id": 7813859644061232577,
+      "calls": [
+        "core::str::as_bytes",
+        "core::str::is_empty",
+        "nom::error::make_error"
+      ]
+    },
+    "phonenumber::parser::helper::is_wide_digit": {
+      "id": 5018970831989079153,
+      "calls": [
+        "nom::traits::as_char",
+        "core::char::methods::is_ascii_digit"
       ]
     },
     "phonenumber::phone_number::from_str": {
-      "id": 5620806005523285528,
+      "id": 14411182961403317840,
       "calls": [
         "phonenumber::parser::parse"
       ]
     },
+    "phonenumber::phone_number::number_type": {
+      "id": 3162392293616099286,
+      "calls": [
+        "phonenumber::validator::number_type",
+        "phonenumber::phone_number::metadata",
+        "alloc::string::to_string"
+      ]
+    },
+    "phonenumber::metadata::database::by_code": {
+      "id": 9804458746161632641,
+      "calls": [
+        "core::iter::traits::iterator::collect",
+        "std::collections::hash::map::get"
+      ]
+    },
+    "phonenumber::metadata::loader::descriptor": {
+      "id": 7106868599319179981,
+      "calls": [
+        "core::convert::into",
+        "core::result::map_err",
+        "quick_xml::events::attributes",
+        "quick_xml::reader::buffered_reader::read_event_into",
+        "core::str::converts::from_utf8",
+        "phonenumber::metadata::loader::lengths",
+        "alloc::vec::new",
+        "quick_xml::name::into_inner",
+        "phonenumber::metadata::loader::text",
+        "quick_xml::events::name"
+      ]
+    },
+    "phonenumber::phone_number::deref": {
+      "id": 11651348000052974931,
+      "calls": [
+        "phonenumber::phone_number::code"
+      ]
+    },
+    "phonenumber::parser::helper::is_plus": {
+      "id": 5991237177340856395,
+      "calls": [
+        "nom::traits::as_char"
+      ]
+    },
+    "phonenumber::phone_number::code": {
+      "id": 7806846012816406289,
+      "calls": [
+        "phonenumber::country::value"
+      ]
+    },
     "phonenumber::validator::is_viable": {
-      "id": 1169433170115898449,
+      "id": 6473057366562362777,
       "calls": [
         "phonenumber::parser::valid::phone_number",
         "core::str::len",
         "core::result::is_ok"
       ]
     },
-    "phonenumber::validator::is_valid_with": {
-      "id": 16443601547252602058,
+    "phonenumber::metadata::loader::lengths": {
+      "id": 2166183109934258438,
       "calls": [
-        "phonenumber::metadata::database::by_code",
-        "phonenumber::phone_number::country",
-        "phonenumber::metadata::database::by_id",
-        "core::option::unwrap_or",
+        "alloc::vec::push",
+        "core::str::parse",
+        "core::str::split",
+        "core::iter::traits::iterator::next",
+        "core::str::len",
+        "core::str::as_bytes",
+        "alloc::vec::new"
+      ]
+    },
+    "phonenumber::parser::helper::is_start": {
+      "id": 4277326695853486890,
+      "calls": [
+        "nom::traits::as_char",
+        "phonenumber::parser::helper::is_wide_digit",
+        "phonenumber::parser::helper::is_plus",
+        "nom::traits::is_dec_digit"
+      ]
+    },
+    "phonenumber::validator::source_for": {
+      "id": 2853574688484372151,
+      "calls": [
         "phonenumber::validator::number_type",
-        "phonenumber::phone_number::code",
-        "alloc::string::to_string",
-        "phonenumber::validator::source_for"
+        "phonenumber::metadata::database::region",
+        "regex_cache::cache::find",
+        "core::option::unwrap",
+        "regex::regex::string::start",
+        "phonenumber::metadata::database::by_id"
+      ]
+    },
+    "phonenumber::parser::helper::act": {
+      "id": 4375651087631737835,
+      "calls": [
+        "std::collections::hash::map::get",
+        "core::iter::traits::iterator::by_ref",
+        "core::option::unwrap_or",
+        "core::iter::traits::iterator::next",
+        "core::str::char_indices",
+        "nom::traits::is_dec_digit",
+        "phonenumber::parser::helper::as_dec_digit",
+        "core::convert::from",
+        "alloc::string::push"
+      ]
+    },
+    "phonenumber::formatter::replace": {
+      "id": 18377667435083896473,
+      "calls": [
+        "regex::regex::string::captures",
+        "phonenumber::metadata::format::pattern",
+        "core::convert::into",
+        "regex_cache::cache::replace",
+        "regex::regex::string::get",
+        "regex::regex::string::as_str",
+        "alloc::str::replace",
+        "core::option::unwrap_or",
+        "core::option::unwrap",
+        "phonenumber::metadata::metadata::national_prefix",
+        "regex::regex::string::replace",
+        "phonenumber::metadata::format::format"
       ]
     },
     "phonenumber::parser::rfc3966::pchar": {
-      "id": 13634970320346034187,
+      "id": 17533826162430375399,
       "calls": [
         "phonenumber::parser::rfc3966::parameter_unreserved",
         "phonenumber::parser::rfc3966::unreserved"
       ]
     },
-    "phonenumber::metadata::loader::lengths": {
-      "id": 2143394286641298184,
+    "phonenumber::validator::length": {
+      "id": 3228730205804554149,
       "calls": [
-        "alloc::vec::new",
-        "core::str::as_bytes",
-        "core::iter::traits::iterator::next",
-        "core::str::split",
-        "alloc::vec::push",
-        "core::str::parse",
-        "core::str::len"
-      ]
-    },
-    "phonenumber::metadata::loader::text": {
-      "id": 1768310403449354941,
-      "calls": [
-        "alloc::string::new",
-        "quick_xml::events::name",
-        "core::str::converts::from_utf8",
-        "quick_xml::name::into_inner",
-        "quick_xml::reader::buffered_reader::read_event_into",
-        "alloc::vec::new",
-        "core::convert::into",
-        "alloc::string::push_str"
-      ]
-    },
-    "phonenumber::parser::helper::extract": {
-      "id": 18252876231070399152,
-      "calls": [
-        "core::str::is_empty",
-        "nom::error::make_error",
+        "core::slice::contains",
+        "core::slice::last",
+        "phonenumber::metadata::metadata::descriptors",
+        "phonenumber::metadata::metadata::get",
+        "alloc::vec::is_empty",
+        "core::slice::is_empty",
         "core::str::len",
-        "regex::regex::string::find",
-        "regex::regex::string::start"
-      ]
-    },
-    "phonenumber::phone_number::code": {
-      "id": 15308789539412882314,
-      "calls": [
-        "phonenumber::country::value"
-      ]
-    },
-    "phonenumber::parser::rfc3966::check": {
-      "id": 2583455214922052608,
-      "calls": [
-        "core::str::is_empty",
-        "core::str::as_bytes",
-        "nom::error::make_error"
-      ]
-    },
-    "phonenumber::parser::parse_with": {
-      "id": 17227978954118138093,
-      "calls": [
-        "core::result::or",
-        "core::str::chars",
-        "phonenumber::parser::helper::national_number",
-        "core::str::len",
-        "phonenumber::parser::helper::country_code",
-        "alloc::string::len",
-        "core::iter::traits::iterator::take_while",
-        "phonenumber::parser::helper::trim",
-        "phonenumber::parser::phone_number",
-        "core::option::unwrap_or",
-        "core::iter::traits::iterator::count",
-        "core::str::parse",
-        "phonenumber::metadata::database::by_id",
-        "core::str::starts_with",
-        "phonenumber::validator::length"
-      ]
-    },
-    "phonenumber::parser::helper::normalize": {
-      "id": 2026014533886609466,
-      "calls": [
-        "phonenumber::parser::helper::act"
-      ]
-    },
-    "build_script_build::main": {
-      "id": 3560931950900698424,
-      "calls": [
-        "core::result::expect",
-        "bincode::config::serialize_into",
-        "std::io::buffered::bufwriter::new",
-        "bincode::config::with_varint_encoding",
-        "build_script_build::loader::load",
-        "std::io::buffered::bufreader::new",
-        "std::fs::create",
-        "core::result::unwrap",
-        "std::fs::open",
-        "bincode::options",
-        "std::env::var",
-        "std::path::new"
-      ]
-    },
-    "phonenumber::metadata::database::parse": {
-      "id": 767741779531578563,
-      "calls": [
-        "phonenumber::metadata::database::from",
-        "phonenumber::metadata::loader::load",
-        "std::io::cursor::new"
-      ]
-    },
-    "phonenumber::parser::rfc3966::phone_number": {
-      "id": 9067027912292356016,
-      "calls": [
-        "core::default::default"
-      ]
-    },
-    "phonenumber::phone_number::format_with": {
-      "id": 775375498923085442,
-      "calls": [
-        "phonenumber::formatter::format_with"
-      ]
-    },
-    "phonenumber::validator::source_for": {
-      "id": 10616573342024076309,
-      "calls": [
-        "phonenumber::metadata::database::by_id",
-        "phonenumber::validator::number_type",
-        "regex_cache::cache::find",
-        "regex::regex::string::start",
-        "phonenumber::metadata::database::region",
         "core::option::unwrap"
       ]
     },
-    "phonenumber::metadata::loader::descriptor": {
-      "id": 10279854780709539778,
-      "calls": [
-        "alloc::vec::new",
-        "core::convert::into",
-        "phonenumber::metadata::loader::lengths",
-        "quick_xml::events::name",
-        "quick_xml::events::attributes",
-        "core::str::converts::from_utf8",
-        "phonenumber::metadata::loader::text",
-        "quick_xml::reader::buffered_reader::read_event_into",
-        "core::result::map_err",
-        "quick_xml::name::into_inner"
-      ]
-    },
     "phonenumber::formatter::formatter": {
-      "id": 15954830242687931548,
+      "id": 1425848165947881832,
       "calls": [
-        "core::slice::is_empty",
-        "regex_cache::cache::find",
         "core::option::unwrap",
-        "phonenumber::metadata::format::pattern",
         "core::slice::last",
-        "core::str::len",
+        "phonenumber::metadata::format::leading_digits",
+        "regex_cache::cache::find",
+        "phonenumber::metadata::format::pattern",
+        "core::slice::is_empty",
         "core::option::unwrap_or",
-        "phonenumber::metadata::format::leading_digits"
+        "core::str::len"
       ]
     },
-    "phonenumber::parser::helper::act": {
-      "id": 4447550694091083798,
+    "build_script_build::main": {
+      "id": 8693086364651194518,
       "calls": [
-        "core::str::char_indices",
-        "core::convert::from",
-        "phonenumber::parser::helper::as_dec_digit",
-        "alloc::string::push",
-        "core::option::unwrap_or",
-        "nom::traits::is_dec_digit",
-        "core::iter::traits::iterator::next",
-        "std::collections::hash::map::get",
-        "core::iter::traits::iterator::by_ref"
+        "std::io::buffered::bufwriter::new",
+        "core::result::unwrap",
+        "bincode::config::with_varint_encoding",
+        "std::path::new",
+        "std::env::var",
+        "bincode::config::serialize_into",
+        "std::fs::create",
+        "core::result::expect",
+        "build_script_build::loader::load",
+        "std::fs::open",
+        "std::io::buffered::bufreader::new",
+        "bincode::options"
       ]
     },
-    "phonenumber::carrier::from": {
-      "id": 1140299807005036692,
+    "phonenumber::metadata::loader::format": {
+      "id": 3256645887701900896,
       "calls": [
-        "core::convert::into"
+        "quick_xml::events::name",
+        "alloc::vec::new",
+        "phonenumber::metadata::loader::text",
+        "alloc::vec::push",
+        "quick_xml::events::attributes",
+        "quick_xml::reader::buffered_reader::read_event_into",
+        "quick_xml::name::into_inner",
+        "core::convert::into",
+        "core::str::converts::from_utf8",
+        "core::result::map_err"
       ]
     },
-    "phonenumber::validator::is_valid": {
-      "id": 9586241996337582723,
+    "phonenumber::phone_number::is_valid_with": {
+      "id": 1999562264275526326,
       "calls": [
         "phonenumber::validator::is_valid_with"
       ]
     },
-    "phonenumber::metadata::loader::ignore": {
-      "id": 3248134109426138693,
+    "phonenumber::formatter::fmt": {
+      "id": 5394312922263991821,
       "calls": [
-        "quick_xml::name::into_inner",
-        "core::convert::into",
-        "core::str::converts::from_utf8",
-        "quick_xml::events::name",
-        "quick_xml::reader::buffered_reader::read_event_into",
-        "alloc::vec::new",
-        "phonenumber::metadata::loader::ignore"
-      ]
-    },
-    "phonenumber::metadata::descriptor::is_match": {
-      "id": 4289868795134576798,
-      "calls": [
-        "alloc::vec::is_empty",
-        "core::slice::contains",
+        "phonenumber::metadata::format::domestic_carrier",
         "core::option::unwrap_or",
-        "regex_cache::cache::find",
-        "core::str::len"
+        "phonenumber::metadata::database::by_code",
+        "phonenumber::phone_number::code",
+        "alloc::string::to_string",
+        "phonenumber::phone_number::national",
+        "phonenumber::metadata::format::national_prefix",
+        "core::option::or_else",
+        "phonenumber::phone_number::extension",
+        "phonenumber::phone_number::carrier",
+        "phonenumber::phone_number::country",
+        "phonenumber::formatter::formatter"
       ]
     },
-    "phonenumber::validator::number_type": {
-      "id": 6552254516355493269,
+    "phonenumber::parser::rfc3966::phone_number": {
+      "id": 17562306114102728223,
       "calls": [
-        "phonenumber::metadata::descriptor::is_match",
-        "core::option::unwrap_or"
+        "core::default::default"
       ]
     },
-    "phonenumber::parser::helper::ieof": {
-      "id": 16395738317411829696,
+    "phonenumber::validator::is_valid_with": {
+      "id": 18291055000451404921,
       "calls": [
+        "phonenumber::phone_number::country",
+        "phonenumber::metadata::database::by_id",
+        "phonenumber::validator::source_for",
+        "core::option::unwrap_or",
+        "alloc::string::to_string",
+        "phonenumber::phone_number::code",
+        "phonenumber::metadata::database::by_code",
+        "phonenumber::validator::number_type"
+      ]
+    },
+    "phonenumber::parser::helper::extract": {
+      "id": 8725832883255552952,
+      "calls": [
+        "core::str::len",
+        "core::str::is_empty",
+        "regex::regex::string::start",
         "nom::error::make_error",
-        "core::str::is_empty"
-      ]
-    },
-    "phonenumber::phone_number::deref": {
-      "id": 16823037778952320041,
-      "calls": [
-        "phonenumber::phone_number::code"
-      ]
-    },
-    "phonenumber::metadata::database::by_id": {
-      "id": 13353386714376293353,
-      "calls": [
-        "std::collections::hash::map::get"
-      ]
-    },
-    "phonenumber::parser::helper::national_number": {
-      "id": 8685063333012026485,
-      "calls": [
-        "regex_cache::cache::find",
-        "core::convert::into",
-        "phonenumber::parser::helper::trim",
-        "core::str::starts_with",
-        "regex_cache::cache::captures",
-        "core::option::unwrap",
-        "regex_cache::cache::replace",
-        "regex_cache::cache::captures_len",
-        "phonenumber::metadata::descriptor::is_match",
-        "alloc::borrow::into_owned",
-        "alloc::string::len"
-      ]
-    },
-    "phonenumber::metadata::loader::formats": {
-      "id": 8805869911587470529,
-      "calls": [
-        "quick_xml::reader::buffered_reader::read_event_into",
-        "quick_xml::events::name",
-        "phonenumber::metadata::loader::format",
-        "core::convert::into",
-        "alloc::vec::new",
-        "alloc::vec::push",
-        "quick_xml::name::into_inner",
-        "core::str::converts::from_utf8"
-      ]
-    },
-    "phonenumber::extension::from": {
-      "id": 16634267930516513875,
-      "calls": [
-        "core::convert::into"
-      ]
-    },
-    "phonenumber::parser::helper::trim": {
-      "id": 12624113780518978510,
-      "calls": [
-        "alloc::string::drain"
-      ]
-    },
-    "phonenumber::parser::rfc3966::number": {
-      "id": 2374784069983930097,
-      "calls": [
-        "phonenumber::parser::rfc3966::separator",
-        "phonenumber::parser::rfc3966::digit"
-      ]
-    },
-    "phonenumber::parser::parse": {
-      "id": 5923828006346295571,
-      "calls": [
-        "phonenumber::parser::parse_with"
-      ]
-    },
-    "phonenumber::metadata::database::region": {
-      "id": 11868638441354644813,
-      "calls": [
-        "std::collections::hash::map::get",
-        "core::iter::traits::iterator::collect"
-      ]
-    },
-    "phonenumber::parser::rfc3966::unreserved": {
-      "id": 18087434709003122429,
-      "calls": [
-        "nom::traits::is_alphanum",
-        "phonenumber::parser::rfc3966::mark"
-      ]
-    },
-    "phonenumber::metadata::loader::load": {
-      "id": 16638248134526964668,
-      "calls": [
-        "phonenumber::metadata::loader::metadata",
-        "quick_xml::reader::from_reader"
-      ]
-    },
-    "phonenumber::phone_number::format": {
-      "id": 147278774726241231,
-      "calls": [
-        "phonenumber::formatter::format"
-      ]
-    },
-    "phonenumber::metadata::database::by_code": {
-      "id": 572969635967652202,
-      "calls": [
-        "core::iter::traits::iterator::collect",
-        "std::collections::hash::map::get"
-      ]
-    },
-    "phonenumber::parser::helper::as_dec_digit": {
-      "id": 9008041750774330374,
-      "calls": [
-        "nom::traits::is_dec_digit",
-        "nom::traits::as_char"
-      ]
-    },
-    "phonenumber::metadata::database::load": {
-      "id": 12038862308065577289,
-      "calls": [
-        "std::io::buffered::bufreader::new",
-        "phonenumber::metadata::database::from",
-        "std::fs::open",
-        "phonenumber::metadata::loader::load"
-      ]
-    },
-    "phonenumber::metadata::loader::territories": {
-      "id": 3425764191485997583,
-      "calls": [
-        "core::str::converts::from_utf8",
-        "alloc::vec::push",
-        "phonenumber::metadata::loader::ignore",
-        "quick_xml::name::into_inner",
-        "quick_xml::events::name",
-        "core::convert::into",
-        "alloc::vec::new",
-        "quick_xml::reader::buffered_reader::read_event_into",
-        "phonenumber::metadata::loader::territory"
-      ]
-    },
-    "phonenumber::parser::natural::phone_number": {
-      "id": 1315307028654790685,
-      "calls": [
-        "core::option::unwrap_or",
-        "core::default::default",
-        "regex::regex::string::captures",
-        "regex::regex::string::get",
-        "nom::error::new",
-        "core::convert::into",
-        "phonenumber::parser::helper::extract"
-      ]
-    },
-    "phonenumber::parser::rfc3966::pname": {
-      "id": 16364887318947534510,
-      "calls": [
-        "nom::traits::is_alphanum"
+        "regex::regex::string::find"
       ]
     },
     "phonenumber::metadata::loader::metadata": {
-      "id": 17454174321539768264,
+      "id": 14971822485999873447,
       "calls": [
-        "core::convert::into",
-        "phonenumber::metadata::loader::territories",
-        "quick_xml::name::into_inner",
         "quick_xml::events::name",
-        "core::str::converts::from_utf8",
+        "quick_xml::name::into_inner",
+        "quick_xml::reader::buffered_reader::read_event_into",
+        "core::convert::into",
         "core::iter::traits::collect::extend",
-        "quick_xml::reader::buffered_reader::read_event_into",
-        "alloc::vec::new",
-        "phonenumber::metadata::loader::ignore"
-      ]
-    },
-    "phonenumber::metadata::database::from": {
-      "id": 4880823950560859862,
-      "calls": [
-        "core::convert::from",
-        "phonenumber::metadata::database::tranpose",
-        "std::sync::poison::mutex::new",
-        "core::option::unwrap",
-        "std::collections::hash::map::insert",
-        "regex_cache::cache::ignore_whitespace",
-        "core::iter::traits::collect::into_iter",
-        "std::collections::hash::map::entry",
-        "regex_cache::cache::new",
-        "core::option::ok_or_else",
-        "regex_cache::cache::build",
-        "core::default::default",
-        "alloc::vec::push",
-        "alloc::sync::new",
-        "std::collections::hash::map::or_insert_with",
-        "alloc::vec::insert",
-        "core::convert::into"
-      ]
-    },
-    "phonenumber::metadata::loader::territory": {
-      "id": 11823379468682878061,
-      "calls": [
-        "phonenumber::metadata::loader::formats",
-        "alloc::vec::new",
-        "quick_xml::reader::buffered_reader::read_event_into",
-        "quick_xml::events::attributes",
-        "core::convert::into",
-        "quick_xml::name::into_inner",
-        "core::result::map_err",
-        "quick_xml::events::name",
+        "core::str::converts::from_utf8",
         "phonenumber::metadata::loader::ignore",
-        "phonenumber::metadata::loader::descriptor",
+        "phonenumber::metadata::loader::territories",
+        "alloc::vec::new"
+      ]
+    },
+    "phonenumber::phone_number::format_with": {
+      "id": 6257668390537043702,
+      "calls": [
+        "phonenumber::formatter::format_with"
+      ]
+    },
+    "phonenumber::parser::rfc3966::number": {
+      "id": 17630708158630954089,
+      "calls": [
+        "phonenumber::parser::rfc3966::digit",
+        "phonenumber::parser::rfc3966::separator"
+      ]
+    },
+    "phonenumber::parser::natural::phone_number": {
+      "id": 14903347541412108631,
+      "calls": [
+        "core::convert::into",
         "core::default::default",
-        "core::str::converts::from_utf8"
+        "nom::error::new",
+        "phonenumber::parser::helper::extract",
+        "regex::regex::string::get",
+        "regex::regex::string::captures",
+        "core::option::unwrap_or"
       ]
     },
-    "phonenumber::phone_number::id": {
-      "id": 16366399389165430198,
+    "phonenumber::parser::helper::international_prefix": {
+      "id": 9109848616926700,
       "calls": [
-        "phonenumber::phone_number::metadata"
+        "phonenumber::parser::helper::normalize",
+        "phonenumber::parser::helper::trim",
+        "core::option::unwrap_or",
+        "phonenumber::parser::helper::ignore_plus",
+        "core::result::unwrap_or"
       ]
     },
-    "phonenumber::parser::helper::is_start": {
-      "id": 11171905037326106252,
+    "phonenumber::parser::helper::national_number": {
+      "id": 7672928414170079031,
       "calls": [
-        "nom::traits::as_char",
-        "nom::traits::is_dec_digit",
-        "phonenumber::parser::helper::is_plus",
-        "phonenumber::parser::helper::is_wide_digit"
+        "core::option::unwrap",
+        "core::str::starts_with",
+        "phonenumber::parser::helper::trim",
+        "alloc::string::len",
+        "regex_cache::cache::find",
+        "regex_cache::cache::captures",
+        "regex_cache::cache::replace",
+        "regex_cache::cache::captures_len",
+        "alloc::borrow::into_owned",
+        "core::convert::into",
+        "phonenumber::metadata::descriptor::is_match"
       ]
     },
     "phonenumber::phone_number::is_valid": {
-      "id": 16673276325229969869,
+      "id": 751459154406539695,
       "calls": [
         "phonenumber::validator::is_valid"
       ]
     },
     "phonenumber::parser::rfc3966::digit": {
-      "id": 13742461358041804250,
+      "id": 14586558599703064585,
       "calls": [
-        "nom::traits::is_hex_digit",
-        "phonenumber::parser::helper::is_wide_digit"
+        "phonenumber::parser::helper::is_wide_digit",
+        "nom::traits::is_hex_digit"
       ]
     },
-    "phonenumber::parser::helper::country_code": {
-      "id": 160723304654558978,
+    "phonenumber::metadata::database::by_id": {
+      "id": 9379702991993843273,
       "calls": [
-        "phonenumber::metadata::metadata::descriptors",
+        "std::collections::hash::map::get"
+      ]
+    },
+    "phonenumber::validator::number_type": {
+      "id": 2140005562482538409,
+      "calls": [
         "phonenumber::metadata::descriptor::is_match",
-        "phonenumber::metadata::database::by_id",
-        "phonenumber::metadata::database::by_code",
-        "phonenumber::validator::length",
-        "alloc::string::len",
-        "phonenumber::parser::helper::trim",
-        "phonenumber::parser::helper::international_prefix",
-        "alloc::string::to_string",
-        "core::convert::into",
-        "core::str::starts_with",
-        "core::str::parse",
-        "phonenumber::metadata::metadata::general",
-        "phonenumber::validator::is_possible",
-        "core::str::len",
-        "core::option::unwrap"
-      ]
-    },
-    "phonenumber::formatter::fmt": {
-      "id": 16475998827992954841,
-      "calls": [
-        "alloc::string::to_string",
-        "core::option::unwrap_or",
-        "phonenumber::phone_number::country",
-        "core::option::or_else",
-        "phonenumber::formatter::formatter",
-        "phonenumber::phone_number::extension",
-        "phonenumber::metadata::database::by_code",
-        "phonenumber::phone_number::carrier",
-        "phonenumber::metadata::format::domestic_carrier",
-        "phonenumber::phone_number::national",
-        "phonenumber::metadata::format::national_prefix",
-        "phonenumber::phone_number::code"
-      ]
-    },
-    "phonenumber::phone_number::number_type": {
-      "id": 1543207178537907426,
-      "calls": [
-        "alloc::string::to_string",
-        "phonenumber::phone_number::metadata",
-        "phonenumber::validator::number_type"
-      ]
-    },
-    "phonenumber::parser::helper::is_wide_digit": {
-      "id": 18443667970809840822,
-      "calls": [
-        "core::char::methods::is_ascii_digit",
-        "nom::traits::as_char"
-      ]
-    },
-    "phonenumber::parser::helper::international_prefix": {
-      "id": 16995230923292817707,
-      "calls": [
-        "core::result::unwrap_or",
-        "phonenumber::parser::helper::trim",
-        "phonenumber::parser::helper::normalize",
-        "phonenumber::parser::helper::ignore_plus",
         "core::option::unwrap_or"
       ]
     },
-    "phonenumber::phone_number::metadata": {
-      "id": 10058052199075581540,
+    "phonenumber::metadata::database::parse": {
+      "id": 6001980229704555699,
       "calls": [
-        "phonenumber::country::value",
-        "alloc::string::to_string",
-        "phonenumber::validator::source_for",
-        "phonenumber::metadata::database::by_id",
-        "phonenumber::metadata::database::by_code"
+        "std::io::cursor::new",
+        "phonenumber::metadata::database::from",
+        "phonenumber::metadata::loader::load"
       ]
     },
-    "phonenumber::validator::length": {
-      "id": 11087011569651153437,
+    "phonenumber::metadata::loader::territory": {
+      "id": 5842372005804455191,
       "calls": [
-        "core::slice::last",
-        "core::slice::contains",
-        "core::slice::is_empty",
-        "alloc::vec::is_empty",
-        "phonenumber::metadata::metadata::get",
-        "core::str::len",
+        "core::result::map_err",
+        "quick_xml::events::name",
+        "phonenumber::metadata::loader::descriptor",
+        "alloc::vec::new",
+        "core::convert::into",
+        "phonenumber::metadata::loader::ignore",
+        "phonenumber::metadata::loader::formats",
+        "quick_xml::events::attributes",
+        "core::str::converts::from_utf8",
+        "core::default::default",
+        "quick_xml::reader::buffered_reader::read_event_into",
+        "quick_xml::name::into_inner"
+      ]
+    },
+    "phonenumber::extension::from": {
+      "id": 9117918685206697289,
+      "calls": [
+        "core::convert::into"
+      ]
+    },
+    "phonenumber::parser::helper::ieof": {
+      "id": 6533929099567558792,
+      "calls": [
+        "nom::error::make_error",
+        "core::str::is_empty"
+      ]
+    },
+    "phonenumber::parser::rfc3966::unreserved": {
+      "id": 15886775386033246859,
+      "calls": [
+        "nom::traits::is_alphanum",
+        "phonenumber::parser::rfc3966::mark"
+      ]
+    },
+    "phonenumber::parser::parse": {
+      "id": 949087423362671360,
+      "calls": [
+        "phonenumber::parser::parse_with"
+      ]
+    },
+    "phonenumber::parser::helper::country_code": {
+      "id": 1697797716652069098,
+      "calls": [
+        "phonenumber::validator::length",
+        "core::option::unwrap",
+        "phonenumber::parser::helper::trim",
+        "core::str::parse",
+        "phonenumber::parser::helper::international_prefix",
+        "phonenumber::metadata::database::by_code",
+        "alloc::string::len",
         "phonenumber::metadata::metadata::descriptors",
-        "core::option::unwrap"
+        "core::str::len",
+        "phonenumber::metadata::descriptor::is_match",
+        "core::str::starts_with",
+        "phonenumber::metadata::metadata::general",
+        "alloc::string::to_string",
+        "phonenumber::metadata::database::by_id",
+        "phonenumber::validator::is_possible",
+        "core::convert::into"
       ]
     },
     "phonenumber::parser::helper::is_punctuation": {
-      "id": 8297927440474970835,
+      "id": 7483980465991672101,
       "calls": [
         "core::iter::traits::iterator::any",
-        "nom::traits::as_char",
-        "core::str::chars"
+        "core::str::chars",
+        "nom::traits::as_char"
       ]
     },
-    "phonenumber::formatter::replace": {
-      "id": 9330046922075606065,
+    "phonenumber::carrier::from": {
+      "id": 10031978527552966451,
       "calls": [
-        "phonenumber::metadata::format::format",
-        "core::option::unwrap_or",
-        "regex::regex::string::replace",
-        "core::convert::into",
-        "regex_cache::cache::replace",
-        "regex::regex::string::captures",
-        "alloc::str::replace",
-        "regex::regex::string::as_str",
-        "core::option::unwrap",
-        "regex::regex::string::get",
-        "phonenumber::metadata::format::pattern",
-        "phonenumber::metadata::metadata::national_prefix"
+        "core::convert::into"
       ]
     },
-    "phonenumber::phone_number::is_valid_with": {
-      "id": 15480215294855180738,
+    "phonenumber::phone_number::metadata": {
+      "id": 255459268437913757,
+      "calls": [
+        "phonenumber::metadata::database::by_id",
+        "phonenumber::country::value",
+        "phonenumber::validator::source_for",
+        "alloc::string::to_string",
+        "phonenumber::metadata::database::by_code"
+      ]
+    },
+    "phonenumber::metadata::loader::ignore": {
+      "id": 236012469591080507,
+      "calls": [
+        "phonenumber::metadata::loader::ignore",
+        "quick_xml::events::name",
+        "alloc::vec::new",
+        "core::str::converts::from_utf8",
+        "core::convert::into",
+        "quick_xml::reader::buffered_reader::read_event_into",
+        "quick_xml::name::into_inner"
+      ]
+    },
+    "phonenumber::validator::is_valid": {
+      "id": 498585448994043909,
       "calls": [
         "phonenumber::validator::is_valid_with"
+      ]
+    },
+    "phonenumber::phone_number::format": {
+      "id": 6120990229174878319,
+      "calls": [
+        "phonenumber::formatter::format"
+      ]
+    },
+    "phonenumber::parser::helper::as_dec_digit": {
+      "id": 16754636946983088089,
+      "calls": [
+        "nom::traits::is_dec_digit",
+        "nom::traits::as_char"
+      ]
+    },
+    "phonenumber::metadata::database::from": {
+      "id": 7393281131386670697,
+      "calls": [
+        "regex_cache::cache::ignore_whitespace",
+        "alloc::vec::push",
+        "regex_cache::cache::new",
+        "alloc::vec::insert",
+        "core::default::default",
+        "regex_cache::cache::build",
+        "core::option::ok_or_else",
+        "alloc::sync::new",
+        "core::option::unwrap",
+        "std::collections::hash::map::entry",
+        "core::iter::traits::collect::into_iter",
+        "std::collections::hash::map::insert",
+        "core::convert::into",
+        "std::collections::hash::map::or_insert_with",
+        "std::sync::poison::mutex::new",
+        "phonenumber::metadata::database::tranpose",
+        "core::convert::from"
+      ]
+    },
+    "phonenumber::parser::helper::normalize": {
+      "id": 860651153426166421,
+      "calls": [
+        "phonenumber::parser::helper::act"
       ]
     }
   }

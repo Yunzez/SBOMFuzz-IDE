@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import path from "path";
-import * as vscode from "vscode";
 import { getGlobalContext } from "./globalContextProvider";
 import { isFileExcluded, loadExcludedFilePaths } from "./excludeList";
 export type FunctionResult = {
@@ -58,9 +57,7 @@ export function loadFunctionResults(
     return undefined;
   }
 
-  vscode.window.showInformationMessage(
-    `Rust analyzer result processed, checking output path: ${resultFilePath}`
-  );
+  console.log(`Rust analyzer result processed, output path: ${resultFilePath}`);
 
   if (!fs.existsSync(resultFilePath)) {
     console.error(`Output file not found: ${resultFilePath}`);
@@ -127,15 +124,16 @@ export function loadFunctionResults(
       resultFilePath,
       globalContext.projectRoot
     );
+    ensureValidatorIsViableEntry(
+      entries,
+      resultFilePath,
+      globalContext.projectRoot
+    );
 
     return entries.filter(
       (fn) => !isFileExcluded(fn.functionLocation?.filePath, excludedPaths)
     );
   }
-
-  vscode.window.showInformationMessage(
-    `Rust analyzer result processed, ${result.length} functions found`
-  );
 
   return undefined;
 }
@@ -145,6 +143,10 @@ export type FunctionLocation = {
   offset: number;
 };
 
+// STUDY-SPECIFIC: Injects a hardcoded entry for `parser::natural::phone_number`
+// from the `phonenumber` crate for a specific research participant's project.
+// Also appends to the results file on disk as a side effect.
+// Remove or gate behind a config flag for general use.
 function ensureNaturalPhoneNumberEntry(
   entries: FunctionResult[],
   resultFilePath: string,
@@ -213,6 +215,81 @@ function ensureNaturalPhoneNumberEntry(
     centralityScore: 0.0038938841419146365,
     unsafeScore: 0,
     priorityScore: 0.20672372,
+    status: FunctionStatus.NoHarness,
+  });
+}
+
+// STUDY-SPECIFIC: Injects a hardcoded entry for `validator::is_viable` from the
+// `phonenumber` crate. The backend analyzer misses this function due to its
+// generic type parameter `<S: AsRef<str>>`.
+function ensureValidatorIsViableEntry(
+  entries: FunctionResult[],
+  resultFilePath: string,
+  projectRoot?: string
+): void {
+  const modulePath = "validator";
+  const functionName = "is_viable";
+  const locationPath = projectRoot
+    ? path.join(projectRoot, "src", "validator.rs")
+    : "";
+  const expectedLocation = locationPath
+    ? `${locationPath}|offset=2626`
+    : "";
+
+  const exists = entries.some(
+    (entry) =>
+      entry.functionName === functionName &&
+      entry.functionModulePath === modulePath &&
+      entry.functionLocation?.filePath === locationPath
+  );
+  if (exists) {
+    return;
+  }
+
+  const functionKey = "10000000000000001";
+  const recordLines = [
+    "",
+    `Function Key: ${functionKey}`,
+    "- Macro: false",
+    "- Crate: phonenumber",
+    "- From Crate: phonenumber",
+    "- Module Path: phonenumber::validator",
+    "- Use Statement: None",
+    "- Function Name: is_viable",
+    "- Parameters: string: S",
+    "- Is Entry Node: false",
+    `- Location: ${expectedLocation || "unknown"}`,
+    "- Count: 1",
+    "- Unsafe Score: 0",
+    "- Number of Parameters: 1",
+    "- Centrality Score: 0.01",
+    "- Priority Score: 0.25",
+    "",
+  ].join("\n");
+
+  try {
+    fs.appendFileSync(resultFilePath, recordLines, "utf8");
+  } catch (err) {
+    console.error("Failed to append validator::is_viable to results file:", err);
+  }
+
+  if (!locationPath) {
+    return;
+  }
+
+  entries.push({
+    functionKey,
+    functionName,
+    functionCrate: "phonenumber",
+    functionModulePath: modulePath,
+    functionDescription: "Check if the provided string is a viable phone number.",
+    functionParameters: { string: "S" },
+    functionLocation: { filePath: locationPath, offset: 2626 },
+    paramCount: 1,
+    usageCount: 1,
+    centralityScore: 0.01,
+    unsafeScore: 0,
+    priorityScore: 0.25,
     status: FunctionStatus.NoHarness,
   });
 }

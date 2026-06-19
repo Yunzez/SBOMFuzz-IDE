@@ -9,7 +9,7 @@ import {
 import { findFuzzRoot, getFuzzTargets, globalBroadcastEventType } from "./util";
 import { getGlobalContext, useGlobalContext } from "./globalContextProvider";
 import { FunctionResult } from "./functionOutputProcesser";
-import { generateHarness, optimizeHarness, runGenerateAndOptimizeHarness } from "./harnessGen";
+import { runGenerateAndOptimizeHarness, runSelectedHarnessGUI, stopHarness } from "./harnessGen";
 import { runRustAnalyzer } from "./rustAnalyzerStart";
 import {
   applyHarnessMetadata,
@@ -157,7 +157,53 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "sbomfuzz.runHarnessFromCodeLens",
+      (targetName: string) => {
+        if (!globalContext.fuzzRoot) {
+          vscode.window.showErrorMessage(
+            "SBOMFuzz could not find a fuzz root."
+          );
+          return;
+        }
+        runSelectedHarnessGUI(targetName, globalContext.fuzzRoot);
+      }
+    )
+  );
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "sbomfuzz.stopHarnessFromCodeLens",
+      () => stopHarness()
+    )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "sbomfuzz.jumpToFunctionFromHarness",
+      (functionKey: string) => {
+        const fn = (globalContext.results ?? []).find(
+          (r) => r.functionKey === functionKey
+        );
+        if (!fn?.functionLocation) {
+          vscode.window.showWarningMessage("Could not locate the source function.");
+          return;
+        }
+        const uri = vscode.Uri.file(fn.functionLocation.filePath);
+        vscode.workspace.openTextDocument(uri).then((doc) => {
+          const position = doc.positionAt(fn.functionLocation!.offset);
+          vscode.window.showTextDocument(doc, { preview: false }).then((editor) => {
+            editor.selection = new vscode.Selection(position, position);
+            editor.revealRange(
+              new vscode.Range(position, position),
+              vscode.TextEditorRevealType.InCenter
+            );
+          });
+        });
+      }
+    )
+  );
 }
 
 async function runAnalysisTask(
@@ -243,62 +289,6 @@ export function findFuzzTargets(
   // Do something with targetInfo...
   console.log(`Found function`);
   return targetInfo;
-}
-
-export function startGeneration(
-  target: FunctionResult,
-  root: string,
-  extensionPath: string
-) {
-  console.log("Generating harness for target:", target);
-  vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: "Optimizing fuzz harness...",
-      cancellable: false,
-    },
-    async (progress) => {
-      progress.report({ increment: 0 });
-
-      const { success, targetPath } = await generateHarness(
-        target,
-        root,
-        extensionPath
-      );
-      if (!success || !targetPath) {
-        vscode.window.showErrorMessage("Failed to generate harness.");
-        return;
-      }
-
-      progress.report({ increment: 30, message: "Harness generated." });
-      vscode.window.showInformationMessage(
-        "✅ Harness generated successfully!"
-      );
-
-      const optimized = await optimizeHarness(
-        target,
-        root,
-        targetPath,
-        extensionPath
-      );
-
-      if (optimized.success) {
-        progress.report({
-          increment: 70,
-          message: "Harness optimized and ready.",
-        });
-        vscode.window.showInformationMessage("🚀 Harness is ready to run!");
-        vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
-      } else {
-        progress.report({
-          increment: 70,
-          message: "Optimization failed.",
-        });
-        vscode.window.showWarningMessage("⚠️ Harness optimization failed.");
-        vscode.commands.executeCommand("sbomfuzz.refreshHarnessList");
-      }
-    }
-  );
 }
 
 // This method is called when your extension is deactivated
