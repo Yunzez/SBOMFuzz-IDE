@@ -1,0 +1,62 @@
+/* Loading indicators */
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.loading-more {
+  text-align: center;
+  padding: 10px;
+  color: #888;
+  font-size: 0.9em;
+  margin: 10px 0;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+  font-size: 0.8em;
+  margin-left: 6px;
+}
+
+/* Score breakdown tooltip */
+.score-breakdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 100;
+  width: 200px;
+}
+
+/* Improve button styling */
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+}
+
+/* Function button improvements */
+.function-button {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.function-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}

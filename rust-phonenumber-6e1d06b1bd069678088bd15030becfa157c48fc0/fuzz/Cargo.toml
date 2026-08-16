@@ -1,0 +1,34 @@
+[package]
+name = "phonenumber-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.phonenumber]
+path = ".."
+
+[[bin]]
+name = "fuzz_target_1"
+path = "fuzz_targets/fuzz_target_1.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_target_replace"
+path = "fuzz_targets/fuzz_target_replace.rs"
+test = false
+doc = false
+bench = false
+[[bin]]
+name = "fuzz_target_phone_number"
+path = "fuzz_targets/fuzz_target_phone_number.rs"
+test = false
+doc = false
+bench = false

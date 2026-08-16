@@ -1,0 +1,21 @@
+**/node_modules/
+/fuzzlens/toy-rust/target
+/fuzzlens/toy-rust/target/debug
+*.lock
+fuzzlens/harnessGen/generated_fuzz_harnesses/.DS_Store
+fuzzlens/harnessGen/.DS_Store
+fuzzlens/.DS_Store
+.DS_Store
+fuzzlens/harnessGen/.env
+fuzzlens/.env
+fuzzlens/.env
+.DS_Store
+# Ignore all rustc_info.json files
+**/*.rustc_info.json
+
+# Ignore all target directories recursively
+**/target/
+**/program_a/target/
+
+# Ignore all debug directories recursively
+**/debug/

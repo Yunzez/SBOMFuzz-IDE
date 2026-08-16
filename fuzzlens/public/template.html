@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src ${cspSource}; script-src ${cspSource};" />
+    <link href="${webviewUri}/webview.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px">
+      FuzzLens Dashboard
+    </div> -->
+    <div class="header-row">
+      <div class="roots-panel">
+        <div id="path-display-container"></div>
+        <div id="fuzz-path-display"></div>
+      </div>
+      <button class="menu-button" id="refresh-button">Refresh</button>
+    </div>
+
+    <!-- <button class="menu-button" id="clear-button">Clear</button>
+    <button class="menu-button" id="start-analyzer">Run Analyzer</button> -->
+    <!-- <div class="section-title">Functions</div> -->
+    <div class="container" id="entry-list"></div>
+    
+
+    <script src="${webviewUri}/webview.js"></script>
+  </body>
+</html>

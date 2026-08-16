@@ -1,0 +1,8 @@
+src/metadata/
+src/country.rs
+src/error.rs
+src/national_number.rs
+src/phone_number.rs
+src/carrier.rs
+src/consts.rs
+src/extension.rs
