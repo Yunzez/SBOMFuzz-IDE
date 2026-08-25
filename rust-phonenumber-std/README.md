@@ -39,7 +39,7 @@ The parser layer:
 
 ## Functions List
 To help you get started, we have selected a few functions that cover the main parsing paths and validation checks.
-They include higher-level entry points as well as format-specific parsers. You can choose from the follow functions to begin with. 
+They include higher-level entry points as well as format-specific parsers. You can choose from the follow functions to begin your investigation with. 
 
 - `phonenumber::parser::parse_with (parser/mod.rs)`
 - `phonenumber::parser::parse (parser/mod.rs)`
