@@ -19,3 +19,5 @@ sbomfuzz/.env
 
 # Ignore all debug directories recursively
 **/debug/
+
+/Fuzzing-IDE-CCS/
